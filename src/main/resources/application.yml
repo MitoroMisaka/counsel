@@ -4,3 +4,7 @@ spring:
     url: jdbc:mysql://150.158.23.113:3306/counsel
     username: root
     password: 123456
+
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
