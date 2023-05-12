@@ -16,7 +16,6 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-
     @PostMapping("/users")
     public List<User> findAllUsers() {
         return accountService.findAllUsers();

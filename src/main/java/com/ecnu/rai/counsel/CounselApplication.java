@@ -10,8 +10,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @MapperScan("com.ecnu.rai.counsel.mapper")
 public class CounselApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(CounselApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(CounselApplication.class, args);
+    }
+
 
 }
