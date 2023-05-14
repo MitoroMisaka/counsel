@@ -1,12 +1,10 @@
 package com.ecnu.rai.counsel.controller;
 
+import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,7 +15,10 @@ public class AccountController {
     private AccountService accountService;
 
     @PostMapping("/users")
-    public List<User> findAllUsers() {
-        return accountService.findAllUsers();
+    public Page<User> findAllUsers(
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size
+    ) {
+        return accountService.findAllUsers(page, size);
     }
 }
