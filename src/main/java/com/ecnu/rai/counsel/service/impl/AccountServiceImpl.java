@@ -1,11 +1,15 @@
 package com.ecnu.rai.counsel.service.impl;
 
+import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.mapper.MyMapper;
 import com.ecnu.rai.counsel.service.AccountService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -13,8 +17,10 @@ public class AccountServiceImpl implements AccountService {
     private MyMapper myMapper;
 
     @Override
-    public List<User> findAllUsers() {
-        return myMapper.findAllUser();
+    public Page<User> findAllUsers(int page, int size) {
+        PageHelper.startPage(page, size);
+        List<User> users = myMapper.findAllUser();
+        return new Page<>(new PageInfo<>(users));
     }
 }
 
