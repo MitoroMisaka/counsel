@@ -27,11 +27,15 @@ public class SearchServiceImpl implements SearchService {
 
         // 过滤出符合搜索条件的用户
         List<User> searchResults = userList.stream()
-                .filter(user -> user.getUserName().contains(content))
+
+                .filter(user -> user.getUsername().contains(content))
                 .collect(Collectors.toList());
 
         // 返回分页后的结果
         return new Page<>(new PageInfo<>(searchResults));
     }
 
+
+
 }
+

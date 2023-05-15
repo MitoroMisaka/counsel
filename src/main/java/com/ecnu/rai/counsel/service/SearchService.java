@@ -5,4 +5,6 @@ import com.ecnu.rai.counsel.entity.User;
 
 public interface SearchService {
     Page<User> searchUserByName(String content, int page, int size,String order);
+
 }
+
