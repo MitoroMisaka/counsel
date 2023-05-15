@@ -6,7 +6,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 public interface AccountService {
-    List<User> findAllUsers();
+
+    User findUserByID(Long id);
+
+    User findUserByUsername(String username);
+
 }
 
 
