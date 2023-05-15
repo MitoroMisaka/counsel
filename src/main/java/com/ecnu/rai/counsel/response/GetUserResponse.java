@@ -32,9 +32,6 @@ public class GetUserResponse implements Serializable {
         this.id = user.getId();
         this.username = user.getUsername();
         this.password = user.getPassword();
-        if(role == "visitor")
-            this.role = "visitor";
-        else if(role == "admin")
-            this.role = "admin";
+        this.role = user.getRole();
     }
 }

@@ -41,4 +41,9 @@ public class User {
         username = user.getUsername();
         role = user.getRole();
     }
+
+    public String getUsername() {
+        return username;
+    }
+
 }

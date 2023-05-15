@@ -45,7 +45,9 @@ public class MyRealm extends AuthorizingRealm {
             info.addRole("visitor");
             info.addRole("online");
         }
+        System.out.println(principal);
         System.out.println(info.getRoles());
+        System.out.println("++++++++++++++++++++++++++++++++++++++++");
 
         return info;
     }

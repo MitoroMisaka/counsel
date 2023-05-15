@@ -12,6 +12,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.annotation.RequiresGuest;
+import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,6 +67,9 @@ public class AccountController {
         }
 
         User principal = (User) SecurityUtils.getSubject().getPrincipal();
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+        info.addRole(principal.getRole());
+        System.out.println(principal);
         QueryWrapper wrapper = new QueryWrapper();
         wrapper.eq("username",username);
 
@@ -76,10 +83,17 @@ public class AccountController {
         return Result.success(null);
     }
 
+
+    @RequiresUser
     @PostMapping("/hello")
     @ApiImplicitParam(name = "str", value = "参数", required = true, paramType = "query", dataType = "String")
     public Result Hello(@RequestParam("str")@NotNull String str) {
         return Result.success(null);
     }
 
+    @PostMapping("/users")
+    @ApiOperation("获取用户列表")
+    public Result getUsers() {
+        return Result.success("获取成功", userMapper.getUserList());
+    }
 }
