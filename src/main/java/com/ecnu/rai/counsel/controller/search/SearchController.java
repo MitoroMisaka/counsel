@@ -34,4 +34,4 @@ public class SearchController {
                                     @RequestParam("page")Integer page, @RequestParam("order")String order) {
         return searchService.searchUserByName(content, size, page, order);
     }
-}
+

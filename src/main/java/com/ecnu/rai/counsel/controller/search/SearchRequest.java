@@ -18,3 +18,4 @@ public class SearchRequest {
     private Integer pageNum;
     private String orderBy;
 }
+

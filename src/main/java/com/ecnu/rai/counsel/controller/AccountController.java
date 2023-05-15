@@ -1,7 +1,9 @@
 package com.ecnu.rai.counsel.controller;
 
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.response.GetUserResponse;
@@ -17,11 +19,13 @@ import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -95,5 +99,10 @@ public class AccountController {
     @ApiOperation("获取用户列表")
     public Result getUsers() {
         return Result.success("获取成功", userMapper.getUserList());
+    public Page<User> findAllUsers(
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size
+    ) {
+        return accountService.findAllUsers(page, size);
     }
 }

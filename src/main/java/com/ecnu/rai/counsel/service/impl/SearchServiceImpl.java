@@ -27,6 +27,7 @@ public class SearchServiceImpl implements SearchService {
 
         // 过滤出符合搜索条件的用户
         List<User> searchResults = userList.stream()
+
                 .filter(user -> user.getUsername().contains(content))
                 .collect(Collectors.toList());
 
@@ -34,4 +35,7 @@ public class SearchServiceImpl implements SearchService {
         return new Page<>(new PageInfo<>(searchResults));
     }
 
+
+
 }
+
