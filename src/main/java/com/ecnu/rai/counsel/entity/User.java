@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import javax.validation.constraints.Size;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @ApiModel(description = "用户信息")
 public class User {
     @TableId(type = IdType.AUTO)
@@ -32,6 +34,11 @@ public class User {
     private String password;
 
     @ApiModelProperty(value = "角色", example = "admin")
-    private String type;
-}
+    private String role;
 
+    public User(User user){
+        id = user.getId();
+        username = user.getUsername();
+        role = user.getRole();
+    }
+}

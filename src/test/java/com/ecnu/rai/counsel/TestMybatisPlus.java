@@ -21,7 +21,7 @@ public class TestMybatisPlus {
 		User user = new User();
 		user.setUsername("Jack");
 		user.setPassword("123456");
-		user.setType("visitor");
+		user.setRole("visitor");
 		int result = this.userMapper.insert(user);
 		System.out.println("result: " + result);
 		System.out.println(user.getId());
