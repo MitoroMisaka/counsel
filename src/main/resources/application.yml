@@ -1,9 +1,9 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://150.158.23.113:3306/counsel
-    username: root
-    password: 123456
+    url: jdbc:mysql://1.117.156.226:3306/counsel
+    username: ubuntu
+    password: Software_64
 
   mvc:
     pathmatch:
