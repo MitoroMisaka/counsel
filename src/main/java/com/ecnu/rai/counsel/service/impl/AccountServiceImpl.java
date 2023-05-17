@@ -24,5 +24,30 @@ public class AccountServiceImpl implements AccountService {
         wrapper.eq("username",username);
         return userMapper.selectOne(wrapper);
     }
+
+    @Override
+    public User updateUser(Long id, User user) {
+        User existingUser = userMapper.findById(id);
+        if (existingUser == null) {
+            throw new RuntimeException("User not found with ID: " + id);
+        }
+
+        // Update the user properties
+        existingUser.setName(user.getName());
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPassword(user.getPassword());
+        existingUser.setRole(user.getRole());
+        existingUser.setAvatar(user.getAvatar());
+        existingUser.setPhone(user.getPhone());
+        existingUser.setGender(user.getGender());
+        existingUser.setDepartment(user.getDepartment());
+        existingUser.setEmergentContact(user.getEmergentContact());
+        existingUser.setEmergentPhone(user.getEmergentPhone());
+
+        // Perform the update in the database
+        userMapper.update(existingUser);
+
+        return existingUser;
+    }
 }
 

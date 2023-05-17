@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Size;
 
@@ -22,6 +19,11 @@ public class User {
     @TableId(type = IdType.AUTO)
     @ApiModelProperty(value = "用户ID")
     private Long id;
+
+    @ApiModelProperty(value = "姓名", example = "John Smith")
+    @NotNull(message = "姓名不能为空")
+    @Size(min = 1, max = 50, message = "姓名长度必须在1到50个字符之间")
+    private String name;
 
     @ApiModelProperty(value = "用户名", example = "john")
     @NotNull(message = "用户名不能为空")
@@ -36,14 +38,24 @@ public class User {
     @ApiModelProperty(value = "角色", example = "admin")
     private String role;
 
-    public User(User user){
-        id = user.getId();
-        username = user.getUsername();
-        role = user.getRole();
-    }
+    @ApiModelProperty(value = "头像")
+    private String avatar;
 
-    public String getUsername() {
-        return username;
-    }
+    @ApiModelProperty(value = "电话号码")
+    private String phone;
 
+    @ApiModelProperty(value = "性别")
+    private String gender;
+
+    @ApiModelProperty(value = "部门")
+    private String department;
+
+    @ApiModelProperty(value = "紧急联系人")
+    private String emergentContact;
+
+    @ApiModelProperty(value = "紧急联系电话")
+    private String emergentPhone;
+
+    // 省略其他方法...
 }
+
