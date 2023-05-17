@@ -3,6 +3,7 @@ package com.ecnu.rai.counsel.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.entity.User;
+import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.response.GetUserResponse;
 import com.ecnu.rai.counsel.service.AccountService;
@@ -13,8 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.authz.annotation.RequiresGuest;
-import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -41,12 +40,15 @@ public class AccountController {
             @ApiImplicitParam(name = "username", value = "用户名", required = true, paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "password", value = "密码(长度6-20)", required = true, paramType = "query", dataType = "String")
     })
-    public Result Login(@RequestParam("username")@NotNull String username, @RequestParam("password")@NotNull @Size(min = 6,max = 20)String password ){
+    public Result Login(@RequestParam("username")@NotNull String username,
+                        @RequestParam("password")@NotNull @Size(min = 6,max = 20)String password){
 
         if(StringUtils.isEmpty(username) || StringUtils.isEmpty(password) ) {
             return Result.fail("用户名,密码和姓名不能为空！");
         }
-        AuthenticationToken token = new UsernamePasswordToken(username, PasswordUtil.convert(password));
+
+        // AuthenticationToken token = new UsernamePasswordToken(username, PasswordUtil.convert(password));
+        AuthenticationToken token = new UsernamePasswordToken(username, password);
 
         try {
 

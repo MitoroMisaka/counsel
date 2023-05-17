@@ -1,7 +1,7 @@
 package com.ecnu.rai.counsel.controller.search;
 
 import com.ecnu.rai.counsel.common.Page;
-import com.ecnu.rai.counsel.entity.User;
+import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.service.SearchService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -30,8 +30,9 @@ public class SearchController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<User> searchByTitle(@RequestParam("content")String content, @RequestParam("size")Integer size,
-                                    @RequestParam("page")Integer page, @RequestParam("order")String order) {
+    public Page<Visitor> searchByTitle(@RequestParam("content") String content, @RequestParam("size") Integer size,
+                                       @RequestParam("page") Integer page, @RequestParam("order") String order) {
         return searchService.searchUserByName(content, size, page, order);
     }
+}
 

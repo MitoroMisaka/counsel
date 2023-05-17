@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @Builder
 @ApiModel(description = "用户信息")
-public class User {
+public class Visitor {
     @TableId(type = IdType.AUTO)
     @ApiModelProperty(value = "用户ID")
     private Long id;
@@ -38,5 +38,27 @@ public class User {
     @ApiModelProperty(value = "角色", example = "admin")
     private String role;
 
+    @ApiModelProperty(value = "头像")
+    private String avatar;
+
+    @ApiModelProperty(value = "电话号码")
+    private String phone;
+
+    @ApiModelProperty(value = "性别")
+    private Integer gender;
+
+    @ApiModelProperty(value = "部门")
+    private String department;
+
+    @ApiModelProperty(value = "职称")
+    private String title;
+
+    @ApiModelProperty(value = "紧急联系人")
+    private String emergentContact;
+
+    @ApiModelProperty(value = "紧急联系电话")
+    private String emergentPhone;
+
+    // 省略其他方法...
 }
 
