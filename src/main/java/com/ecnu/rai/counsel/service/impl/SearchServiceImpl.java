@@ -1,6 +1,7 @@
 package com.ecnu.rai.counsel.service.impl;
 
 import com.ecnu.rai.counsel.common.Page;
+import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.mapper.MyMapper;
 import com.ecnu.rai.counsel.service.SearchService;
@@ -18,17 +19,16 @@ public class SearchServiceImpl implements SearchService {
     MyMapper myMapper;
 
     @Override
-    public Page<Visitor> searchUserByName(String content, int page, int size, String order) {
+    public Page<User> searchUserByName(String content, int page, int size, String order) {
         // 构造分页参数
         PageHelper.startPage(page, size, order);
 
         // 调用 Mapper 层的查询所有用户方法
-        List<Visitor> userList = myMapper.findAllUser();
+        List<User> userList = myMapper.findAllUser();
 
         // 过滤出符合搜索条件的用户
-        List<Visitor> searchResults = userList.stream()
-
-                .filter(user -> user.getUsername().contains(content))
+        List<User> searchResults = userList.stream()
+                .filter(user -> user.getName().contains(content))
                 .collect(Collectors.toList());
 
         // 返回分页后的结果
