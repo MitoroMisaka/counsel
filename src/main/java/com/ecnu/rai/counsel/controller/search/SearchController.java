@@ -30,8 +30,9 @@ public class SearchController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<User> searchByTitle(@RequestParam("content")String content, @RequestParam("size")Integer size,
-                                    @RequestParam("page")Integer page, @RequestParam("order")String order) {
+    public Page<User> searchByTitle(@RequestParam("content") String content, @RequestParam("size") Integer size,
+                                    @RequestParam("page") Integer page, @RequestParam("order") String order) {
         return searchService.searchUserByName(content, size, page, order);
     }
+}
 
