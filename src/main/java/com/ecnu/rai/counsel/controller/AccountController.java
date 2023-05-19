@@ -3,15 +3,13 @@ package com.ecnu.rai.counsel.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.entity.*;
-import com.ecnu.rai.counsel.mapper.AdminMapper;
-import com.ecnu.rai.counsel.mapper.CounselorMapper;
-import com.ecnu.rai.counsel.mapper.SupervisorMapper;
-import com.ecnu.rai.counsel.mapper.UserMapper;
+import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.response.GetUserResponse;
 import com.ecnu.rai.counsel.service.AccountService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import net.bytebuddy.asm.Advice;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -20,9 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import com.ecnu.rai.counsel.entity.Admin;
-import com.ecnu.rai.counsel.entity.Counselor;
-import com.ecnu.rai.counsel.entity.Supervisor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -40,6 +35,9 @@ public class AccountController {
 
     @Autowired
     private AdminMapper adminMapper;
+
+    @Autowired
+    private VisitorMapper visitorMapper;
 
     @Autowired
     private CounselorMapper counselorMapper;
@@ -109,6 +107,27 @@ public class AccountController {
     @ApiOperation("获取用户列表")
     public Result getUsers() {
         return Result.success("获取成功", userMapper.getUserList());
+    }
+
+    //获取用户信息
+    @GetMapping("/{id}")
+    public Result getUser(@PathVariable Long id) {
+        User user = accountService.findUserByID(id);
+        String role = user.getRole();
+        if(role.equals("visitor")) {
+            Visitor visitor = visitorMapper.selectById(id);
+            return Result.success("获取成功", visitor);
+        } else if(role.equals("supervisor")) {
+            Supervisor supervisor = supervisorMapper.selectById(id);
+            return Result.success("获取成功", supervisor);
+        } else if(role.equals("counselor")) {
+            Counselor counselor = counselorMapper.selectById(id);
+            return Result.success("获取成功", counselor);
+        } else if(role.equals("admin")) {
+            Admin admin = adminMapper.selectById(id);
+            return Result.success("获取成功", admin);
+        }
+        return Result.fail("获取失败");
     }
 
     @PutMapping("/visitor/{id}")

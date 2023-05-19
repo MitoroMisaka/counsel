@@ -56,9 +56,9 @@ public class AccountServiceImpl implements AccountService {
         return userMapper.selectOne(wrapper);
     }
 
-        public Page<Visitor> findAllUsers (int page, int size){
+        public Page<User> findAllUsers (int page, int size){
             PageHelper.startPage(page, size);
-            List<Visitor> users = myMapper.findAllUser();
+            List<User> users = myMapper.findAllUser();
             return new Page<>(new PageInfo<>(users));
         }
 
