@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Page;
 
 import com.ecnu.rai.counsel.entity.User;
+import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.mapper.MyMapper;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.service.AccountService;
@@ -14,7 +15,6 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -35,9 +35,9 @@ public class AccountServiceImpl implements AccountService {
         return userMapper.selectOne(wrapper);
     }
 
-        public Page<User> findAllUsers ( int page, int size){
+        public Page<Visitor> findAllUsers (int page, int size){
             PageHelper.startPage(page, size);
-            List<User> users = myMapper.findAllUser();
+            List<Visitor> users = myMapper.findAllUser();
             return new Page<>(new PageInfo<>(users));
         }
 
@@ -53,12 +53,6 @@ public class AccountServiceImpl implements AccountService {
             existingUser.setUsername(user.getUsername());
             existingUser.setPassword(user.getPassword());
             existingUser.setRole(user.getRole());
-            existingUser.setAvatar(user.getAvatar());
-            existingUser.setPhone(user.getPhone());
-            existingUser.setGender(user.getGender());
-            existingUser.setDepartment(user.getDepartment());
-            existingUser.setEmergentContact(user.getEmergentContact());
-            existingUser.setEmergentPhone(user.getEmergentPhone());
 
             // Perform the update in the database
             userMapper.update(existingUser);
