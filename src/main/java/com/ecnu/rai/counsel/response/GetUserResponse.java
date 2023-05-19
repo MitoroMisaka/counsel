@@ -1,6 +1,7 @@
 package com.ecnu.rai.counsel.response;
 
 import com.ecnu.rai.counsel.entity.User;
+import com.ecnu.rai.counsel.entity.Visitor;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
