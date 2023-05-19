@@ -59,6 +59,7 @@ public class Visitor {
     @ApiModelProperty(value = "紧急联系电话")
     private String emergentPhone;
 
-    // 省略其他方法...
+    @ApiModelProperty(value = "微信id")
+    private String openid;
 }
 

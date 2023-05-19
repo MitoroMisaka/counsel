@@ -16,9 +16,9 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("SELECT * FROM user WHERE id = #{id}")
     User findById(@Param("id") Long id);
 
-    @Update("UPDATE user SET name = #{user.name}, username = #{user.username}, password = #{user.password}, role = #{user.role}, " +
+    @Update("UPDATE user SET name = #{user.name}, username = #{user.username}, password = #{user.password}, role = #{user.role}  " +
             "WHERE id = #{user.id}")
-    void update(@Param("user") User user);
+    void updateUser(@Param("user") User user);
 
     @Select("SELECT * FROM user")
     List<User> getUserList();

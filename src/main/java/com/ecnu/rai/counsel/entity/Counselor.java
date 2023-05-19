@@ -56,10 +56,10 @@ public class Counselor {
     private String title;
 
     @ApiModelProperty(value = "部门")
-    private Integer supervisor;
+    private Integer supervisors;
 
     @ApiModelProperty(value = "职称")
-    private Integer max_consults;
+    private Integer maxConsults;
 
     // 省略其他方法...
 }

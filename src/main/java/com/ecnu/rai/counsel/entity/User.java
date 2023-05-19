@@ -37,6 +37,5 @@ public class User {
 
     @ApiModelProperty(value = "角色", example = "admin")
     private String role;
-
 }
 
