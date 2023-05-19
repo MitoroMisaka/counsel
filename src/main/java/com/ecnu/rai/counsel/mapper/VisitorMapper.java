@@ -17,9 +17,9 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
 
     @Update("UPDATE visitor SET name = #{visitor.name}, username = #{visitor.username}, password = #{visitor.password}, role = #{visitor.role}, " +
             "avatar = #{visitor.avatar}, phone = #{visitor.phone}, gender = #{visitor.gender}, department = #{visitor.department}, " +
-            "title = #{visitor.title}, emergent_contact = #{visitor.emergentContact}, emergent_phone = #{visitor.emergentPhone} " +
+            "title = #{visitor.title}, emergent_contact = #{visitor.emergentContact}, emergent_phone = #{visitor.emergentPhone} , openid= #{visitor.openid}" +
             "WHERE id = #{visitor.id}")
-    void update(@Param("user") Visitor visitor);
+    void updateVisitor(@Param("visitor") Visitor visitor);
 
     @Select("SELECT * FROM visitor")
     List<Visitor> getVisitorList();

@@ -2,12 +2,13 @@ package com.ecnu.rai.counsel.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Result;
-import com.ecnu.rai.counsel.entity.User;
-import com.ecnu.rai.counsel.entity.Visitor;
+import com.ecnu.rai.counsel.entity.*;
+import com.ecnu.rai.counsel.mapper.AdminMapper;
+import com.ecnu.rai.counsel.mapper.CounselorMapper;
+import com.ecnu.rai.counsel.mapper.SupervisorMapper;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.response.GetUserResponse;
 import com.ecnu.rai.counsel.service.AccountService;
-import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import com.ecnu.rai.counsel.entity.Admin;
+import com.ecnu.rai.counsel.entity.Counselor;
+import com.ecnu.rai.counsel.entity.Supervisor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -33,6 +37,15 @@ public class AccountController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private AdminMapper adminMapper;
+
+    @Autowired
+    private CounselorMapper counselorMapper;
+
+    @Autowired
+    private SupervisorMapper supervisorMapper;
 
     @PostMapping("/login")
     @ApiOperation("登录")
@@ -98,12 +111,78 @@ public class AccountController {
         return Result.success("获取成功", userMapper.getUserList());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(
+    @PutMapping("/visitor/{id}")
+    public ResponseEntity<Visitor> updateUser(
             @PathVariable Long id,
-            @Valid @RequestBody User user
+            @Valid @RequestBody Visitor visitor
     ) {
+        Visitor updatedVisitor = accountService.updateVisitor(id , visitor);
+        //build user by visitor
+        User user = User.builder()
+                .id(updatedVisitor.getId())
+                .name(updatedVisitor.getName())
+                .username(updatedVisitor.getUsername())
+                .password(updatedVisitor.getPassword())
+                .role("visitor")
+                .build();
         User updatedUser = accountService.updateUser(id, user);
-        return ResponseEntity.ok(updatedUser);
+        return ResponseEntity.ok(updatedVisitor);
+    }
+
+    //update Admin
+    @PutMapping("/admin/{id}")
+    public ResponseEntity<Admin> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody Admin admin
+    ) {
+        Admin updatedAdmin = accountService.updateAdmin(id , admin);
+        //build user by admin
+        User user = User.builder()
+                .id(updatedAdmin.getId())
+                .name(updatedAdmin.getName())
+                .username(updatedAdmin.getUsername())
+                .password(updatedAdmin.getPassword())
+                .role("admin")
+                .build();
+        User updatedUser = accountService.updateUser(id, user);
+        return ResponseEntity.ok(updatedAdmin);
+    }
+
+    //update Counselor
+    @PutMapping("/counselor/{id}")
+    public ResponseEntity<Counselor> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody Counselor counselor
+    ) {
+        Counselor updatedCounselor = accountService.updateCounselor(id , counselor);
+        //build user by counselor
+        User user = User.builder()
+                .id(updatedCounselor.getId())
+                .name(updatedCounselor.getName())
+                .username(updatedCounselor.getUsername())
+                .password(updatedCounselor.getPassword())
+                .role("counselor")
+                .build();
+        User updatedUser = accountService.updateUser(id, user);
+        return ResponseEntity.ok(updatedCounselor);
+    }
+
+    //update Supervisor
+    @PutMapping("/supervisor/{id}")
+    public ResponseEntity<Supervisor> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody Supervisor supervisor
+    ) {
+        Supervisor updatedSupervisor = accountService.updateSupervisor(id , supervisor);
+        //build user by supervisor
+        User user = User.builder()
+                .id(updatedSupervisor.getId())
+                .name(updatedSupervisor.getName())
+                .username(updatedSupervisor.getUsername())
+                .password(updatedSupervisor.getPassword())
+                .role("supervisor")
+                .build();
+        User updatedUser = accountService.updateUser(id, user);
+        return ResponseEntity.ok(updatedSupervisor);
     }
 }

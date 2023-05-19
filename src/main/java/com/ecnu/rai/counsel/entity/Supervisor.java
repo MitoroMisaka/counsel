@@ -59,7 +59,7 @@ public class Supervisor {
     private String qualification;
 
     @ApiModelProperty(value = "职称")
-    private String qualification_code;
+    private String qualificationCode;
 
     // 省略其他方法...
 }
