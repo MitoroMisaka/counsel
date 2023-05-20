@@ -20,7 +20,7 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
             "avatar = #{visitor.avatar}, phone = #{visitor.phone}, gender = #{visitor.gender}, department = #{visitor.department}, " +
             "title = #{visitor.title}, emergent_contact = #{visitor.emergentContact}, emergent_phone = #{visitor.emergentPhone} " +
             "WHERE id = #{visitor.id}")
-    void update(@Param("user") Visitor visitor);
+    void updateVisitor(@Param("user") Visitor visitor);
 
     @Insert("INSERT into visitor (openid,id) values (#{openid},#{id})")
     void insert( String openid,long id);
