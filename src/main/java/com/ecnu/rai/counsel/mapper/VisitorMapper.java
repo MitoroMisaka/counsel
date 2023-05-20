@@ -2,6 +2,7 @@ package com.ecnu.rai.counsel.mapper;
 
 import com.ecnu.rai.counsel.entity.Visitor;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -21,6 +22,17 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
             "WHERE id = #{visitor.id}")
     void update(@Param("user") Visitor visitor);
 
+    @Insert("INSERT into visitor (openid,id) values (#{openid},#{id})")
+    void insert( String openid,long id);
+
     @Select("SELECT * FROM visitor")
     List<Visitor> getVisitorList();
+
+    @Select("SELECT * FROM visitor WHERE openid = #{openid}")
+    Visitor findByopenid(@Param("openid") String openid);
+
+    @Select("SELECT count(*) FROM visitor where openid=#{openid} limit 1")
+    int ifVisitorExist(@Param("openid")String openid);
+
+
 }

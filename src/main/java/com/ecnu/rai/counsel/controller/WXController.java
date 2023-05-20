@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ecnu.rai.counsel.config.WXConfig;
 import com.ecnu.rai.counsel.entity.User;
-import com.ecnu.rai.counsel.entity.WXUser;
+import com.ecnu.rai.counsel.entity.Visitor;
+import com.ecnu.rai.counsel.service.AccountService;
+import com.ecnu.rai.counsel.service.WXService;
 import com.ecnu.rai.counsel.utils.CommonUtil;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,9 @@ import java.util.Objects;
 public class WXController {
     @Autowired
     private WXConfig wxConfig;
+
+    @Autowired
+    private WXService WXService;
     public String refreshToken(String refreshToken) throws IOException {
       String url = "https://api.weixin.qq.com/sns/oauth2/refresh_token" +
                "appid="+wxConfig.getAppId()+"grant_type=refresh_token&refresh_token="
@@ -67,16 +72,25 @@ public class WXController {
         response.close();
 
         JSONObject bodyJson = JSON.parseObject(body);
-        String openId = bodyJson.getString("openid");
+        String openid = bodyJson.getString("openid");
         String session_key = bodyJson.getString("session_key");
-        WXUser u = new WXUser();
-        u.setOpenid(openId);
-        u.setSession_key(session_key);
-        String token = TokenGenUtil.TokenGen(u);
+        String token = "";
+        if(!WXService.visitorExist(openid)) {
+            Visitor u = new Visitor();
+            u.setOpenid(openid);
+            WXService.insertNewVisitor(openid);
+            token = TokenGenUtil.TokenGen(u);
+//          u.setSession_key(session_key);
+        }
+        else {
+            Visitor u = WXService.findByopenid(openid);
+            u.setOpenid(openid);
+            token = TokenGenUtil.TokenGen(u);
+        }
 
 
 return token;
-        //return "登录成功";
+     //   return "登录成功";
     }
 
 
