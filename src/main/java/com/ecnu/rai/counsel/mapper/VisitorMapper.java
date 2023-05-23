@@ -2,6 +2,8 @@ package com.ecnu.rai.counsel.mapper;
 
 import com.ecnu.rai.counsel.entity.Visitor;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -17,10 +19,28 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
 
     @Update("UPDATE visitor SET name = #{visitor.name}, username = #{visitor.username}, password = #{visitor.password}, role = #{visitor.role}, " +
             "avatar = #{visitor.avatar}, phone = #{visitor.phone}, gender = #{visitor.gender}, department = #{visitor.department}, " +
-            "title = #{visitor.title}, emergent_contact = #{visitor.emergentContact}, emergent_phone = #{visitor.emergentPhone} , openid= #{visitor.openid}" +
+            "title = #{visitor.title}, emergent_contact = #{visitor.emergentContact}, emergent_phone = #{visitor.emergentPhone} " +
             "WHERE id = #{visitor.id}")
-    void updateVisitor(@Param("visitor") Visitor visitor);
+    void updateVisitor(@Param("user") Visitor visitor);
+
+    @Insert("INSERT into visitor (openid,id) values (#{openid},#{id})")
+    void insert( String openid,long id);
 
     @Select("SELECT * FROM visitor")
     List<Visitor> getVisitorList();
+
+    @Select("SELECT * FROM visitor WHERE openid = #{openid}")
+    Visitor selectByOpenid(@Param("openid") String openid);
+
+    @Insert("INSERT INTO visitor(id, openid, name, phone, emergent_contact, emergent_phone, role, gender, avatar) " +
+        "VALUES(#{visitor.id}, #{visitor.openid}, #{visitor.name}, #{visitor.phone}, #{visitor.emergentContact}, #{visitor.emergentPhone}, " +
+        "#{visitor.role}, #{visitor.gender}, #{visitor.avatar})")
+    @Options(useGeneratedKeys = true, keyProperty = "visitor.id")
+    void insertVisitor(@Param("visitor") Visitor visitor);
+    Visitor findByopenid(@Param("openid") String openid);
+
+    @Select("SELECT count(*) FROM visitor where openid=#{openid} limit 1")
+    int ifVisitorExist(@Param("openid")String openid);
+
+
 }

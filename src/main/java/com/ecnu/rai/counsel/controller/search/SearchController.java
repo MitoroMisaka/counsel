@@ -1,6 +1,7 @@
 package com.ecnu.rai.counsel.controller.search;
 
 import com.ecnu.rai.counsel.common.Page;
+import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.service.SearchService;
 import io.swagger.annotations.Api;
@@ -22,17 +23,17 @@ public class SearchController {
     @Autowired
     SearchService searchService;
 
-    @GetMapping("/user/name")
+    @GetMapping("/user")
     @ApiOperation("根据标题搜索(实际上发布会议，主要内容这些都在搜)")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "content", value = "姓名", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "name", value = "姓名", required = true, dataType = "String"),
             @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<Visitor> searchByTitle(@RequestParam("content") String content, @RequestParam("size") Integer size,
-                                       @RequestParam("page") Integer page, @RequestParam("order") String order) {
-        return searchService.searchUserByName(content, size, page, order);
+    public Page<User> searchByTitle(@RequestParam("name") String name, @RequestParam("size") Integer size,
+                                    @RequestParam("page") Integer page, @RequestParam("order") String order) {
+        return searchService.searchUserByName(name, size, page, order);
     }
 }
 

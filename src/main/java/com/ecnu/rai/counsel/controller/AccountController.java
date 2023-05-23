@@ -2,16 +2,15 @@ package com.ecnu.rai.counsel.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.dao.SigninRequest;
 import com.ecnu.rai.counsel.entity.*;
-import com.ecnu.rai.counsel.mapper.AdminMapper;
-import com.ecnu.rai.counsel.mapper.CounselorMapper;
-import com.ecnu.rai.counsel.mapper.SupervisorMapper;
-import com.ecnu.rai.counsel.mapper.UserMapper;
+import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.response.GetUserResponse;
 import com.ecnu.rai.counsel.service.AccountService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import net.bytebuddy.asm.Advice;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -20,14 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import com.ecnu.rai.counsel.entity.Admin;
-import com.ecnu.rai.counsel.entity.Counselor;
-import com.ecnu.rai.counsel.entity.Supervisor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/account")
@@ -42,10 +40,14 @@ public class AccountController {
     private AdminMapper adminMapper;
 
     @Autowired
+    private VisitorMapper visitorMapper;
+
+    @Autowired
     private CounselorMapper counselorMapper;
 
     @Autowired
     private SupervisorMapper supervisorMapper;
+
 
     @PostMapping("/login")
     @ApiOperation("登录")
@@ -111,6 +113,27 @@ public class AccountController {
         return Result.success("获取成功", userMapper.getUserList());
     }
 
+    //获取用户信息
+    @GetMapping("/{id}")
+    public Result getUser(@PathVariable Long id) {
+        User user = accountService.findUserByID(id);
+        String role = user.getRole();
+        if(role.equals("visitor")) {
+            Visitor visitor = visitorMapper.selectById(id);
+            return Result.success("获取成功", visitor);
+        } else if(role.equals("supervisor")) {
+            Supervisor supervisor = supervisorMapper.selectById(id);
+            return Result.success("获取成功", supervisor);
+        } else if(role.equals("counselor")) {
+            Counselor counselor = counselorMapper.selectById(id);
+            return Result.success("获取成功", counselor);
+        } else if(role.equals("admin")) {
+            Admin admin = adminMapper.selectById(id);
+            return Result.success("获取成功", admin);
+        }
+        return Result.fail("获取失败");
+    }
+
     @PutMapping("/visitor/{id}")
     public ResponseEntity<Visitor> updateUser(
             @PathVariable Long id,
@@ -148,14 +171,130 @@ public class AccountController {
         return ResponseEntity.ok(updatedAdmin);
     }
 
+    @PostMapping("/counselor")
+    public ResponseEntity<String> insertCounselor(@Valid @RequestBody Counselor counselor) {
+        // Check if all required fields are filled
+        if(counselor.getName() == null || counselor.getGender() == null || counselor.getAge() == null ||
+                counselor.getIdNumber() == null || counselor.getPhone() == null || counselor.getEmail() == null ||
+                counselor.getSupervisors() == null || counselor.getUsername() == null || counselor.getPassword() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        // Check if the name is valid
+        if(!counselor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the ID number is valid
+        if(!counselor.getIdNumber().matches("(^\\d{15}$)|(^\\d{18}$)|(^\\d{17}(\\d|X|x)$)")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Extract the gender and age from the ID number
+        String idNumber = counselor.getIdNumber();
+        String gender = idNumber.substring(16, 17);
+        Integer age = LocalDate.now().getYear() - Integer.parseInt("19" + idNumber.substring(6, 8));
+        counselor.setGender(gender);
+        counselor.setAge(age);
+        // Check if the phone number is valid
+        if(!counselor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the email is valid
+        if(!counselor.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the username is valid
+        if(!counselor.getUsername().matches("^[A-Za-z0-9_]+$")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the password is valid
+        if(counselor.getPassword().length() < 6) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the phone number is used by another counselor
+        if(accountService.isPhoneUsedByOtherCounselor(null, counselor.getPhone())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the email is used by another counselor
+        if(accountService.isEmailUsedByOtherCounselor(null, counselor.getEmail())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Build the user object
+        User user = User.builder()
+                .name(counselor.getName())
+                .username(counselor.getUsername())
+                .password(counselor.getPassword())
+                .role("COUNSELOR")
+                .build();
+        // Insert the user
+        userMapper.insertUser(user);
+        User insertedUser = userMapper.findByUsername(user.getUsername());
+        // Set the ID of the counselor to the ID of the user
+        counselor.setId(insertedUser.getId());
+        // Set default values for role, create time, update time, enabled, deleted, and rating
+        counselor.setRole("COUNSELOR");
+        counselor.setCreateTime(LocalDateTime.now());
+        counselor.setUpdateTime(LocalDateTime.now());
+        counselor.setEnabled(true);
+        counselor.setDeleted(false);
+        counselor.setRating(0);
+        // Insert the counselor
+        counselorMapper.insertCounselor(counselor);
+        // Return the inserted counselor
+        return ResponseEntity.ok("sign in successfully");
+    }
+
     //update Counselor
     @PutMapping("/counselor/{id}")
-    public ResponseEntity<Counselor> updateUser(
-            @PathVariable Long id,
-            @Valid @RequestBody Counselor counselor
+    public ResponseEntity<Counselor> updateCounselor(
+        @PathVariable Long id,
+        @Valid @RequestBody Counselor counselor
     ) {
-        Counselor updatedCounselor = accountService.updateCounselor(id , counselor);
-        //build user by counselor
+        // Check if all required fields are filled
+        if(counselor.getName() == null || counselor.getGender() == null || counselor.getAge() == null ||
+                counselor.getIdNumber() == null || counselor.getPhone() == null || counselor.getEmail() == null ||
+                counselor.getSupervisors() == null || counselor.getUsername() == null || counselor.getPassword() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        // Check if the name is valid
+        if(!counselor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the ID number is valid
+        if(!counselor.getIdNumber().matches("(^\\d{15}$)|(^\\d{18}$)|(^\\d{17}(\\d|X|x)$)")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Extract the gender and age from the ID number
+        String idNumber = counselor.getIdNumber();
+        String gender = idNumber.substring(16, 17);
+        Integer age = LocalDate.now().getYear() - Integer.parseInt("19" + idNumber.substring(6, 8));
+        counselor.setGender(gender);
+        counselor.setAge(age);
+        // Check if the phone number is valid
+        if(!counselor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the email is valid
+        if(!counselor.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the username is valid
+        if(!counselor.getUsername().matches("^[A-Za-z0-9_]+$")) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the password is valid
+        if(counselor.getPassword().length() < 6) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the phone number is unique
+        if(accountService.isPhoneUsedByOtherCounselor(id, counselor.getPhone())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Check if the email is unique
+        if(accountService.isEmailUsedByOtherCounselor(id, counselor.getEmail())) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        // Update the counselor
+        Counselor updatedCounselor = accountService.updateCounselor(id, counselor);
+        // Build user by counselor
         User user = User.builder()
                 .id(updatedCounselor.getId())
                 .name(updatedCounselor.getName())
@@ -166,6 +305,8 @@ public class AccountController {
         User updatedUser = accountService.updateUser(id, user);
         return ResponseEntity.ok(updatedCounselor);
     }
+
+
 
     //update Supervisor
     @PutMapping("/supervisor/{id}")
@@ -186,3 +327,4 @@ public class AccountController {
         return ResponseEntity.ok(updatedSupervisor);
     }
 }
+

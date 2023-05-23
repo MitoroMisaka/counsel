@@ -56,9 +56,9 @@ public class AccountServiceImpl implements AccountService {
         return userMapper.selectOne(wrapper);
     }
 
-        public Page<Visitor> findAllUsers (int page, int size){
+        public Page<User> findAllUsers (int page, int size){
             PageHelper.startPage(page, size);
-            List<Visitor> users = myMapper.findAllUser();
+            List<User> users = myMapper.findAllUser();
             return new Page<>(new PageInfo<>(users));
         }
 
@@ -187,5 +187,24 @@ public class AccountServiceImpl implements AccountService {
 
             return existingSupervisor;
         }
+
+        @Override
+        public boolean isPhoneUsedByOtherCounselor(Long id, String phone) {
+            // Get the counselor with the given phone number
+            Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("phone", phone));
+            // Check if the counselor exists and has a different ID than the given ID
+            return counselor != null && !counselor.getId().equals(id);
+        }
+
+        @Override
+        public boolean isEmailUsedByOtherCounselor(Long id, String email) {
+            // Get the counselor with the given email address
+            Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("email", email));
+            // Check if the counselor exists and has a different ID than the given ID
+            return counselor != null && !counselor.getId().equals(id);
+        }
     }
+
+    
+
 
