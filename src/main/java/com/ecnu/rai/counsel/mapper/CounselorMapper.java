@@ -2,6 +2,7 @@ package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ecnu.rai.counsel.entity.Counselor;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -28,4 +29,10 @@ public interface CounselorMapper extends BaseMapper<Counselor> {
             "max_consults = #{counselor.maxConsults} " +
             "WHERE id = #{counselor.id}")
     void updateCounselor(@Param("counselor") Counselor counselor);
+
+    @Insert("INSERT INTO counselor (name, username, password, role, avatar, gender, phone, department, title, supervisors, max_consults) " +
+        "VALUES (#{counselor.name}, #{counselor.username}, #{counselor.password}, #{counselor.role}, #{counselor.avatar}, " +
+        "#{counselor.gender}, #{counselor.phone}, #{counselor.department}, #{counselor.title}, #{counselor.supervisors}, " +
+        "#{counselor.maxConsults})")
+    void insertCounselor(@Param("counselor") Counselor counselor);
 }
