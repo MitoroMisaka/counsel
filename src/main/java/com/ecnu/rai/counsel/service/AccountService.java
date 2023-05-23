@@ -10,6 +10,10 @@ public interface AccountService {
 
     User findUserByID(Long id);
 
+    boolean isPhoneUsedByOtherCounselor(Long id,String phone);
+
+    boolean isEmailUsedByOtherCounselor(Long id, String email);
+
     User findUserByUsername(String username);
 
     User updateUser(Long id, User user);
