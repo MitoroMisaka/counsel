@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,8 +28,14 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("SELECT * FROM user")
     List<User> getUserList();
 
+
     @Insert("INSERT INTO user (name, username, password, role, create_time, update_time, enabled, deleted) " +
         "VALUES (#{user.name}, #{user.username}, #{user.password}, #{user.role}, #{user.createTime}, " +
         "#{user.updateTime}, #{user.enabled}, #{user.deleted})")
     void insertUser(@Param("user") User user);
+
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    @Insert("INSERT INTO user(role) values ('visitor')")
+    Long addVisitor(@Param("user")User user);
+
 }
