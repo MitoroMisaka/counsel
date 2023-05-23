@@ -40,7 +40,9 @@ public class WXController {
     private WXConfig wxConfig;
 
     @Autowired
-
+    private WXService wxService;
+    
+    @Autowired
     private VisitorMapper visitorMapper;
 
     @Autowired
@@ -97,7 +99,6 @@ public class WXController {
         return Result.success("注册成功");
     }
 
-    private WXService WXService;
     public String refreshToken(String refreshToken) throws IOException {
       String url = "https://api.weixin.qq.com/sns/oauth2/refresh_token" +
                "appid="+wxConfig.getAppId()+"grant_type=refresh_token&refresh_token="
