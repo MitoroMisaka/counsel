@@ -25,13 +25,13 @@ public class GetCounselorBriefInfoResponse {
     private String status;
 
     @ApiModelProperty("评分")
-    private String star;
+    private Integer rating;
 
-    public GetUserResponse(Counselor counselor) {
+    public void GetUserResponse(Counselor counselor) {
         this.id = counselor.getId();
         this.username = counselor.getUsername();
         this.status = counselor.getStatus();
-        this.star = counselor.getStar();
+        this.rating = counselor.getRating();
     }
 
 }

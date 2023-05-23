@@ -2,6 +2,7 @@ package com.ecnu.rai.counsel.controller;
 
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.mapper.CounselorMapper;
+import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.service.CounselorService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class CounselorController {
 
     @Autowired
     private CounselorMapper counselorMapper;
+
+    @Autowired
+    UserMapper userMapper;
 
     @PostMapping("/info")
     @ApiOperation("获取用户列表")
