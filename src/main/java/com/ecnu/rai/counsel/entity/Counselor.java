@@ -11,7 +11,11 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.sql.Timestamp;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -38,51 +42,64 @@ public class Counselor {
     @Size(min = 6, max = 20, message = "密码长度必须在6到20个字符之间")
     private String password;
 
-    @ApiModelProperty(value = "性别")
-    private Integer gender;
+    @ApiModelProperty(value = "性别", example = "男")
+    @NotNull(message = "性别不能为空")
+    private String gender;
 
-    @ApiModelProperty(value = "年龄")
+    @ApiModelProperty(value = "年龄", example = "30")
+    @NotNull(message = "年龄不能为空")
     private Integer age;
 
-    @ApiModelProperty(value = "身份证号")
-    private String id_number;
+    @ApiModelProperty(value = "身份证号码", example = "110101199001011234")
+    @NotNull(message = "身份证号码不能为空")
+    private String idNumber;
 
-    @ApiModelProperty(value = "手机号码")
+    @ApiModelProperty(value = "手机号码", example = "13812345678")
+    @NotNull(message = "手机号码不能为空")
     private String phone;
 
-    @ApiModelProperty(value = "邮箱")
+    @ApiModelProperty(value = "电子邮箱", example = "john@example.com")
+    @NotNull(message = "电子邮箱不能为空")
     private String email;
 
-    @ApiModelProperty(value = "头衔")
+    //role
+    @ApiModelProperty(value = "角色", example = "COUNSELOR")
+    private String role;
+
+    //title
+    @ApiModelProperty(value = "职称", example = "CHIEF_COUNSELOR")
+    @NotNull(message = "职称不能为空")
     private String title;
 
-    @ApiModelProperty(value = "部门")
+    //department
+    @ApiModelProperty(value = "部门", example = "COUNSELING_CENTER")
+    @NotNull(message = "部门不能为空")
     private String department;
+
+    @ApiModelProperty(value = "所属主管列表")
+    private List<Supervisor> supervisors;
 
     @ApiModelProperty(value = "头像")
     private String avatar;
 
-    @ApiModelProperty(value = "创建时期")
-    private Timestamp create_time;
+    @ApiModelProperty(value = "创建时间")
+    private LocalDateTime createTime;
 
-    @ApiModelProperty(value = "修改时期")
-    private Timestamp update_time;
+    @ApiModelProperty(value = "更新时间")
+    private LocalDateTime updateTime;
+    
+    @ApiModelProperty(value = "是否启用", example = "true")
+    private Boolean enabled;
+    
+    @ApiModelProperty(value = "是否删除", example = "false")
+    private Boolean deleted;
 
-    @ApiModelProperty(value = "是否被启用")
-    private Boolean enable;
+    //status 
+    @ApiModelProperty(value = "状态", example = "ONLINE")
+    private String status;
 
-    @ApiModelProperty(value = "是否被删除")
-    private Boolean delete;
-
-    @ApiModelProperty(value = "评分")
-    private Double star;
-
-    @ApiModelProperty(value = "状态")
-    private String stauts;
-
-    @ApiModelProperty(value = "最大咨询人数")
-    private Integer maxConsults;
-
-    // 省略其他方法...
+    //star 
+    @ApiModelProperty(value = "星级", example = "5")
+    private Integer rating;
 }
 
