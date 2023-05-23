@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
@@ -37,28 +38,49 @@ public class Counselor {
     @Size(min = 6, max = 20, message = "密码长度必须在6到20个字符之间")
     private String password;
 
-    @ApiModelProperty(value = "角色", example = "admin")
-    private String role;
-
-    @ApiModelProperty(value = "头像")
-    private String avatar;
-
     @ApiModelProperty(value = "性别")
     private Integer gender;
 
-    @ApiModelProperty(value = "电话号码")
-    private Integer phone;
+    @ApiModelProperty(value = "年龄")
+    private Integer age;
+
+    @ApiModelProperty(value = "身份证号")
+    private String id_number;
+
+    @ApiModelProperty(value = "手机号码")
+    private String phone;
+
+    @ApiModelProperty(value = "邮箱")
+    private String email;
+
+    @ApiModelProperty(value = "头衔")
+    private String title;
 
     @ApiModelProperty(value = "部门")
     private String department;
 
-    @ApiModelProperty(value = "职称")
-    private String title;
+    @ApiModelProperty(value = "头像")
+    private String avatar;
 
-    @ApiModelProperty(value = "部门")
-    private Integer supervisors;
+    @ApiModelProperty(value = "创建时期")
+    private Timestamp create_time;
 
-    @ApiModelProperty(value = "职称")
+    @ApiModelProperty(value = "修改时期")
+    private Timestamp update_time;
+
+    @ApiModelProperty(value = "是否被启用")
+    private Boolean enable;
+
+    @ApiModelProperty(value = "是否被删除")
+    private Boolean delete;
+
+    @ApiModelProperty(value = "评分")
+    private Double star;
+
+    @ApiModelProperty(value = "状态")
+    private String stauts;
+
+    @ApiModelProperty(value = "最大咨询人数")
     private Integer maxConsults;
 
     // 省略其他方法...
