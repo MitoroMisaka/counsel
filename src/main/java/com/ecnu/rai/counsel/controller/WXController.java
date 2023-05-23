@@ -9,7 +9,6 @@ import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.mapper.VisitorMapper;
-import com.ecnu.rai.counsel.service.WXService;
 import com.ecnu.rai.counsel.utils.CommonUtil;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -41,10 +40,10 @@ public class WXController {
     private WXConfig wxConfig;
 
     @Autowired
-    private VisitorMapper visitorMapper;
-
-    @Autowired
     private WXService wxService;
+    
+    @Autowired
+    private VisitorMapper visitorMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -100,7 +99,6 @@ public class WXController {
         return Result.success("注册成功");
     }
 
-
     public String refreshToken(String refreshToken) throws IOException {
       String url = "https://api.weixin.qq.com/sns/oauth2/refresh_token" +
                "appid="+wxConfig.getAppId()+"grant_type=refresh_token&refresh_token="
@@ -139,15 +137,15 @@ public class WXController {
         String openid = bodyJson.getString("openid");
         String session_key = bodyJson.getString("session_key");
         String token = "";
-        if(!wxService.visitorExist(openid)) {
+        if(!WXService.visitorExist(openid)) {
             Visitor u = new Visitor();
             u.setOpenid(openid);
-            wxService.insertNewVisitor(openid);
+            WXService.insertNewVisitor(openid);
             token = TokenGenUtil.TokenGen(u);
 //          u.setSession_key(session_key);
         }
         else {
-            Visitor u = wxService.findByopenid(openid);
+            Visitor u = WXService.findByopenid(openid);
             u.setOpenid(openid);
             token = TokenGenUtil.TokenGen(u);
         }
