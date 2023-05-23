@@ -9,6 +9,7 @@ import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.mapper.VisitorMapper;
+import com.ecnu.rai.counsel.service.WXService;
 import com.ecnu.rai.counsel.utils.CommonUtil;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -137,15 +138,15 @@ public class WXController {
         String openid = bodyJson.getString("openid");
         String session_key = bodyJson.getString("session_key");
         String token = "";
-        if(!WXService.visitorExist(openid)) {
+        if(!wxService.visitorExist(openid)) {
             Visitor u = new Visitor();
             u.setOpenid(openid);
-            WXService.insertNewVisitor(openid);
+            wxService.insertNewVisitor(openid);
             token = TokenGenUtil.TokenGen(u);
 //          u.setSession_key(session_key);
         }
         else {
-            Visitor u = WXService.findByopenid(openid);
+            Visitor u = wxService.findByopenid(openid);
             u.setOpenid(openid);
             token = TokenGenUtil.TokenGen(u);
         }
