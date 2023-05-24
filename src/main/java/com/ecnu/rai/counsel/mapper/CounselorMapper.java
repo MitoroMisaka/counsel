@@ -2,17 +2,23 @@ package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ecnu.rai.counsel.entity.Counselor;
+import com.ecnu.rai.counsel.entity.Supervisor;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CounselorMapper extends BaseMapper<Counselor> {
     //find by id
     @Select("SELECT * FROM counselor WHERE id = #{id}")
-    Counselor findById(Long id);
+    Counselor findById(@Param("id") Long id);
+
+    @Select("SELECT * FROM supervise WHERE counselor_id = #{id}")
+    List<Supervisor> findSupervisors(@Param("id") Long id);
 
     //generate SQL statement to update counselor info
     @Update("UPDATE counselor SET " +
