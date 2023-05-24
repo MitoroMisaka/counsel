@@ -15,11 +15,18 @@ public class CounselorController {
     @Autowired
     private CounselorService counselorService;
 
-    // 傻逼
     @GetMapping("/info")
     @ApiOperation("获取咨询师基本信息")
     public Result getCounselorInfo(@RequestParam("id") Long id) {
         Counselor counselor = counselorService.findCounselorByID(id);
         return Result.success("获取成功", counselor);
     }
+
+    @PostMapping("/update")
+    @ApiOperation("更新咨询师基本信息")
+    public Result updateCounselorInfo(@RequestBody Counselor counselor) {
+        counselorService.updateCounselor(counselor);
+        return Result.success("更新成功");
+    }
+
 }

@@ -254,8 +254,6 @@ public class AccountController {
     }
 
 
-
-    //update Counselor
     @PutMapping("/counselor/{id}")
     public ResponseEntity<Object> updateCounselor(
         @PathVariable Long id,

@@ -13,4 +13,6 @@ public interface ArrangeService {
 
     List<Arrange> findArrangeByUser(Long user);
 
+    List<Arrange> findArrangeByUserYearMonth(Long user, Integer year, Integer month);
+
 }

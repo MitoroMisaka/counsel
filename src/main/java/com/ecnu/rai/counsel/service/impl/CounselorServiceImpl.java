@@ -22,4 +22,9 @@ public class CounselorServiceImpl implements CounselorService {
         return counselor;
     }
 
+    @Override
+    public void updateCounselor(Counselor counselor) {
+        counselorMapper.updateCounselor(counselor);
+    }
+
 }
