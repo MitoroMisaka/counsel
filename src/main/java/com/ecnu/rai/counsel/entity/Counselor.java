@@ -42,6 +42,10 @@ public class Counselor {
     @Size(min = 6, max = 20, message = "密码长度必须在6到20个字符之间")
     private String password;
 
+    @ApiModelProperty(value = "角色", example = "男")
+    @NotNull(message = "角色不能为空")
+    private String role;
+
     @ApiModelProperty(value = "性别", example = "男")
     @NotNull(message = "性别不能为空")
     private String gender;
@@ -61,10 +65,6 @@ public class Counselor {
     @ApiModelProperty(value = "电子邮箱", example = "john@example.com")
     @NotNull(message = "电子邮箱不能为空")
     private String email;
-
-    //role
-    @ApiModelProperty(value = "角色", example = "COUNSELOR")
-    private String role;
 
     //title
     @ApiModelProperty(value = "职称", example = "CHIEF_COUNSELOR")
