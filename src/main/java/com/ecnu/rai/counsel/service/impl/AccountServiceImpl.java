@@ -153,10 +153,9 @@ public class AccountServiceImpl implements AccountService {
             existingCounselor.setGender(counselor.getGender());
             existingCounselor.setDepartment(counselor.getDepartment());
             existingCounselor.setTitle(counselor.getTitle());
-            existingCounselor.setSupervisors(counselor.getSupervisors());
-
+            existingCounselor.setMaxConsult(counselor.getMaxConsult());
             // Perform the update in the database
-            counselorMapper.updateCounselor(existingCounselor);
+            counselorMapper.updateCounselor(counselor);
 
             return existingCounselor;
         }
@@ -202,6 +201,22 @@ public class AccountServiceImpl implements AccountService {
             Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("email", email));
             // Check if the counselor exists and has a different ID than the given ID
             return counselor != null && !counselor.getId().equals(id);
+        }
+
+        @Override
+        public boolean isUsernameUsedByOtherUser(String username) {
+            // Get the user with the given username
+            User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+            // Check if the user exists
+            return user != null;
+        }
+
+        @Override
+        public boolean isUsernameUsedByOtherCounselor(String username) {
+            // Get the counselor with the given username
+            Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("username", username));
+            // Check if the counselor exists
+            return counselor != null;
         }
     }
 

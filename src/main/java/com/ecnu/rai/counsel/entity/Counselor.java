@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -47,11 +44,9 @@ public class Counselor {
     private String role;
 
     @ApiModelProperty(value = "性别", example = "男")
-    @NotNull(message = "性别不能为空")
     private String gender;
 
     @ApiModelProperty(value = "年龄", example = "30")
-    @NotNull(message = "年龄不能为空")
     private Integer age;
 
     @ApiModelProperty(value = "身份证号码", example = "110101199001011234")
@@ -101,5 +96,9 @@ public class Counselor {
     //star 
     @ApiModelProperty(value = "星级", example = "5")
     private Integer rating;
+
+    //maxConsult
+    @ApiModelProperty(value = "最大咨询量", example = "10")
+    private Integer maxConsult;
 }
 

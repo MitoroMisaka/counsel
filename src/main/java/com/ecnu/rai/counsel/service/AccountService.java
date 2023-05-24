@@ -28,6 +28,10 @@ public interface AccountService {
 
     //update Supervisor
     Supervisor updateSupervisor(Long id, Supervisor supervisor);
+
+    boolean isUsernameUsedByOtherUser(String username);
+
+    boolean isUsernameUsedByOtherCounselor(String username);
 }
 
 
