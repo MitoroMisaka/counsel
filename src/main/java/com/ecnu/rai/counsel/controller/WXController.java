@@ -101,22 +101,21 @@ public class WXController {
     }
 
     public String refreshToken(String refreshToken) throws IOException {
-      String url = "https://api.weixin.qq.com/sns/oauth2/refresh_token" +
-               "appid="+wxConfig.getAppId()+"grant_type=refresh_token&refresh_token="
-      +refreshToken;
-      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-      HttpGet httpGet = new HttpGet(url);
-      CloseableHttpResponse response = httpClient.execute(httpGet);
-      HttpEntity entity = response.getEntity();
-      String body = CommonUtil.getBody(entity.getContent());
-      JSONObject bodyJson = JSON.parseObject(body);
+        String url = "https://api.weixin.qq.com/sns/oauth2/refresh_token" +
+                "appid="+wxConfig.getAppId()+"grant_type=refresh_token&refresh_token="
+                +refreshToken;
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet httpGet = new HttpGet(url);
+        CloseableHttpResponse response = httpClient.execute(httpGet);
+        HttpEntity entity = response.getEntity();
+        String body = CommonUtil.getBody(entity.getContent());
+        JSONObject bodyJson = JSON.parseObject(body);
         return bodyJson.getString("access_token");
     };
 
-
     @ResponseBody
     @CrossOrigin
-    @RequestMapping("/wx/login")
+    @PostMapping("/wx/login")
     public String login(HttpServletRequest request) throws IOException {
 
         String code = request.getParameter("code");
@@ -152,7 +151,7 @@ public class WXController {
         }
 
 
-return token;
+        return token;
      //   return "登录成功";
     }
 

@@ -7,6 +7,7 @@ import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.response.GetUserResponse;
 import com.ecnu.rai.counsel.service.AccountService;
+import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -107,7 +108,7 @@ public class AccountController {
         return Result.success(null);
     }
 
-    @PostMapping("/users")
+    @GetMapping("/users")
     @ApiOperation("获取用户列表")
     public Result getUsers() {
         return Result.success("获取成功", userMapper.getUserList());
@@ -172,50 +173,49 @@ public class AccountController {
     }
 
     @PostMapping("/counselor")
-    public ResponseEntity<String> insertCounselor(@Valid @RequestBody Counselor counselor) {
+    public ResponseEntity<Object> insertCounselor(@Valid @RequestBody Counselor counselor) {
         // Check if all required fields are filled
         if(counselor.getName() == null || counselor.getGender() == null || counselor.getAge() == null ||
                 counselor.getIdNumber() == null || counselor.getPhone() == null || counselor.getEmail() == null ||
-                counselor.getSupervisors() == null || counselor.getUsername() == null || counselor.getPassword() == null) {
-            return ResponseEntity.badRequest().build();
+                counselor.getUsername() == null || counselor.getPassword() == null) {
+            return ResponseEntity.badRequest().body("Required fields are not filled");
         }
         // Check if the name is valid
         if(!counselor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid name");
         }
         // Check if the ID number is valid
         if(!counselor.getIdNumber().matches("(^\\d{15}$)|(^\\d{18}$)|(^\\d{17}(\\d|X|x)$)")) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid ID number");
         }
         // Extract the gender and age from the ID number
         String idNumber = counselor.getIdNumber();
-        String gender = idNumber.substring(16, 17);
-        Integer age = LocalDate.now().getYear() - Integer.parseInt("19" + idNumber.substring(6, 8));
-        counselor.setGender(gender);
+        Integer age = LocalDate.now().getYear() - Integer.parseInt(idNumber.substring(6, 10));
         counselor.setAge(age);
+        counselor.setPassword(PasswordUtil.convert(counselor.getPassword()));
         // Check if the phone number is valid
         if(!counselor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid phone number");
         }
         // Check if the email is valid
         if(!counselor.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid email");
         }
         // Check if the username is valid
         if(!counselor.getUsername().matches("^[A-Za-z0-9_]+$")) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid username");
         }
         // Check if the password is valid
         if(counselor.getPassword().length() < 6) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid password");
         }
         // Check if the phone number is used by another counselor
         if(accountService.isPhoneUsedByOtherCounselor(null, counselor.getPhone())) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Phone number is used by another counselor");
         }
         // Check if the email is used by another counselor
         if(accountService.isEmailUsedByOtherCounselor(null, counselor.getEmail())) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Email is used by another counselor");
         }
         // Build the user object
         User user = User.builder()
@@ -225,7 +225,12 @@ public class AccountController {
                 .role("COUNSELOR")
                 .build();
         // Insert the user
-        userMapper.insertUser(user);
+        //if the username is used by another user
+        if(accountService.isUsernameUsedByOtherUser(user.getUsername())) {
+            return ResponseEntity.badRequest().body("Username is used by another user ");
+        }else {
+            userMapper.insertUser(user);
+        }
         User insertedUser = userMapper.findByUsername(user.getUsername());
         // Set the ID of the counselor to the ID of the user
         counselor.setId(insertedUser.getId());
@@ -235,62 +240,71 @@ public class AccountController {
         counselor.setUpdateTime(LocalDateTime.now());
         counselor.setEnabled(true);
         counselor.setDeleted(false);
+        counselor.setStatus("OFFLINE");
         counselor.setRating(0);
+        counselor.setMaxConsult(10);
         // Insert the counselor
-        counselorMapper.insertCounselor(counselor);
+        if(accountService.isUsernameUsedByOtherCounselor(user.getUsername())) {
+            return ResponseEntity.badRequest().body("Username is used by another counselor");
+        }else {
+            counselorMapper.insertCounselor(counselor);
+        }
         // Return the inserted counselor
-        return ResponseEntity.ok("sign in successfully");
+        return ResponseEntity.ok(Result.success("Insert counselor successfully", counselor));
     }
+
+
 
     //update Counselor
     @PutMapping("/counselor/{id}")
-    public ResponseEntity<Counselor> updateCounselor(
+    public ResponseEntity<Object> updateCounselor(
         @PathVariable Long id,
         @Valid @RequestBody Counselor counselor
     ) {
         // Check if all required fields are filled
-        if(counselor.getName() == null || counselor.getGender() == null || counselor.getAge() == null ||
+        if(counselor.getName() == null ||
                 counselor.getIdNumber() == null || counselor.getPhone() == null || counselor.getEmail() == null ||
-                counselor.getSupervisors() == null || counselor.getUsername() == null || counselor.getPassword() == null) {
-            return ResponseEntity.badRequest().build();
+                counselor.getUsername() == null || counselor.getPassword() == null) {
+            return ResponseEntity.badRequest().body("All required fields must be filled.");
         }
         // Check if the name is valid
         if(!counselor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid name.");
         }
         // Check if the ID number is valid
         if(!counselor.getIdNumber().matches("(^\\d{15}$)|(^\\d{18}$)|(^\\d{17}(\\d|X|x)$)")) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid ID number.");
         }
         // Extract the gender and age from the ID number
         String idNumber = counselor.getIdNumber();
         String gender = idNumber.substring(16, 17);
-        Integer age = LocalDate.now().getYear() - Integer.parseInt("19" + idNumber.substring(6, 8));
+        Integer age = LocalDate.now().getYear() - Integer.parseInt(idNumber.substring(6, 9));
         counselor.setGender(gender);
         counselor.setAge(age);
+        counselor.setUpdateTime(LocalDateTime.now());
         // Check if the phone number is valid
         if(!counselor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid phone number.");
         }
         // Check if the email is valid
         if(!counselor.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid email.");
         }
         // Check if the username is valid
         if(!counselor.getUsername().matches("^[A-Za-z0-9_]+$")) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Invalid username.");
         }
         // Check if the password is valid
         if(counselor.getPassword().length() < 6) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Password must be at least 6 characters long.");
         }
         // Check if the phone number is unique
         if(accountService.isPhoneUsedByOtherCounselor(id, counselor.getPhone())) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Duplicate Phone Number.");
         }
         // Check if the email is unique
         if(accountService.isEmailUsedByOtherCounselor(id, counselor.getEmail())) {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body("Duplicate Email.");
         }
         // Update the counselor
         Counselor updatedCounselor = accountService.updateCounselor(id, counselor);
