@@ -92,7 +92,7 @@ public class AccountController {
         return Result.success(null);
     }
 
-    @PostMapping("/users")
+    @GetMapping("/users")
     @ApiOperation("获取用户列表")
     public Result getUsers() {
         return Result.success("获取成功", userMapper.getUserList());
