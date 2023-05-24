@@ -15,10 +15,10 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     @Select("SELECT * FROM arrange WHERE id = #{id}")
     Arrange findById(@Param("id") Long id);
 
-    @Update("UPDATE arrange SET create_time = #{arrange.create_time} , creator = #{arrange.creator} , last_update_time = #{arrange.last_update_time} , " +
-            "last_updater = #{arrange.last_updater} , year = #{arrange.year} , month = #{arrange.month} , day = #{arrange.day} , " +
-            "start_time = #{arrange.start_time} , end_time = #{arrange.end_time}  , user = #{arrange.user} , role = #{arrange.role} , " +
-            "weekday = #{arrange.weekday} , local_date = #{arrange.local_date} " +
+    @Update("UPDATE arrange SET create_time = #{arrange.createTime} , creator = #{arrange.creator} , last_update_time = #{arrange.lastUpdate_time} , " +
+            "last_updater = #{arrange.lastUpdater} , year = #{arrange.year} , month = #{arrange.month} , day = #{arrange.day} , " +
+            "start_time = #{arrange.startTime} , end_time = #{arrange.endTime}  , user = #{arrange.user} , role = #{arrange.role} , " +
+            "weekday = #{arrange.weekday} , local_date = #{arrange.localDate} " +
             "WHERE id = #{arrange.id}")
     void updateArrange(@Param("arrange") Arrange arrange);
 
