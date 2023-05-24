@@ -1,5 +1,6 @@
 package com.ecnu.rai.counsel.mapper;
 
+import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
@@ -10,5 +11,5 @@ import java.util.List;
 public interface MyMapper {
 
     @Select("SELECT * FROM user")
-    List<Visitor> findAllUser();
+    List<User> findAllUser();
 }
