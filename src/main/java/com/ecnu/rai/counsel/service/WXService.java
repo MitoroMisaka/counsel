@@ -5,4 +5,5 @@ public interface WXService {
     void insertNewVisitor(String openid);
     boolean visitorExist(String openid);
     Visitor findByopenid(String openid);
+    Long findIdByopenid(String openid);
 }

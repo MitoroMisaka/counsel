@@ -21,4 +21,6 @@ public class CounselorController {
         Counselor counselor = counselorService.findCounselorByID(id);
         return Result.success("获取成功", counselor);
     }
+
+
 }

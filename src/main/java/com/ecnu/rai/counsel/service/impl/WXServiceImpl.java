@@ -41,5 +41,10 @@ public class WXServiceImpl implements WXService {
     public Visitor findByopenid(String openid) {
         return visitorMapper.findByopenid(openid);
     }
+
+    @Override
+    public Long findIdByopenid(String openid) {
+        return visitorMapper.findIdbyopenid(openid);
+    }
 }
 

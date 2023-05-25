@@ -1,12 +1,17 @@
 package com.ecnu.rai.counsel.dao;
-public class SigninRequest {
+public class EditRequest {
+    private String token;
     private String openid;
     private String realName;
+    private String userName;
     private String phoneNumber;
     private String emergencyContactName;
     private String emergencyContactPhoneNumber;
-
     private Integer gender;
+
+    public String getToken() {
+        return token;
+    }
 
     public Integer getGender() {
         return gender;
@@ -16,16 +21,18 @@ public class SigninRequest {
         return openid;
     }
 
-    public void setOpenid(String openid) {
-        this.openid = openid;
-    }
-
     public String getRealName() {
         return realName;
     }
 
+    public String getUsername() { return userName; }
+
     public void setRealName(String realName) {
         this.realName = realName;
+    }
+
+    public void setUsername(String userName) {
+        this.userName = userName;
     }
 
     public String getPhoneNumber() {

@@ -1,5 +1,6 @@
 package com.ecnu.rai.counsel.mapper;
 
+import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.entity.Visitor;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Insert;
@@ -9,6 +10,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
@@ -30,17 +32,21 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
     List<Visitor> getVisitorList();
 
     @Select("SELECT * FROM visitor WHERE openid = #{openid}")
-    Visitor selectByOpenid(@Param("openid") String openid);
+    Visitor findByopenid(@Param("openid") String openid);
 
     @Insert("INSERT INTO visitor(id, openid, name, phone, emergent_contact, emergent_phone, role, gender, avatar) " +
         "VALUES(#{visitor.id}, #{visitor.openid}, #{visitor.name}, #{visitor.phone}, #{visitor.emergentContact}, #{visitor.emergentPhone}, " +
         "#{visitor.role}, #{visitor.gender}, #{visitor.avatar})")
     @Options(useGeneratedKeys = true, keyProperty = "visitor.id")
     void insertVisitor(@Param("visitor") Visitor visitor);
-    Visitor findByopenid(@Param("openid") String openid);
+
 
     @Select("SELECT count(*) FROM visitor where openid=#{openid} limit 1")
     int ifVisitorExist(@Param("openid")String openid);
 
+    @Select("SELECT id FROM visitor where openid=#{openid}")
+    Long findIdbyopenid(String openid);
 
+    @Select("SELECT counselor.id , name FROM (arrange join counselor on arrange.id=counselor.id) where #{timestamp}>arrange.start_time and #{timestamp}<arrange.end_time")
+    List<Result> findAvaliableCounselor(Timestamp timestamp);
 }
