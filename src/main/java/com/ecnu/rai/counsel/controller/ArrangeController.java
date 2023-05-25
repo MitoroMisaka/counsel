@@ -37,4 +37,13 @@ public class ArrangeController {
         return Result.success("获取成功", arranges);
     }
 
+    @GetMapping("/userYearMonth")
+    @ApiOperation("根据用户ID, 年份, 月份获取排班信息")
+    public Result getArrangebyUserYearMonth(@RequestParam("user") Long user,
+                                            @RequestParam("year") Integer year,
+                                            @RequestParam("month") Integer month) {
+        List<Arrange> arranges = arrangeService.findArrangeByUserYearMonth(user, year, month);
+        return Result.success("获取成功", arranges);
+    }
+
 }

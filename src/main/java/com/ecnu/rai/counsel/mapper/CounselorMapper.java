@@ -28,17 +28,21 @@ public interface CounselorMapper extends BaseMapper<Counselor> {
             "role = #{counselor.role}, " +
             "avatar = #{counselor.avatar}, " +
             "gender = #{counselor.gender}, " +
+            "age = #{counselor.age}, " +
             "phone = #{counselor.phone}, " +
             "department = #{counselor.department}, " +
+            "update_time = #{counselor.updateTime}, " +
             "title = #{counselor.title}, " +
-            "supervisors = #{counselor.supervisors}, " +
-            "max_consults = #{counselor.maxConsults} " +
+            "max_consult = #{counselor.maxConsult}, " +
+            "id_number = #{counselor.idNumber}, " +
+            "email = #{counselor.email}, " +
+            "status = #{counselor.status} " +
             "WHERE id = #{counselor.id}")
     void updateCounselor(@Param("counselor") Counselor counselor);
 
-    @Insert("INSERT INTO counselor (name, username, password, role, avatar, gender, phone, department, title, supervisors, max_consults) " +
-        "VALUES (#{counselor.name}, #{counselor.username}, #{counselor.password}, #{counselor.role}, #{counselor.avatar}, " +
-        "#{counselor.gender}, #{counselor.phone}, #{counselor.department}, #{counselor.title}, #{counselor.supervisors}, " +
-        "#{counselor.maxConsults})")
+    @Insert("INSERT INTO counselor (id, name, username, password, role, avatar,id_number,  gender,age ,  phone, email, department, title, create_time, update_time,enabled, deleted, status, rating,  max_consult) " +
+        "VALUES (#{counselor.id}, #{counselor.name}, #{counselor.username}, #{counselor.password}, #{counselor.role}, #{counselor.idNumber}, #{counselor.avatar}, " +
+        "#{counselor.gender}, #{counselor.age}, #{counselor.phone}, #{counselor.email}, #{counselor.department}, #{counselor.title}, #{counselor.createTime}, #{counselor.updateTime} , " +
+        "#{counselor.enabled}, #{counselor.deleted}, #{counselor.status},#{counselor.rating}, #{counselor.maxConsult})")
     void insertCounselor(@Param("counselor") Counselor counselor);
 }

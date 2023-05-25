@@ -52,4 +52,9 @@ public class ArrangeServiceImpl implements ArrangeService {
     public List<Arrange> findArrangeByUser(Long user) {
         return arrangeMapper.findByUser(user);
     }
+
+    @Override
+    public List<Arrange> findArrangeByUserYearMonth(Long user, Integer year, Integer month) {
+        return arrangeMapper.findByUserYearMonth(user, year, month);
+    }
 }

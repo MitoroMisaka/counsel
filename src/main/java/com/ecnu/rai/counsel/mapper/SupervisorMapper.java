@@ -20,6 +20,19 @@ public interface SupervisorMapper extends BaseMapper<Supervisor> {
     List<Counselor> findCounselors(@Param("id") Long id);
 
     @Update("UPDATE supervisor SET name = #{supervisor.name}, username = #{supervisor.username}, password = #{supervisor.password}, role = #{supervisor.role}, avatar = #{supervisor.avatar}, gender = #{supervisor.gender}, phone = #{supervisor.phone}, department = #{supervisor.department}, title = #{supervisor.title}, qualification = #{supervisor.qualification}, qualification_code = #{supervisor.qualificationCode} WHERE id = #{supervisor.id}")
+    @Update("UPDATE supervisor SET " +
+            "name = #{supervisor.name}, " +
+            "username = #{supervisor.username}, " +
+            "password = #{supervisor.password}, " +
+            "role = #{supervisor.role}, " +
+            "avatar = #{supervisor.avatar}, " +
+            "gender = #{supervisor.gender}, " +
+            "phone = #{supervisor.phone}, " +
+            "department = #{supervisor.department}, " +
+            "title = #{supervisor.title}, " +
+            "qualification = #{supervisor.qualification}, " +
+            "qualification_code = #{supervisor.qualificationCode} " +
+            "WHERE id = #{supervisor.id}")
     void updateSupervisor(@Param("supervisor") Supervisor supervisor);
 
 }
