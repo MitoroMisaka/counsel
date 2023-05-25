@@ -15,14 +15,32 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     @Select("SELECT * FROM arrange WHERE id = #{id}")
     Arrange findById(@Param("id") Long id);
 
-    @Update("UPDATE arrange SET create_time = #{arrange.createTime} , creator = #{arrange.creator} , last_update_time = #{arrange.lastUpdate_time} , " +
-            "last_updater = #{arrange.lastUpdater} , year = #{arrange.year} , month = #{arrange.month} , day = #{arrange.day} , " +
-            "start_time = #{arrange.startTime} , end_time = #{arrange.endTime}  , user = #{arrange.user} , role = #{arrange.role} , " +
-            "weekday = #{arrange.weekday} , local_date = #{arrange.localDate} " +
+    @Update("UPDATE arrange SET " +
+            "create_time = #{arrange.createTime}, " +
+            "creator = #{arrange.creator}, " +
+            "last_update_time = #{arrange.lastUpdate_time}, " +
+            "last_updater = #{arrange.lastUpdater}, " +
+            "year = #{arrange.year}, " +
+            "month = #{arrange.month}, " +
+            "day = #{arrange.day}, " +
+            "start_time = #{arrange.startTime}, " +
+            "end_time = #{arrange.endTime}, " +
+            "user = #{arrange.user}, " +
+            "role = #{arrange.role}, " +
+            "weekday = #{arrange.weekday}, " +
+            "local_date = #{arrange.localDate} " +
             "WHERE id = #{arrange.id}")
     void updateArrange(@Param("arrange") Arrange arrange);
 
     @Select("SELECT * FROM arrange WHERE user = #{user}")
     List<Arrange> findByUser(@Param("user") Long user);
+
+    @Select("SELECT * FROM arrange WHERE " +
+            "user = #{user} AND " +
+            "year = #{year} AND " +
+            "month = #{month}")
+    List<Arrange> findByUserYearMonth(@Param("user") Long user,
+                                      @Param("year") Integer year,
+                                      @Param("month") Integer month);
 
 }

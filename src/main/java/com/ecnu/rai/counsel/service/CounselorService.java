@@ -5,4 +5,7 @@ import com.ecnu.rai.counsel.entity.Counselor;
 public interface CounselorService {
 
     Counselor findCounselorByID(Long id);
+
+    void updateCounselor(Counselor counselor);
+
 }
