@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.util.List;
 
 @Repository
@@ -16,10 +17,31 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     @Select("SELECT * FROM conversation WHERE id = #{id}")
     Conversation findById(@Param("id") Long id);
 
-    @Update("UPDATE conversation SET create_time = #{conversation.createTime} , creator = #{conversation.creator} , last_update_time = #{conversation.lastUpdate_time} , " +
-            "last_updater = #{conversation.lastUpdater} , year = #{conversation.year} , month = #{conversation.month} , day = #{conversation.day} , " +
-            "start_time = #{conversation.startTime} , end_time = #{conversation.endTime}  , user = #{conversation.user} , counselor = #{conversation.counselor} , " +
-            "status = #{conversation.status} , visitor_name = #{conversation.visitorName} , evaluate = #{conversation.evaluate} , conversation_type = #{conversation.conversationType}" +
+    @Select("INSERT INTO conversation " +
+            "(id, create_time, creator, last_update_time, last_updater, " +
+            "year, month, day, start_time, end_time, user, counselor, status, " +
+            "visitor_name, evaluate, conversation_type) VALUES " +
+            "(#{conversation.id}, #{conversation.createTime}, #{conversation.creator}, #{conversation.lastUpdateTime}, #{conversation.lastUpdater}, " +
+            "#{conversation.year}, #{conversation.month}, #{conversation.day}, #{conversation.startTime}, #{conversation.endTime}, #{conversation.user}, #{conversation.counselor}, #{conversation.status}, " +
+            "#{conversation.visitorName}, #{conversation.evaluate}, #{conversation.conversationType})")
+    Conversation insertConversationByID(@Param("conversation") Conversation conversation);
+
+    @Update("UPDATE conversation SET " +
+            "create_time = #{conversation.createTime}, " +
+            "creator = #{conversation.creator}, " +
+            "last_update_time = #{conversation.lastUpdate_time}, " +
+            "last_updater = #{conversation.lastUpdater}, " +
+            "year = #{conversation.year}, " +
+            "month = #{conversation.month}, " +
+            "day = #{conversation.day}, " +
+            "start_time = #{conversation.startTime}, " +
+            "end_time = #{conversation.endTime}, " +
+            "user = #{conversation.user}, " +
+            "counselor = #{conversation.counselor}, " +
+            "status = #{conversation.status}, " +
+            "visitor_name = #{conversation.visitorName}, " +
+            "evaluate = #{conversation.evaluate}, " +
+            "conversation_type = #{conversation.conversationType}" +
             "WHERE id = #{conversation.id}")
     void updateConversation(@Param("conversation") Conversation conversation);
 
@@ -28,5 +50,36 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
 
     @Select("SELECT * FROM conversation WHERE counselor = #{counselor}")
     List<Conversation> findByCounselor(@Param("counselor") Long counselor);
+
+    @Select("SELECT * FROM conversation WHERE " +
+            "counselor = #{counselor} AND " +
+            "user = #{user} AND " +
+            "DATE(start_time) = #{date}")
+    List<Conversation> findByCounselorUserDate(@Param("counselor") Long counselor,
+                                               @Param("user") Long user,
+                                               @Param("date") Date date);
+
+    @Select("SELECT SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) " +
+            "FROM conversation " +
+            "WHERE counselor= #{counselor}")
+    Integer findTotalByCounselor(@Param("counselor") Long counselor);
+
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
+            "WHERE counselor= #{counselor} AND " +
+            "DATE(start_time) = DATE(SYSDATE())")
+    Integer findTodayNumByCounselor(@Param("counselor") Long counselor);
+
+    @Select("SELECT SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) " +
+            "FROM conversation " +
+            "WHERE counselor= #{counselor} AND " +
+            "DATE(start_time) = DATE(SYSDATE())")
+    Integer findTodayTotalByCounselor(@Param("counselor") Long counselor);
+
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
+            "WHERE counselor= #{counselor} AND " +
+            "status = 'active'")
+    Integer findCurrentNumByCounselor(@Param("counselor") Long counselor);
 
 }

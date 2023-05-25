@@ -47,7 +47,7 @@ public class Supervisor {
     private Integer gender;
 
     @ApiModelProperty(value = "电话号码")
-    private Integer phone;
+    private String phone;
 
     @ApiModelProperty(value = "部门")
     private String department;
