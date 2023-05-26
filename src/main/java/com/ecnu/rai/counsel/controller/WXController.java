@@ -115,7 +115,7 @@ public class WXController {
 
     @ResponseBody
     @CrossOrigin
-    @PostMapping("/wx/login")
+    @RequestMapping("/wx/login")
     public String login(HttpServletRequest request) throws IOException {
 
         String code = request.getParameter("code");

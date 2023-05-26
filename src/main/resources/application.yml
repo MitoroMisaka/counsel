@@ -15,3 +15,6 @@ wx:
 #  appId: wx548a99cf2b57984c
 #  appSecret: 20045ded4b565219e4d7116f01d6a1dd
 
+im:
+  sdkAppId: 1400810659
+  secretKey: 09c3165c7f23871cdbef8f6db600ae2c59ee44b4628b44f7f6896a69cde2282d
