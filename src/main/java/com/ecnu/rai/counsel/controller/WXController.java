@@ -5,11 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import com.alibaba.fastjson.JSON;
@@ -40,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.ecnu.rai.counsel.util.TokenGenUtil;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -113,11 +110,16 @@ public class WXController {
 
 
     public boolean token_check(String token) {
+        if(token == null) {
+            System.out.println("Token is null");
+            return false;
+        }
         try {
             DecodedJWT jwt = JWT.decode(token);
             Date expirationTime = jwt.getExpiresAt();
+            System.out.println(expirationTime);
             Date currentTime = new Date();
-
+            System.out.println(currentTime);
             if (expirationTime.before(currentTime)) {
                 System.out.println("Token overtime");
                 return false;
@@ -139,15 +141,20 @@ public class WXController {
         }
 
     }
-    @PostMapping("/wx/counselor")
-    public Result getCounselor(NormalRequest request){
+    @CrossOrigin
+    @RequestMapping("/wx/counselor")
+    public Result getCounselor(@RequestBody NormalRequest request){
         if(!token_check(request.getToken())){
             System.out.println("Token过期或非法");
             return null;
         }
-        Date date = new Date();
-        Timestamp timestamp = new Timestamp(date.getTime());
-        return Result.success("Successfully get avaliable counselors.",visitorMapper.findAvaliableCounselor(timestamp));
+        LocalDateTime localDateTime = LocalDateTime.of(2023,5,24,19,28,22);
+        System.out.println("到此步");
+        List<HashMap<String,Object>> counselorUserviews = visitorMapper.findAvailableCounselor(localDateTime);
+        for (Object obj : counselorUserviews) {
+            System.out.println(obj);
+        }
+        return Result.success("Successfully get available counselors.",counselorUserviews);
 
     }
 

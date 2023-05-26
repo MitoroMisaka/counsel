@@ -28,8 +28,11 @@ public class WXServiceImpl implements WXService {
     @Override
     public void insertNewVisitor(String openid) {
         User visitor = new User();
-        Long id = userMapper.addVisitor(visitor);
-        visitorMapper.insert(openid,id);
+        userMapper.addVisitor(visitor);
+        Long id = visitor.getId();
+        System.out.println(id);
+        System.out.println(openid);
+        visitorMapper.insertVisitor(openid,id);
     }
 
     @Override
