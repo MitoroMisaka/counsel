@@ -25,7 +25,7 @@ public class TokenGenUtil {
     //密钥
     public static final String SECRET = "sdjhakdhajdklsl;o653632";
     //过期时间:秒
-    public static final int EXPIRE = 5;
+    public static final int EXPIRE = 50000000;
     public static String TokenGen(Visitor u){
         Calendar nowTime = Calendar.getInstance();
         nowTime.add(Calendar.SECOND, EXPIRE);
@@ -36,9 +36,10 @@ public class TokenGenUtil {
         String token ="";
         token = JWT.create()
                 .withHeader(map)//头
+                .withClaim("openid",u.getOpenid())
                 .withIssuedAt(new Date())//签名时间
                 .withExpiresAt(expireDate)//过期时间
-                .sign(Algorithm.HMAC256((u.getOpenid())));//签名+u.getSession_key()
+                .sign(Algorithm.HMAC256(SECRET));//签名+u.getSession_key()
         return token;
 
 

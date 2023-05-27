@@ -1,17 +1,26 @@
 package com.ecnu.rai.counsel.controller;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.config.WXConfig;
-import com.ecnu.rai.counsel.dao.SigninRequest;
+import com.ecnu.rai.counsel.dao.EditRequest;
+import com.ecnu.rai.counsel.dao.NormalRequest;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.mapper.VisitorMapper;
 import com.ecnu.rai.counsel.service.WXService;
+import com.ecnu.rai.counsel.util.TokenUtil;
 import com.ecnu.rai.counsel.utils.CommonUtil;
-import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -20,22 +29,16 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import com.ecnu.rai.counsel.util.TokenGenUtil;
-
-
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.List;
+
 
 @Slf4j
-@Controller
+@RestController
 public class WXController {
     @Autowired
     private WXConfig wxConfig;
@@ -49,12 +52,13 @@ public class WXController {
     @Autowired
     private UserMapper userMapper;
 
-    @PostMapping("/wx/signin")
-    public Result signin(@RequestBody SigninRequest request) {
-        // Check if the user has already registered
-        if(visitorMapper.selectByOpenid(request.getOpenid()) != null) {
-            return Result.fail("该微信账号已注册");
+
+    @PostMapping("/wx/edit")
+    public Result edit(@RequestBody EditRequest request) {
+        if(!TokenUtil.token_check(request.getToken())){
+            return Result.fail("Token过期或非法");
         }
+
         // Check if the real name is valid
         if(!request.getRealName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
             return Result.fail("真实姓名格式不正确");
@@ -75,43 +79,70 @@ public class WXController {
         if(request.getEmergencyContactPhoneNumber().equals(request.getPhoneNumber())) {
             return Result.fail("紧急联系人电话不能和访客自己的电话号码重复");
         }
-        User user = new User();
-        user.setUsername(request.getOpenid());
+        Visitor u;
+        DecodedJWT jwt = JWT.decode(request.getToken());
+        String openid = jwt.getClaim("openid").asString();
+        if(!wxService.visitorExist(openid)) {
+            return Result.fail("该微信账号不存在");
+        }
+        else{
+            u = wxService.findByopenid(openid);
+        }
+        u.setName(request.getRealName());
+        u.setUsername(request.getUserName());
+        u.setPhone(request.getPhoneNumber());
+        u.setEmergentContact(request.getEmergencyContactName());
+        u.setEmergentPhone(request.getEmergencyContactPhoneNumber());
+        u.setRole("visitor");
+        u.setTitle(request.getTitle());
+        u.setDepartment(request.getDepartment());
+        u.setGender(request.getGender());
+        u.setAvatar("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKKEsVP4BbdXrF0d2Jve5mpwHkTrQ3BPtZxg&usqp=CAU");
+        visitorMapper.updateVisitor(u);
+        Long id = wxService.findIdByopenid(openid);
+        User user = userMapper.findById(id);
+        user.setName(request.getRealName());
+        user.setUsername(request.getUserName());
         user.setRole("visitor");
-        if(userMapper.findByUsername(request.getOpenid()) == null) {
-            userMapper.insert(user);
+        userMapper.updateUser(user);
+        return Result.success("信息修改成功");
+    }
+    @PostMapping("/wx/delete")
+    public String deleteVisitor(@RequestBody NormalRequest request){
+        if(!TokenUtil.token_check(request.getToken())){
+            System.out.println("Token过期或非法");
+            return("Token过期或非法");
+
         }
-        else {
-            return Result.fail("该微信账号已注册");
+        else{
+            DecodedJWT jwt = JWT.decode(request.getToken());
+            String openid = jwt.getClaim("openid").asString();
+            if(!wxService.visitorExist(openid)){
+                return("用户不存在");
+            }
+            else{
+                visitorMapper.deleteVisitor(openid);
+                return("账号已删除！");
+            }
         }
-        Long id = userMapper.findByUsername(request.getOpenid()).getId();
-        // Register the user
-        Visitor visitor = new Visitor();
-        visitor.setId(id);
-        visitor.setOpenid(request.getOpenid());
-        visitor.setName(request.getRealName());
-        visitor.setPhone(request.getPhoneNumber());
-        visitor.setEmergentContact(request.getEmergencyContactName());
-        visitor.setEmergentPhone(request.getEmergencyContactPhoneNumber());
-        visitor.setRole("visitor");
-        visitor.setGender(request.getGender());
-        visitor.setAvatar("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKKEsVP4BbdXrF0d2Jve5mpwHkTrQ3BPtZxg&usqp=CAU");
-        visitorMapper.insertVisitor(visitor);
-        return Result.success("注册成功");
     }
 
-    public String refreshToken(String refreshToken) throws IOException {
-        String url = "https://api.weixin.qq.com/sns/oauth2/refresh_token" +
-                "appid="+wxConfig.getAppId()+"grant_type=refresh_token&refresh_token="
-                +refreshToken;
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-        HttpGet httpGet = new HttpGet(url);
-        CloseableHttpResponse response = httpClient.execute(httpGet);
-        HttpEntity entity = response.getEntity();
-        String body = CommonUtil.getBody(entity.getContent());
-        JSONObject bodyJson = JSON.parseObject(body);
-        return bodyJson.getString("access_token");
-    };
+    @PostMapping("/wx/counselor")
+    public Object getCounselor(@RequestBody NormalRequest request){
+        if(!TokenUtil.token_check(request.getToken())){
+            System.out.println("Token过期或非法");
+            return null;
+        }
+        LocalDateTime localDateTime = LocalDateTime.of(2023,5,24,19,28,22);
+        List<HashMap<String,Object>> counselorUserviews = visitorMapper.findAvailableCounselor(localDateTime);
+//        for (Object obj : counselorUserviews) {
+//            System.out.println(obj);
+//        }
+        return counselorUserviews;
+
+    }
+
+
 
     @ResponseBody
     @CrossOrigin
@@ -121,6 +152,7 @@ public class WXController {
         String code = request.getParameter("code");
         if (code == null){
             log.error("用户取消登录");
+            return null;
         }
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid="
                  +wxConfig.getAppId() +"&secret="+wxConfig.getAppSecret()
@@ -135,14 +167,12 @@ public class WXController {
 
         JSONObject bodyJson = JSON.parseObject(body);
         String openid = bodyJson.getString("openid");
-        String session_key = bodyJson.getString("session_key");
         String token = "";
         if(!wxService.visitorExist(openid)) {
             Visitor u = new Visitor();
             u.setOpenid(openid);
             wxService.insertNewVisitor(openid);
             token = TokenGenUtil.TokenGen(u);
-//          u.setSession_key(session_key);
         }
         else {
             Visitor u = wxService.findByopenid(openid);
@@ -151,9 +181,10 @@ public class WXController {
         }
 
 
-        return token;
+return token;
      //   return "登录成功";
     }
+
 
 
 
