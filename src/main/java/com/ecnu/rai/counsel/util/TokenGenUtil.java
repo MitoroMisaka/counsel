@@ -36,7 +36,7 @@ public class TokenGenUtil {
         String token ="";
         token = JWT.create()
                 .withHeader(map)//头
-                .withClaim(u.getName(),u.getId())
+                .withClaim("openid",u.getOpenid())
                 .withIssuedAt(new Date())//签名时间
                 .withExpiresAt(expireDate)//过期时间
                 .sign(Algorithm.HMAC256(SECRET));//签名+u.getSession_key()

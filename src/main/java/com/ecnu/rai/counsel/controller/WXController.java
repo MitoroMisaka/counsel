@@ -19,6 +19,7 @@ import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.mapper.VisitorMapper;
 import com.ecnu.rai.counsel.service.WXService;
+import com.ecnu.rai.counsel.util.TokenUtil;
 import com.ecnu.rai.counsel.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -28,11 +29,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import com.ecnu.rai.counsel.util.TokenGenUtil;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -41,7 +38,7 @@ import java.util.List;
 
 
 @Slf4j
-@Controller
+@RestController
 public class WXController {
     @Autowired
     private WXConfig wxConfig;
@@ -58,7 +55,7 @@ public class WXController {
 
     @PostMapping("/wx/edit")
     public Result edit(@RequestBody EditRequest request) {
-        if(!token_check(request.getToken())){
+        if(!TokenUtil.token_check(request.getToken())){
             return Result.fail("Token过期或非法");
         }
 
@@ -83,80 +80,69 @@ public class WXController {
             return Result.fail("紧急联系人电话不能和访客自己的电话号码重复");
         }
         Visitor u;
-        if(!wxService.visitorExist(request.getOpenid())) {
+        DecodedJWT jwt = JWT.decode(request.getToken());
+        String openid = jwt.getClaim("openid").asString();
+        if(!wxService.visitorExist(openid)) {
             return Result.fail("该微信账号不存在");
         }
         else{
-            u = wxService.findByopenid(request.getOpenid());
+            u = wxService.findByopenid(openid);
         }
         u.setName(request.getRealName());
-        u.setUsername(request.getUsername());
+        u.setUsername(request.getUserName());
         u.setPhone(request.getPhoneNumber());
         u.setEmergentContact(request.getEmergencyContactName());
         u.setEmergentPhone(request.getEmergencyContactPhoneNumber());
+        u.setRole("visitor");
+        u.setTitle(request.getTitle());
+        u.setDepartment(request.getDepartment());
         u.setGender(request.getGender());
         u.setAvatar("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKKEsVP4BbdXrF0d2Jve5mpwHkTrQ3BPtZxg&usqp=CAU");
         visitorMapper.updateVisitor(u);
-        Long id = wxService.findIdByopenid(request.getOpenid());
+        Long id = wxService.findIdByopenid(openid);
         User user = userMapper.findById(id);
         user.setName(request.getRealName());
-        user.setUsername(request.getUsername());
+        user.setUsername(request.getUserName());
         user.setRole("visitor");
         userMapper.updateUser(user);
         return Result.success("信息修改成功");
     }
+    @PostMapping("/wx/delete")
+    public String deleteVisitor(@RequestBody NormalRequest request){
+        if(!TokenUtil.token_check(request.getToken())){
+            System.out.println("Token过期或非法");
+            return("Token过期或非法");
 
-    public static final String secret = "sdjhakdhajdklsl;o653632";
-
-
-    public boolean token_check(String token) {
-        if(token == null) {
-            System.out.println("Token is null");
-            return false;
         }
-        try {
-            DecodedJWT jwt = JWT.decode(token);
-            Date expirationTime = jwt.getExpiresAt();
-            System.out.println(expirationTime);
-            Date currentTime = new Date();
-            System.out.println(currentTime);
-            if (expirationTime.before(currentTime)) {
-                System.out.println("Token overtime");
-                return false;
+        else{
+            DecodedJWT jwt = JWT.decode(request.getToken());
+            String openid = jwt.getClaim("openid").asString();
+            if(!wxService.visitorExist(openid)){
+                return("用户不存在");
             }
-        } catch (Exception e) {
-            // Error decoding or verifying the token
-            System.out.println("Error decoding/verifying the token: " + e.getMessage());
+            else{
+                visitorMapper.deleteVisitor(openid);
+                return("账号已删除！");
+            }
         }
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret);
-            JWTVerifier verifier = JWT.require(algorithm).build();
-            verifier.verify(token);
-            System.out.println("Signature verification successful");
-            return true;
-        } catch (JWTVerificationException e) {
-            // Invalid signature
-            System.out.println("Signature verification failed: " + e.getMessage());
-            return false;
-        }
-
     }
-    @CrossOrigin
-    @RequestMapping("/wx/counselor")
-    public Result getCounselor(@RequestBody NormalRequest request){
-        if(!token_check(request.getToken())){
+
+    @PostMapping("/wx/counselor")
+    public Object getCounselor(@RequestBody NormalRequest request){
+        if(!TokenUtil.token_check(request.getToken())){
             System.out.println("Token过期或非法");
             return null;
         }
         LocalDateTime localDateTime = LocalDateTime.of(2023,5,24,19,28,22);
-        System.out.println("到此步");
         List<HashMap<String,Object>> counselorUserviews = visitorMapper.findAvailableCounselor(localDateTime);
-        for (Object obj : counselorUserviews) {
-            System.out.println(obj);
-        }
-        return Result.success("Successfully get available counselors.",counselorUserviews);
+//        for (Object obj : counselorUserviews) {
+//            System.out.println(obj);
+//        }
+        return counselorUserviews;
 
     }
+
+
 
     @ResponseBody
     @CrossOrigin
@@ -166,6 +152,7 @@ public class WXController {
         String code = request.getParameter("code");
         if (code == null){
             log.error("用户取消登录");
+            return null;
         }
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid="
                  +wxConfig.getAppId() +"&secret="+wxConfig.getAppSecret()
@@ -180,14 +167,12 @@ public class WXController {
 
         JSONObject bodyJson = JSON.parseObject(body);
         String openid = bodyJson.getString("openid");
-        String session_key = bodyJson.getString("session_key");
         String token = "";
         if(!wxService.visitorExist(openid)) {
             Visitor u = new Visitor();
             u.setOpenid(openid);
             wxService.insertNewVisitor(openid);
             token = TokenGenUtil.TokenGen(u);
-//          u.setSession_key(session_key);
         }
         else {
             Visitor u = wxService.findByopenid(openid);
