@@ -2,6 +2,7 @@ package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ecnu.rai.counsel.entity.Arrange;
+import com.ecnu.rai.counsel.response.DayNum;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -42,5 +43,21 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     List<Arrange> findByUserYearMonth(@Param("user") Long user,
                                       @Param("year") Integer year,
                                       @Param("month") Integer month);
+
+    @Select("SELECT day, COUNT(DISTINCT(user)) AS num FROM arrange WHERE " +
+            "year = #{year} AND " +
+            "month = #{month} AND " +
+            "role = \"counselor\" " +
+            "GROUP BY day")
+    List<DayNum> findArrangeCounselorInfoByYearMonthDay(@Param("year") Integer year,
+                                                        @Param("month") Integer month);
+
+    @Select("SELECT day, COUNT(DISTINCT(user)) AS num FROM arrange WHERE " +
+            "year = #{year} AND " +
+            "month = #{month} AND " +
+            "role = \"supervisor\" " +
+            "GROUP BY day")
+    List<DayNum> findArrangeSupervisorInfoByYearMonthDay(@Param("year") Integer year,
+                                                @Param("month") Integer month);
 
 }

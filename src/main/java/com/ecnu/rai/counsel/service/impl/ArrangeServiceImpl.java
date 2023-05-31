@@ -2,6 +2,7 @@ package com.ecnu.rai.counsel.service.impl;
 
 import com.ecnu.rai.counsel.entity.Arrange;
 import com.ecnu.rai.counsel.mapper.ArrangeMapper;
+import com.ecnu.rai.counsel.response.DayNum;
 import com.ecnu.rai.counsel.service.ArrangeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,4 +58,13 @@ public class ArrangeServiceImpl implements ArrangeService {
     public List<Arrange> findArrangeByUserYearMonth(Long user, Integer year, Integer month) {
         return arrangeMapper.findByUserYearMonth(user, year, month);
     }
+
+    public List<DayNum> findArrangeCounselorInfoByYearMonthDay(Integer year, Integer month) {
+        return arrangeMapper.findArrangeCounselorInfoByYearMonthDay(year, month);
+    }
+
+    public List<DayNum> findArrangeSupervisorInfoByYearMonthDay(Integer year, Integer month) {
+        return arrangeMapper.findArrangeSupervisorInfoByYearMonthDay(year, month);
+    }
+
 }
