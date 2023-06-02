@@ -3,9 +3,7 @@ package com.ecnu.rai.counsel.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ecnu.rai.counsel.entity.Arrange;
 import com.ecnu.rai.counsel.entity.Conversation;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
@@ -17,7 +15,7 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     @Select("SELECT * FROM conversation WHERE id = #{id}")
     Conversation findById(@Param("id") Long id);
 
-    @Select("INSERT INTO conversation " +
+    @Insert("INSERT INTO conversation " +
             "(id, create_time, creator, last_update_time, last_updater, " +
             "year, month, day, start_time, end_time, user, counselor, status, " +
             "visitor_name, evaluate, conversation_type) VALUES " +
@@ -25,6 +23,11 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
             "#{conversation.year}, #{conversation.month}, #{conversation.day}, #{conversation.startTime}, #{conversation.endTime}, #{conversation.user}, #{conversation.counselor}, #{conversation.status}, " +
             "#{conversation.visitorName}, #{conversation.evaluate}, #{conversation.conversationType})")
     Conversation insertConversationByID(@Param("conversation") Conversation conversation);
+
+    @Insert("INSERT INTO conversation (create_time, creator, last_update_time, last_updater, year, month, day, start_time, end_time, user, counselor, status, visitor_name, evaluate, conversation_type, message) " +
+            "VALUES (#{conversation.createTime}, #{conversation.creator}, #{conversation.lastUpdateTime}, #{conversation.lastUpdater}, #{conversation.year}, #{conversation.month}, #{conversation.day}, #{conversation.startTime}, #{conversation.endTime}, #{conversation.user}, #{conversation.counselor}, #{conversation.status}, #{conversation.visitorName}, #{conversation.evaluate}, #{conversation.conversationType}, #{conversation.message})")
+    @Options(useGeneratedKeys = true, keyProperty = "conversation.id")
+    void insertConversation(@Param("conversation") Conversation conversation);
 
     @Update("UPDATE conversation SET " +
             "create_time = #{conversation.createTime}, " +
