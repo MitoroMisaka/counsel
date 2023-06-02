@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.Month;
 
 @Data
 @NoArgsConstructor
@@ -21,41 +23,41 @@ import java.time.LocalDateTime;
 public class Conversation {
 
     @TableId(type = IdType.AUTO)
-    @ApiModelProperty(value = "用户ID")
+    @ApiModelProperty(value = "会话ID")
     private Long id;
 
     @ApiModelProperty(value = "创建时间")
     private LocalDateTime createTime;
 
     @ApiModelProperty(value = "创建者")
-    private Long creator;
+    private String creator;
 
     @ApiModelProperty(value = "最后更新时间")
     private LocalDateTime lastUpdateTime;
 
     @ApiModelProperty(value = "最后更新者")
-    private Long lastUpdater;
+    private String lastUpdater;
 
     @ApiModelProperty(value = "年")
     private Integer year;
 
     @ApiModelProperty(value = "月")
-    private Integer month;
+    private Month month;
 
     @ApiModelProperty(value = "日")
     private Integer day;
 
     @ApiModelProperty(value = "开始时间")
-    private LocalDateTime startTime;
+    private Timestamp startTime;
 
     @ApiModelProperty(value = "结束时间")
-    private LocalDateTime endTime;
+    private Timestamp endTime;
 
-    @ApiModelProperty(value = "咨询用户id")
-    private Long user;
+    @ApiModelProperty(value = "咨询用户姓名")
+    private String  user;
 
-    @ApiModelProperty(value = "咨询师id")
-    private Long counselor;
+    @ApiModelProperty(value = "咨询师姓名")
+    private String counselor;
 
     @ApiModelProperty(value = "状态")
     private String status;
@@ -64,9 +66,12 @@ public class Conversation {
     private String visitorName;
 
     @ApiModelProperty(value = "会话评分")
-    private String evaluate;
+    private Integer evaluate;
 
     @ApiModelProperty(value = "会话类型")
     private String conversationType;
+
+    @ApiModelProperty(value = "会话内容")
+    private String message;
 
 }

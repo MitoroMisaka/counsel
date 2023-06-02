@@ -1,12 +1,14 @@
 package com.ecnu.rai.counsel.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
-import com.ecnu.rai.counsel.entity.Arrange;
+import com.ecnu.rai.counsel.dao.group.GetGroupMsgResponse;
+import com.ecnu.rai.counsel.dao.group.RspMsg;
+import com.ecnu.rai.counsel.dao.single.IMRequest;
+import com.ecnu.rai.counsel.dao.single.Message;
 import com.ecnu.rai.counsel.entity.Conversation;
-import com.ecnu.rai.counsel.entity.Counselor;
-import com.ecnu.rai.counsel.entity.User;
-import com.ecnu.rai.counsel.response.ConsultInfo;
+import com.ecnu.rai.counsel.mapper.ConversationMapper;
 import com.ecnu.rai.counsel.service.ConversationService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -24,6 +27,9 @@ public class ConversationController {
 
     @Autowired
     private ConversationService conversationService;
+
+    @Autowired
+    private ConversationMapper conversationMapper;
 
     @GetMapping("/id")
     @ApiOperation("根据ID获取会话信息")
@@ -101,4 +107,84 @@ public class ConversationController {
     public Result getConsultInfo(@RequestParam("counselor") Long counselor) {
         return Result.success("获取成功", conversationService.findConsultInfobyCounselor(counselor));
     }
+
+    @PostMapping("/save_roam_msg")
+    @ApiOperation(value = "存储单聊信息(已弃用)", notes = "save the conversation ")
+    @ResponseBody
+    public Result saveHistory(@Valid @RequestBody IMRequest request) {
+        System.out.println(request);
+        List<Message> messages = request.getMsgList();
+        for (Message message : messages) {
+            if (message.getFromAccount().equals(request.getOperatorAccount())) {
+                message.setFromAccount(request.getOperatorAccountReal());
+                message.setToAccount(request.getPeerAccountReal());
+            } else if (message.getFromAccount().equals(request.getPeerAccount())) {
+                message.setFromAccount(request.getPeerAccountReal());
+                message.setToAccount(request.getOperatorAccountReal());
+            }
+        }
+        //convert message into JSON string
+        String history = JSON.toJSONString(messages);
+        System.out.println(history);
+        Conversation conversation = Conversation.builder()
+                .id(null)
+                .createTime(LocalDateTime.now())
+                .creator(request.getOperatorAccountReal())
+                .lastUpdateTime(LocalDateTime.now())
+                .lastUpdater(request.getOperatorAccountReal())
+                .year(request.getMinTime().toLocalDateTime().getYear())
+                .month(request.getMinTime().toLocalDateTime().getMonth())
+                .day(request.getMinTime().toLocalDateTime().getDayOfMonth())
+                .startTime(request.getMinTime())
+                .endTime(request.getMaxTime())
+                .user(request.getPeerAccountReal())
+                .counselor(request.getOperatorAccountReal())
+                .status("FINISHED")
+                .visitorName(request.getPeerAccountReal())
+                .evaluate(0)
+                .conversationType("C2C")
+                .message(history)
+                .build();
+        conversationMapper.insertConversation(conversation);
+        return Result.success("save and insert conversation ");
+    }
+
+    @PostMapping("/save_group_msg")
+    @ApiOperation(value = "存储群聊信息", notes = "save the conversation ")
+    @ResponseBody
+    public Result saveGroupMsg(@Valid @RequestBody GetGroupMsgResponse getGroupMsgResponse){
+        System.out.println(getGroupMsgResponse);
+        List<RspMsg> messages = getGroupMsgResponse.getRspMsgList();
+        for(RspMsg message : messages){
+            if(message.getFromAccount().equals(getGroupMsgResponse.getUserid())){
+                message.setFromAccount("用户："+ getGroupMsgResponse.getUsername());
+            }
+            if(message.getFromAccount().equals(getGroupMsgResponse.getCounselorid())){
+                message.setFromAccount("咨询师："+ getGroupMsgResponse.getCounselorname());
+            }
+        }
+        String history = JSON.toJSONString(messages);
+        Conversation conversation = Conversation.builder()
+                .id(null)
+                .createTime(LocalDateTime.now())
+                .creator(getGroupMsgResponse.getCounselorname())
+                .lastUpdateTime(LocalDateTime.now())
+                .lastUpdater(getGroupMsgResponse.getCounselorname())
+                .year(getGroupMsgResponse.getStartTime().toLocalDateTime().getYear())
+                .month(getGroupMsgResponse.getStartTime().toLocalDateTime().getMonth())
+                .day(getGroupMsgResponse.getStartTime().toLocalDateTime().getDayOfMonth())
+                .startTime(getGroupMsgResponse.getStartTime())
+                .endTime(getGroupMsgResponse.getEndTime())
+                .user(getGroupMsgResponse.getUsername())
+                .counselor(getGroupMsgResponse.getCounselorname())
+                .status("FINISHED")
+                .visitorName(getGroupMsgResponse.getUsername())
+                .evaluate(0)
+                .conversationType("C2C")
+                .message(history)
+                .build();
+        conversationMapper.insertConversation(conversation);
+        return Result.success("save and insert conversation ");
+    }
+
 }

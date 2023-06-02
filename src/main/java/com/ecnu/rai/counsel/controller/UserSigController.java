@@ -1,5 +1,6 @@
 package com.ecnu.rai.counsel.controller;
 
+import com.ecnu.rai.counsel.dao.UserSig;
 import com.ecnu.rai.counsel.service.UserSigService;
 import lombok.Value;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,8 @@ public class UserSigController {
     UserSigService userSigService;
 
     @GetMapping("/userSig")
-    public String getUserSig(@RequestParam("userid") String userid) {
-        return userSigService.generateUserSig(userid);
+    public Object getUserSig(@RequestParam("userid") String userid) {
+        //返回一个Object，里面第一条是userid，第二条是token
+        return new UserSig(userid, userSigService.generateUserSig(userid));
     }
 }
