@@ -51,8 +51,6 @@ public class ShiroConfig {
         //account
         hashMap.put("/account/login", "anon");
         hashMap.put("/account/logout", "anon");
-        hashMap.put("/account/hello", "anon");
-        // hashMap.put("/account/hello", "roles[admin]");
 
         shiroFilterFactoryBean.setFilterChainDefinitionMap(hashMap);
 

@@ -8,7 +8,7 @@ public class EditRequest {
     private String emergencyContactPhoneNumber;
     private String department;
     private String title;
-    private Integer gender;
+    private String gender;
 
     public String getToken() {
         return token;
@@ -18,11 +18,11 @@ public class EditRequest {
 
     public String getTitle() {return title;}
 
-    public Integer getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Integer gender) { this.gender = gender; }
+    public void setGender(String gender) { this.gender = gender; }
 
     public String getRealName() {
         return realName;
