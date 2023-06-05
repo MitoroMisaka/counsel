@@ -174,6 +174,7 @@ public class AccountController {
     }
 
     @PostMapping("/counselor")
+    @ApiOperation("添加咨询师")
     public ResponseEntity<Object> insertCounselor(@Valid @RequestBody Counselor counselor) {
         // Check if all required fields are filled
         if(counselor.getName() == null || counselor.getGender() == null || counselor.getAge() == null ||
