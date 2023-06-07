@@ -4,6 +4,7 @@ import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
+import com.ecnu.rai.counsel.mapper.ArrangeMapper;
 import com.ecnu.rai.counsel.mapper.CounselorMapper;
 import com.ecnu.rai.counsel.mapper.SupervisorMapper;
 import com.ecnu.rai.counsel.service.CounselorService;
@@ -23,6 +24,14 @@ public class CounselorServiceImpl implements CounselorService {
     @Autowired
     private SupervisorMapper supervisorMapper;
 
+    @Autowired
+    private ArrangeMapper arrangeMapper;
+
+    @Override
+    public void addCounselor(Counselor counselor) {
+        counselorMapper.insertCounselor(counselor);
+    }
+
     @Override
     public Counselor findCounselorByID(Long id) {
         Counselor counselor = counselorMapper.findById(id);
@@ -41,16 +50,16 @@ public class CounselorServiceImpl implements CounselorService {
         counselorMapper.updateCounselor(counselor);
     }
 
-    public Page<Supervisor> getAvailableSupervisor(Long id, Integer page, Integer size, String order) {
+    @Override
+    public Page<Counselor> getAvailableCounselor(Integer page, Integer size, String order) {
+        List<Long> availableCounselorIdList = arrangeMapper.findCounselorByCurrentTime();
+        List<Counselor> counselorList = new ArrayList<>();
 
         PageHelper.startPage(page, size, order);
-        List<Supervise> superviselist = counselorMapper.findSupervisors(id);
-        List<Supervisor> availableSupervisorList = new ArrayList<>();
-        for (Supervise supervise : superviselist) {
-            availableSupervisorList.add(supervisorMapper.findById(supervise.getSupervisorId()));
+        for (Long availableCounselorId : availableCounselorIdList) {
+            counselorList.add(counselorMapper.findById(availableCounselorId));
         }
-        return new Page<>(new PageInfo<>(availableSupervisorList));
-
+        return new Page<>(new PageInfo<>(counselorList));
     }
 
 }
