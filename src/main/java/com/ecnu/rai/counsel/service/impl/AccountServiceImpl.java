@@ -102,7 +102,6 @@ public class AccountServiceImpl implements AccountService {
             existingVisitor.setTitle(visitor.getTitle());
             existingVisitor.setEmergentContact(visitor.getEmergentContact());
             existingVisitor.setEmergentPhone(visitor.getEmergentPhone());
-            existingVisitor.setOpenid(visitor.getOpenid());
 
             // Perform the update in the database
             visitorMapper.updateVisitor(existingVisitor);
@@ -195,7 +194,14 @@ public class AccountServiceImpl implements AccountService {
             return counselor != null && !counselor.getId().equals(id);
         }
 
-        @Override
+    @Override
+    public boolean isPhoneUsedByOtherSupervisor(Long id, String phone) {
+        Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("phone", phone));
+        // Check if the counselor exists and has a different ID than the given ID
+        return supervisor != null && !supervisor.getId().equals(id);
+    }
+
+    @Override
         public boolean isEmailUsedByOtherCounselor(Long id, String email) {
             // Get the counselor with the given email address
             Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("email", email));
@@ -218,7 +224,17 @@ public class AccountServiceImpl implements AccountService {
             // Check if the counselor exists
             return counselor != null;
         }
+
+    @Override
+    public boolean isUsernameUsedByOtherSupervisor(String username) {
+        // Get the supervisor with the given username
+        Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("username", username));
+        // Check if the supervisor exists
+        return supervisor != null;
     }
+
+
+}
 
     
 

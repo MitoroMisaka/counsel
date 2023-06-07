@@ -66,10 +66,13 @@ public class MyRealm extends AuthorizingRealm {
         //数据库匹配，认证
         String username = token.getUsername();
         String password = new String(token.getPassword());
+        System.out.println(password);
+
 
         QueryWrapper wrapper = new QueryWrapper();
         wrapper.eq("username",username);
         User user = userMapper.selectOne(wrapper);
+        System.out.println(user.getPassword());
 
         if (user != null && (user.getPassword() + "").equals(password)) {
             SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, token.getCredentials(), getName());

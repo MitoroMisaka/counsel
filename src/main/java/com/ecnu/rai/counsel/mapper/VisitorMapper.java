@@ -22,7 +22,7 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
     void updateVisitor(@Param("visitor") Visitor visitor);
 
 
-    @Insert("INSERT INTO visitor (openid,id,name) VALUES (#{openid},#{id},'用户')")
+    @Insert("INSERT INTO visitor (openid,id,name,available) VALUES (#{openid},#{id},'用户',1)")
     void insertVisitor(@Param("openid")String openid ,@Param("id")Long id);
 
 
@@ -34,6 +34,9 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
 
     @Delete("DELETE FROM visitor WHERE openid =#{openid}")
     void deleteVisitor(@Param("openid") String openid);
+
+    @Select("SELECT count(*) FROM visitor where phone=#{phone} limit 1")
+    int ifPhoneExist(@Param("phone")String phone);
 
 
     @Select("SELECT count(*) FROM visitor where openid=#{openid} limit 1")
