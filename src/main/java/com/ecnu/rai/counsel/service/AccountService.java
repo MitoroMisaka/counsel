@@ -12,6 +12,8 @@ public interface AccountService {
 
     boolean isPhoneUsedByOtherCounselor(Long id,String phone);
 
+    boolean isPhoneUsedByOtherSupervisor(Long id, String phone);
+
     boolean isEmailUsedByOtherCounselor(Long id, String email);
 
     User findUserByUsername(String username);
