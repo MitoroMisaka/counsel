@@ -45,7 +45,7 @@ public class Visitor {
     private String phone;
 
     @ApiModelProperty(value = "性别")
-    private Integer gender;
+    private String gender;
 
     @ApiModelProperty(value = "部门")
     private String department;

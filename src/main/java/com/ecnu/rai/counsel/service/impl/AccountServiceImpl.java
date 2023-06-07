@@ -93,7 +93,8 @@ public class AccountServiceImpl implements AccountService {
             // Update the user properties
             existingVisitor.setName(visitor.getName());
             existingVisitor.setUsername(visitor.getUsername());
-            existingVisitor.setPassword(PasswordUtil.convert(visitor.getPassword()));
+            // existingVisitor.setPassword(PasswordUtil.convert(visitor.getPassword()));
+            existingVisitor.setPassword(visitor.getPassword());
             existingVisitor.setRole(visitor.getRole());
             existingVisitor.setAvatar(visitor.getAvatar());
             existingVisitor.setPhone(visitor.getPhone());
@@ -102,6 +103,7 @@ public class AccountServiceImpl implements AccountService {
             existingVisitor.setTitle(visitor.getTitle());
             existingVisitor.setEmergentContact(visitor.getEmergentContact());
             existingVisitor.setEmergentPhone(visitor.getEmergentPhone());
+            existingVisitor.setOpenid(visitor.getOpenid());
 
             // Perform the update in the database
             visitorMapper.updateVisitor(existingVisitor);
@@ -120,7 +122,8 @@ public class AccountServiceImpl implements AccountService {
             // Update the admin properties
             existingAdmin.setName(admin.getName());
             existingAdmin.setUsername(admin.getUsername());
-            existingAdmin.setPassword(PasswordUtil.convert(admin.getPassword()));
+            // existingAdmin.setPassword(PasswordUtil.convert(admin.getPassword()));
+            existingAdmin.setPassword(admin.getPassword());
             existingAdmin.setRole(admin.getRole());
             existingAdmin.setAvatar(admin.getAvatar());
             existingAdmin.setPhone(admin.getPhone());
@@ -145,7 +148,8 @@ public class AccountServiceImpl implements AccountService {
             // Update the counselor properties
             existingCounselor.setName(counselor.getName());
             existingCounselor.setUsername(counselor.getUsername());
-            existingCounselor.setPassword(PasswordUtil.convert(counselor.getPassword()));
+            // existingCounselor.setPassword(PasswordUtil.convert(counselor.getPassword()));
+            existingCounselor.setPassword(counselor.getPassword());
             existingCounselor.setRole(counselor.getRole());
             existingCounselor.setAvatar(counselor.getAvatar());
             existingCounselor.setPhone(counselor.getPhone());
@@ -170,7 +174,8 @@ public class AccountServiceImpl implements AccountService {
             // Update the supervisor properties
             existingSupervisor.setName(supervisor.getName());
             existingSupervisor.setUsername(supervisor.getUsername());
-            existingSupervisor.setPassword(PasswordUtil.convert(supervisor.getPassword()));
+            // existingSupervisor.setPassword(PasswordUtil.convert(supervisor.getPassword()));
+            existingSupervisor.setPassword(supervisor.getPassword());
             existingSupervisor.setRole(supervisor.getRole());
             existingSupervisor.setAvatar(supervisor.getAvatar());
             existingSupervisor.setPhone(supervisor.getPhone());
@@ -194,14 +199,15 @@ public class AccountServiceImpl implements AccountService {
             return counselor != null && !counselor.getId().equals(id);
         }
 
-    @Override
-    public boolean isPhoneUsedByOtherSupervisor(Long id, String phone) {
-        Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("phone", phone));
-        // Check if the counselor exists and has a different ID than the given ID
-        return supervisor != null && !supervisor.getId().equals(id);
-    }
+        @Override
+        public boolean isPhoneUsedByOtherSupervisor(Long id, String phone) {
+            // Get the counselor with the given phone number
+            Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("phone", phone));
+            // Check if the counselor exists and has a different ID than the given ID
+            return supervisor != null && !supervisor.getId().equals(id);
+        }
 
-    @Override
+        @Override
         public boolean isEmailUsedByOtherCounselor(Long id, String email) {
             // Get the counselor with the given email address
             Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("email", email));

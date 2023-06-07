@@ -1,10 +1,5 @@
 package com.ecnu.rai.counsel.controller;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.entity.*;
@@ -12,14 +7,14 @@ import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.response.GetUserResponse;
 import com.ecnu.rai.counsel.service.AccountService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
-import com.ecnu.rai.counsel.util.TokenUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import net.bytebuddy.asm.Advice;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.annotation.Logical;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -113,14 +108,14 @@ public class AccountController {
         return Result.success(null);
     }
 
+//    @PostMapping("/signup")
+//    @ApiOperation("注册")
+//    public Result signup(@Valid @RequestBody User user) {
+//        return Result.success("注册成功");
+//    }
 
-    @RequiresUser
-    @PostMapping("/hello")
-    @ApiImplicitParam(name = "str", value = "参数", required = true, paramType = "query", dataType = "String")
-    public Result Hello(@RequestParam("str")@NotNull String str) {
-        return Result.success(null);
-    }
 
+    @RequiresRoles("admin")
     @GetMapping("/users")
     @ApiOperation("获取用户列表")
     public Result getUsers() {
@@ -133,6 +128,14 @@ public class AccountController {
     //获取用户信息
     @GetMapping("/{id}")
     public Result getUser(@PathVariable Long id) {
+
+        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
+        if (!currentUser.getRole().equals("admin")) {
+            if (currentUser.getId() != id) {
+                return Result.fail("无权访问");
+            }
+        }
+
         User user = accountService.findUserByID(id);
         String role = user.getRole();
         if(role.equals("visitor")) {
@@ -151,11 +154,63 @@ public class AccountController {
         return Result.fail("获取失败");
     }
 
+
+    // update Visitor
     @PutMapping("/visitor/{id}")
-    public ResponseEntity<Visitor> updateUser(
+    @ApiOperation("更新访客信息")
+    public Result updateVisitor(
             @PathVariable Long id,
             @Valid @RequestBody Visitor visitor
     ) {
+
+        // 权限控制，只有机构管理员 和 该访客本人可以修改
+        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
+        if (!currentUser.getRole().equals("admin")) {
+            if (currentUser.getId() != id) {
+                return Result.fail("You have no permission to update this counselor");
+            }
+        }
+
+        // Check if all required fields are filled
+        if(visitor.getName() == null || visitor.getUsername() == null || visitor.getPassword() == null || visitor.getRole() == null ||
+                visitor.getAvatar() == null || visitor.getGender() == null || visitor.getPhone() == null ||
+                visitor.getDepartment() == null || visitor.getTitle() == null || visitor.getEmergentContact() == null ||visitor.getEmergentPhone() == null ||
+                visitor.getOpenid() == null) {
+            return Result.fail("All required fields must be filled.");
+        }
+        // Check if the name is valid
+        if(!visitor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
+            return Result.fail("Invalid name.");
+        }
+        // Check if the username is valid
+        if(!visitor.getUsername().matches("^[A-Za-z0-9_]+$")) {
+            return Result.fail("Invalid username.");
+        }
+        // Check if the password is valid
+        if(visitor.getPassword().length() < 6) {
+            return Result.fail("Password must be at least 6 characters long.");
+        }
+        // Check if the phone number is valid
+        if(!visitor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
+            return Result.fail("Invalid phone number.");
+        }
+        // Check if the phone number is unique
+        if(accountService.isPhoneUsedByOtherCounselor(id, visitor.getPhone())) {
+            return Result.fail("Duplicate Phone Number.");
+        }
+        // Check if the emergentContact is valid
+        if(!visitor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
+            return Result.fail("Invalid emergentContact.");
+        }
+        // Check if the emergentPhone number is valid
+        if(!visitor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
+            return Result.fail("Invalid phone number.");
+        }
+        // Check if the emergentPhone number equals to the phone number
+        if(!visitor.getPhone().equals(visitor.getPhone())) {
+            return Result.fail("emergentPhone number can't be the same with the phone number.");
+        }
+
         Visitor updatedVisitor = accountService.updateVisitor(id , visitor);
         //build user by visitor
         User user = User.builder()
@@ -166,15 +221,50 @@ public class AccountController {
                 .role("visitor")
                 .build();
         User updatedUser = accountService.updateUser(id, user);
-        return ResponseEntity.ok(updatedVisitor);
+        return Result.success("更新访客数据", updatedVisitor);
     }
 
-    //update Admin
+    // update Admin
+    @RequiresRoles("admin")
     @PutMapping("/admin/{id}")
-    public ResponseEntity<Admin> updateUser(
+    public Result updateAdmin(
             @PathVariable Long id,
             @Valid @RequestBody Admin admin
     ) {
+
+        // 权限控制，只有机构管理员 和 该访客本人可以修改
+        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
+        if (currentUser.getId() != id) {
+            return Result.fail("You have no permission to update this counselor");
+        }
+
+        // Check if all required fields are filled
+        if(admin.getName() == null || admin.getUsername() == null || admin.getPassword() == null || admin.getRole() == null ||
+                admin.getAvatar() == null || admin.getGender() == null || admin.getPhone() == null ||
+                admin.getDepartment() == null || admin.getTitle() == null) {
+            return Result.fail("All required fields must be filled.");
+        }
+        // Check if the name is valid
+        if(!admin.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
+            return Result.fail("Invalid name.");
+        }
+        // Check if the username is valid
+        if(!admin.getUsername().matches("^[A-Za-z0-9_]+$")) {
+            return Result.fail("Invalid username.");
+        }
+        // Check if the password is valid
+        if(admin.getPassword().length() < 6) {
+            return Result.fail("Password must be at least 6 characters long.");
+        }
+        // Check if the phone number is valid
+        if(!admin.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
+            return Result.fail("Invalid phone number.");
+        }
+        // Check if the phone number is unique
+        if(accountService.isPhoneUsedByOtherCounselor(id, admin.getPhone())) {
+            return Result.fail("Duplicate Phone Number.");
+        }
+
         Admin updatedAdmin = accountService.updateAdmin(id , admin);
         //build user by admin
         User user = User.builder()
@@ -185,84 +275,87 @@ public class AccountController {
                 .role("admin")
                 .build();
         User updatedUser = accountService.updateUser(id, user);
-        return ResponseEntity.ok(updatedAdmin);
+        return Result.success("更新机构管理员信息成功", updatedAdmin);
     }
-    @PostMapping("/supervisor")
-    public ResponseEntity<Object> insertSupervisor(@Valid @RequestBody Supervisor supervisor) {
-        // Check if all required fields are filled
-        if(supervisor.getName() == null || supervisor.getGender() == null ||
-           supervisor.getPhone() == null  || supervisor.getUsername() == null ||
-           supervisor.getPassword() == null  || supervisor.getQualification() == null ||
-           supervisor.getQualificationCode() == null || supervisor.getAvatar() == null ||
-           supervisor.getDepartment() == null || supervisor.getTitle() == null ) {
-            return ResponseEntity.badRequest().body("Required fields are not filled");
-        }
-        // Check if the name is valid
-        if(!supervisor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
-            return ResponseEntity.badRequest().body("Invalid name");
-        }
+//    @PostMapping("/supervisor")
+//    public ResponseEntity<Object> insertSupervisor(@Valid @RequestBody Supervisor supervisor) {
+//        // Check if all required fields are filled
+//        if(supervisor.getName() == null || supervisor.getGender() == null ||
+//           supervisor.getPhone() == null  || supervisor.getUsername() == null ||
+//           supervisor.getPassword() == null  || supervisor.getQualification() == null ||
+//           supervisor.getQualificationCode() == null || supervisor.getAvatar() == null ||
+//           supervisor.getDepartment() == null || supervisor.getTitle() == null ) {
+//            return ResponseEntity.badRequest().body("Required fields are not filled");
+//        }
+//        // Check if the name is valid
+//        if(!supervisor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
+//            return ResponseEntity.badRequest().body("Invalid name");
+//        }
+//
+//        supervisor.setPassword(PasswordUtil.convert(supervisor.getPassword()));
+//        // Check if the phone number is valid
+//        if(!supervisor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
+//            return ResponseEntity.badRequest().body("Invalid phone number");
+//        }
+//        // Check if the username is valid
+//        if(!supervisor.getUsername().matches("^[A-Za-z0-9_]+$")) {
+//            return ResponseEntity.badRequest().body("Invalid username");
+//        }
+//        // Check if the password is valid
+//        if(supervisor.getPassword().length() < 6) {
+//            return ResponseEntity.badRequest().body("Invalid password");
+//        }
+//        // Check if the phone number is used by another supervisor
+//        if(accountService.isPhoneUsedByOtherSupervisor(null, supervisor.getPhone())) {
+//            return ResponseEntity.badRequest().body("Phone number is used by another supervisor");
+//        }
+//        // Build the user object
+//        User user = User.builder()
+//                .name(supervisor.getName())
+//                .username(supervisor.getUsername())
+//                .password(supervisor.getPassword())
+//                .role("supervisor")
+//                .build();
+//        // Insert the user
+//        //if the username is used by another user
+//        if(accountService.isUsernameUsedByOtherUser(user.getUsername())) {
+//            return ResponseEntity.badRequest().body("Username is used by another user");
+//        }else {
+//            userMapper.insertUser(user);
+//        }
+//        User insertedUser = userMapper.findByUsername(user.getUsername());
+//        // Set the ID of the supervisor to the ID of the user
+//        supervisor.setId(insertedUser.getId());
+//        // Set default values for role, create time, update time, enabled, deleted, and rating
+//        supervisor.setRole("supervisor");
+//        // Insert the supervisor
+//        if(accountService.isUsernameUsedByOtherSupervisor(user.getUsername())) {
+//            return ResponseEntity.badRequest().body("Username is used by another supervisor");
+//        }else {
+//            supervisorMapper.insertSupervisor(supervisor);
+//        }
+//        // Return the inserted supervisor
+//        return ResponseEntity.ok(Result.success("Insert supervisor successfully", supervisor));
+//    }
+//
 
-        supervisor.setPassword(PasswordUtil.convert(supervisor.getPassword()));
-        // Check if the phone number is valid
-        if(!supervisor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
-            return ResponseEntity.badRequest().body("Invalid phone number");
-        }
-        // Check if the username is valid
-        if(!supervisor.getUsername().matches("^[A-Za-z0-9_]+$")) {
-            return ResponseEntity.badRequest().body("Invalid username");
-        }
-        // Check if the password is valid
-        if(supervisor.getPassword().length() < 6) {
-            return ResponseEntity.badRequest().body("Invalid password");
-        }
-        // Check if the phone number is used by another supervisor
-        if(accountService.isPhoneUsedByOtherSupervisor(null, supervisor.getPhone())) {
-            return ResponseEntity.badRequest().body("Phone number is used by another supervisor");
-        }
-        // Build the user object
-        User user = User.builder()
-                .name(supervisor.getName())
-                .username(supervisor.getUsername())
-                .password(supervisor.getPassword())
-                .role("supervisor")
-                .build();
-        // Insert the user
-        //if the username is used by another user
-        if(accountService.isUsernameUsedByOtherUser(user.getUsername())) {
-            return ResponseEntity.badRequest().body("Username is used by another user");
-        }else {
-            userMapper.insertUser(user);
-        }
-        User insertedUser = userMapper.findByUsername(user.getUsername());
-        // Set the ID of the supervisor to the ID of the user
-        supervisor.setId(insertedUser.getId());
-        // Set default values for role, create time, update time, enabled, deleted, and rating
-        supervisor.setRole("supervisor");
-        // Insert the supervisor
-        if(accountService.isUsernameUsedByOtherSupervisor(user.getUsername())) {
-            return ResponseEntity.badRequest().body("Username is used by another supervisor");
-        }else {
-            supervisorMapper.insertSupervisor(supervisor);
-        }
-        // Return the inserted supervisor
-        return ResponseEntity.ok(Result.success("Insert supervisor successfully", supervisor));
-    }
-
+    // insert Counselor
+    @RequiresRoles("admin")
     @PostMapping("/counselor")
-    public ResponseEntity<Object> insertCounselor(@Valid @RequestBody Counselor counselor) {
+    public Result insertCounselor(@Valid @RequestBody Counselor counselor) {
         // Check if all required fields are filled
         if(counselor.getName() == null || counselor.getGender() == null || counselor.getAge() == null ||
                 counselor.getIdNumber() == null || counselor.getPhone() == null || counselor.getEmail() == null ||
                 counselor.getUsername() == null || counselor.getPassword() == null) {
-            return ResponseEntity.badRequest().body("Required fields are not filled");
+            return Result.fail("Required fields are not filled");
         }
         // Check if the name is valid
         if(!counselor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
-            return ResponseEntity.badRequest().body("Invalid name");
+            return Result.fail("Invalid name");
         }
         // Check if the ID number is valid
         if(!counselor.getIdNumber().matches("(^\\d{15}$)|(^\\d{18}$)|(^\\d{17}(\\d|X|x)$)")) {
-            return ResponseEntity.badRequest().body("Invalid ID number");
+            return Result.fail("Invalid ID number");
         }
         // Extract the gender and age from the ID number
         String idNumber = counselor.getIdNumber();
@@ -271,27 +364,27 @@ public class AccountController {
         counselor.setPassword(PasswordUtil.convert(counselor.getPassword()));
         // Check if the phone number is valid
         if(!counselor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
-            return ResponseEntity.badRequest().body("Invalid phone number");
+            return Result.fail("Invalid phone number");
         }
         // Check if the email is valid
         if(!counselor.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            return ResponseEntity.badRequest().body("Invalid email");
+            return Result.fail("Invalid email");
         }
         // Check if the username is valid
         if(!counselor.getUsername().matches("^[A-Za-z0-9_]+$")) {
-            return ResponseEntity.badRequest().body("Invalid username");
+            return Result.fail("Invalid username");
         }
         // Check if the password is valid
         if(counselor.getPassword().length() < 6) {
-            return ResponseEntity.badRequest().body("Invalid password");
+            return Result.fail("Invalid password");
         }
         // Check if the phone number is used by another counselor
         if(accountService.isPhoneUsedByOtherCounselor(null, counselor.getPhone())) {
-            return ResponseEntity.badRequest().body("Phone number is used by another counselor");
+            return Result.fail("Phone number is used by another counselor");
         }
         // Check if the email is used by another counselor
         if(accountService.isEmailUsedByOtherCounselor(null, counselor.getEmail())) {
-            return ResponseEntity.badRequest().body("Email is used by another counselor");
+            return Result.fail("Email is used by another counselor");
         }
         // Build the user object
         User user = User.builder()
@@ -303,7 +396,7 @@ public class AccountController {
         // Insert the user
         //if the username is used by another user
         if(accountService.isUsernameUsedByOtherUser(user.getUsername())) {
-            return ResponseEntity.badRequest().body("Username is used by another user ");
+            return Result.fail("Username is used by another user ");
         }else {
             userMapper.insertUser(user);
         }
@@ -311,7 +404,7 @@ public class AccountController {
         // Set the ID of the counselor to the ID of the user
         counselor.setId(insertedUser.getId());
         // Set default values for role, create time, update time, enabled, deleted, and rating
-        counselor.setRole("counselor");
+        counselor.setRole("COUNSELOR");
         counselor.setCreateTime(LocalDateTime.now());
         counselor.setUpdateTime(LocalDateTime.now());
         counselor.setEnabled(true);
@@ -321,33 +414,43 @@ public class AccountController {
         counselor.setMaxConsult(10);
         // Insert the counselor
         if(accountService.isUsernameUsedByOtherCounselor(user.getUsername())) {
-            return ResponseEntity.badRequest().body("Username is used by another counselor");
+            return Result.fail("Username is used by another counselor");
         }else {
             counselorMapper.insertCounselor(counselor);
         }
         // Return the inserted counselor
-        return ResponseEntity.ok(Result.success("Insert counselor successfully", counselor));
+        return Result.success("Insert counselor successfully", counselor);
     }
 
 
+    // update Counselor
     @PutMapping("/counselor/{id}")
-    public ResponseEntity<Object> updateCounselor(
+    public Result updateCounselor(
         @PathVariable Long id,
         @Valid @RequestBody Counselor counselor
     ) {
+
+        // 权限控制，只有机构管理员 和 该咨询师本人可以修改
+        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
+        if (!currentUser.getRole().equals("admin")) {
+            if (currentUser.getId() != id) {
+                return Result.fail("You have no permission to update this counselor");
+            }
+        }
+
         // Check if all required fields are filled
         if(counselor.getName() == null ||
                 counselor.getIdNumber() == null || counselor.getPhone() == null || counselor.getEmail() == null ||
                 counselor.getUsername() == null || counselor.getPassword() == null) {
-            return ResponseEntity.badRequest().body("All required fields must be filled.");
+            return Result.fail("All required fields must be filled.");
         }
         // Check if the name is valid
         if(!counselor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
-            return ResponseEntity.badRequest().body("Invalid name.");
+            return Result.fail("Invalid name.");
         }
         // Check if the ID number is valid
         if(!counselor.getIdNumber().matches("(^\\d{15}$)|(^\\d{18}$)|(^\\d{17}(\\d|X|x)$)")) {
-            return ResponseEntity.badRequest().body("Invalid ID number.");
+            return Result.fail("Invalid ID number.");
         }
         // Extract the gender and age from the ID number
         String idNumber = counselor.getIdNumber();
@@ -358,27 +461,27 @@ public class AccountController {
         counselor.setUpdateTime(LocalDateTime.now());
         // Check if the phone number is valid
         if(!counselor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
-            return ResponseEntity.badRequest().body("Invalid phone number.");
+            return Result.fail("Invalid phone number.");
         }
         // Check if the email is valid
         if(!counselor.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-            return ResponseEntity.badRequest().body("Invalid email.");
+            return Result.fail("Invalid email.");
         }
         // Check if the username is valid
         if(!counselor.getUsername().matches("^[A-Za-z0-9_]+$")) {
-            return ResponseEntity.badRequest().body("Invalid username.");
+            return Result.fail("Invalid username.");
         }
         // Check if the password is valid
         if(counselor.getPassword().length() < 6) {
-            return ResponseEntity.badRequest().body("Password must be at least 6 characters long.");
+            return Result.fail("Password must be at least 6 characters long.");
         }
         // Check if the phone number is unique
         if(accountService.isPhoneUsedByOtherCounselor(id, counselor.getPhone())) {
-            return ResponseEntity.badRequest().body("Duplicate Phone Number.");
+            return Result.fail("Duplicate Phone Number.");
         }
         // Check if the email is unique
         if(accountService.isEmailUsedByOtherCounselor(id, counselor.getEmail())) {
-            return ResponseEntity.badRequest().body("Duplicate Email.");
+            return Result.fail("Duplicate Email.");
         }
         // Update the counselor
         Counselor updatedCounselor = accountService.updateCounselor(id, counselor);
@@ -391,19 +494,122 @@ public class AccountController {
                 .role("counselor")
                 .build();
         User updatedUser = accountService.updateUser(id, user);
-        return ResponseEntity.ok(updatedCounselor);
+        return Result.success("更新咨询师信息成功", updatedCounselor);
     }
 
+
+    // insert Supervisor
+    @RequiresRoles("admin")
+    @PostMapping("/supervisor")
+    public Result insertSupervisor(@Valid @RequestBody Supervisor supervisor) {
+        // Check if all required fields are filled
+        if(supervisor.getName() == null || supervisor.getUsername() == null || supervisor.getPassword() == null ||
+                supervisor.getRole() == null || supervisor.getAvatar() == null || supervisor.getGender() == null ||
+                supervisor.getPhone() == null || supervisor.getDepartment() == null || supervisor.getTitle() == null ||
+                supervisor.getQualification() == null || supervisor.getQualificationCode() == null) {
+            return Result.fail("Required fields are not filled");
+        }
+        // Check if the name is valid
+        if(!supervisor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
+            return Result.fail("Invalid name");
+        }
+        // Check if the username is valid
+        if(!supervisor.getUsername().matches("^[A-Za-z0-9_]+$")) {
+            return Result.fail("Invalid username");
+        }
+        // Check if the password is valid
+        if(supervisor.getPassword().length() < 6) {
+            return Result.fail("Invalid password");
+        }
+        supervisor.setPassword(PasswordUtil.convert(supervisor.getPassword()));
+        // Check if the phone number is valid
+        if(!supervisor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
+            return Result.fail("Invalid phone number");
+        }
+
+        // Build the user object
+        User user = User.builder()
+                .name(supervisor.getName())
+                .username(supervisor.getUsername())
+                .password(supervisor.getPassword())
+                .role("supervisor")
+                .build();
+
+        // Insert the user
+        // Check if the phone number is used by another counselor
+        if(accountService.isPhoneUsedByOtherSupervisor(null, supervisor.getPhone())) {
+            return Result.fail("Phone number is used by another counselor");
+        }
+        //if the username is used by another user
+        if(accountService.isUsernameUsedByOtherUser(user.getUsername())) {
+            return Result.fail("Username is used by another user ");
+        }else {
+            userMapper.insertUser(user);
+        }
+
+          User insertedUser = userMapper.findByUsername(user.getUsername());
+          supervisor.setId(insertedUser.getId());
+
+        // Insert the counselor
+        if(accountService.isUsernameUsedByOtherCounselor(user.getUsername())) {
+            return Result.fail("Username is used by another supervisor");
+        }else {
+            supervisorMapper.insertSupervisor(supervisor);
+        }
+        // Return the inserted counselor
+        return Result.success("Insert supervisor successfully", supervisor);
+    }
+
+
+    // update Supervisor
 
 
     //update Supervisor
     @PutMapping("/supervisor/{id}")
-    public ResponseEntity<Supervisor> updateUser(
+    public Result updateSupervisor(
             @PathVariable Long id,
             @Valid @RequestBody Supervisor supervisor
     ) {
-        Supervisor updatedSupervisor = accountService.updateSupervisor(id , supervisor);
-        //build user by supervisor
+
+        // 权限控制，只有机构管理员 和 该咨询师本人可以修改
+        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
+        if (!currentUser.getRole().equals("admin")) {
+            if (currentUser.getId() != id) {
+                return Result.fail("You have no permission to update this supervisor");
+            }
+        }
+
+        // Check if all required fields are filled
+        if(supervisor.getName() == null || supervisor.getUsername() == null || supervisor.getPassword() == null ||
+                supervisor.getRole() == null || supervisor.getAvatar() == null || supervisor.getGender() == null ||
+                supervisor.getPhone() == null || supervisor.getDepartment() == null || supervisor.getTitle() == null ||
+                supervisor.getQualification() == null || supervisor.getQualificationCode() == null) {
+            return Result.fail("Required fields are not filled");
+        }
+        // Check if the name is valid
+        if(!supervisor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
+            return Result.fail("Invalid name.");
+        }
+        // Check if the username is valid
+        if(!supervisor.getUsername().matches("^[A-Za-z0-9_]+$")) {
+            return Result.fail("Invalid username.");
+        }
+        // Check if the password is valid
+        if(supervisor.getPassword().length() < 6) {
+            return Result.fail("Password must be at least 6 characters long.");
+        }
+        // Check if the phone number is valid
+        if(!supervisor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
+            return Result.fail("Invalid phone number.");
+        }
+        // Check if the phone number is unique
+        if(accountService.isPhoneUsedByOtherSupervisor(id, supervisor.getPhone())) {
+            return Result.fail("Duplicate Phone Number.");
+        }
+
+        // Update the Supervisor
+        Supervisor updatedSupervisor = accountService.updateSupervisor(id, supervisor);
+        // Build user by Supervisor
         User user = User.builder()
                 .id(updatedSupervisor.getId())
                 .name(updatedSupervisor.getName())
@@ -412,7 +618,7 @@ public class AccountController {
                 .role("supervisor")
                 .build();
         User updatedUser = accountService.updateUser(id, user);
-        return ResponseEntity.ok(updatedSupervisor);
+        return Result.success("更新督导信息成功", updatedSupervisor);
     }
 
 

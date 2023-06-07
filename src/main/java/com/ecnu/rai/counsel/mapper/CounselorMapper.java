@@ -2,6 +2,7 @@ package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ecnu.rai.counsel.entity.Counselor;
+import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
@@ -18,7 +19,10 @@ public interface CounselorMapper extends BaseMapper<Counselor> {
     Counselor findById(@Param("id") Long id);
 
     @Select("SELECT * FROM supervise WHERE counselor_id = #{id}")
-    List<Supervisor> findSupervisors(@Param("id") Long id);
+    List<Supervise> findSupervisors(@Param("id") Long id);
+
+    @Select("SELECT * FROM supervise WHERE supervisor_id = #{id}")
+    List<Supervise> findCounselors(@Param("id") Long id);
 
     //generate SQL statement to update counselor info
     @Update("UPDATE counselor SET " +

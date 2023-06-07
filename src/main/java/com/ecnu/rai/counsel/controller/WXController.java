@@ -143,8 +143,6 @@ public class WXController {
 
 
 
-
-
     @ResponseBody
     @CrossOrigin
     @RequestMapping("/wx/login")

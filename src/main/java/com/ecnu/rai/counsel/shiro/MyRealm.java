@@ -2,7 +2,6 @@ package com.ecnu.rai.counsel.shiro;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.entity.User;
-import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -23,7 +22,7 @@ public class MyRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 
         Object principal = principals.getPrimaryPrincipal();
-        Visitor user = (Visitor) principal;
+        User user = (User) principal;
 
         String username = user.getUsername();
         String role = user.getRole();
@@ -32,7 +31,7 @@ public class MyRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 
         //管理员
-        if(role == "admin"){
+        if (role.equals("admin")){
             info.addRole("admin");
             info.addRole("online");
             info.addRole("insert");
@@ -42,7 +41,7 @@ public class MyRealm extends AuthorizingRealm {
         }
 
         //普通用户
-        if(role == "visitor") {
+        else if (role.equals("visitor")) {
             info.addRole("visitor");
             info.addRole("online");
         }
