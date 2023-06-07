@@ -1,19 +1,14 @@
 package com.ecnu.rai.counsel.controller;
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.config.WXConfig;
 import com.ecnu.rai.counsel.dao.EditRequest;
-import com.ecnu.rai.counsel.dao.NormalRequest;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.mapper.UserMapper;
@@ -29,7 +24,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import com.ecnu.rai.counsel.util.TokenGenUtil;
 import javax.servlet.http.HttpServletRequest;
@@ -117,14 +111,14 @@ public class WXController {
         return Result.success("信息修改成功");
     }
     @PostMapping("/wx/delete")
-    public String deleteVisitor(@RequestBody NormalRequest request){
-        if(!TokenUtil.token_check(request.getToken())){
+    public String deleteVisitor(@RequestParam("token") String token){
+        if(!TokenUtil.token_check(token)){
             System.out.println("Token过期或非法");
             return("Token过期或非法");
 
         }
         else{
-            DecodedJWT jwt = JWT.decode(request.getToken());
+            DecodedJWT jwt = JWT.decode(token);
             String openid = jwt.getClaim("openid").asString();
             if(!wxService.visitorExist(openid)){
                 return("用户不存在");
@@ -137,8 +131,8 @@ public class WXController {
     }
 
     @PostMapping("/wx/counselor")
-    public Object getCounselor(@RequestBody NormalRequest request){
-        if(!TokenUtil.token_check(request.getToken())){
+    public Object getCounselor(@RequestParam("token") String token){
+        if(!TokenUtil.token_check(token)){
             System.out.println("Token过期或非法");
             return null;
         }
