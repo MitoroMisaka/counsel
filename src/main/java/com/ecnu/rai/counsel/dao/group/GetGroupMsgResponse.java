@@ -8,6 +8,8 @@ import java.util.List;
 
 @Data
 public class GetGroupMsgResponse {
+    @ApiModelProperty(value = "会话id")
+    private Long id;
     @ApiModelProperty(value = "腾讯IM用户id")
     private String userid;
     @ApiModelProperty(value = "腾讯IM咨询师id")

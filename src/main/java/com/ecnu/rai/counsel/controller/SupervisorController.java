@@ -82,7 +82,7 @@ public class SupervisorController {
             @RequestParam(value = "size", defaultValue = "20") Integer size,
             @RequestParam(value = "order", defaultValue = "id_asc") String order
     ) {
-        return supervisorService.findSupervisorList(page, size, order);
+        return supervisorService.getSupervisorList(page, size, order);
     }
 
     @PostMapping("/update")
@@ -112,7 +112,7 @@ public class SupervisorController {
             return Result.fail("qualification必须是合法值为“一级”、“二级”、“三级”");
         }
         //gender只能为男或女
-        if(!supervisor.getGender().equals(0) && !supervisor.getGender().equals(1)){
+        if(!supervisor.getGender().equals("男") && !supervisor.getGender().equals("女")){
             return Result.fail("gender只能为男(0)或女(1)");
         }
         //密码必须是6-20位
