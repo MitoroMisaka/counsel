@@ -1,9 +1,13 @@
 package com.ecnu.rai.counsel.controller;
 
+import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.entity.Counselor;
+import com.ecnu.rai.counsel.entity.Supervisor;
 import com.ecnu.rai.counsel.mapper.SuperviseMapper;
 import com.ecnu.rai.counsel.service.CounselorService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,11 +40,20 @@ public class CounselorController {
     }
 
 
-    @PostMapping("/getAsupervisors")
-    @ApiOperation("查看绑定督导")
-    public Result askForBinding(@RequestBody Counselor counselor) {
-        List<HashMap<String,Object>> Asupervisors = superviseMapper.selectBindedSupervisor(counselor);
-        return Result.success("获取成功",Asupervisors);
+    @GetMapping("/getSupervisors")
+    @ApiOperation("获取咨询师绑定的督导")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "咨询师id", required = true, dataType = "Long"),
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
+    public Page<Supervisor> getAvailableCounselor(@RequestParam("id") Long id,
+                                                  @RequestParam("page") Integer page,
+                                                  @RequestParam("size") Integer size,
+                                                  @RequestParam("order") String order) {
+        return counselorService.getAvailableSupervisor(id, page, size, order);
     }
+
 
 }
