@@ -100,5 +100,6 @@ public class Counselor {
     //maxConsult
     @ApiModelProperty(value = "最大咨询量", example = "10")
     private Integer maxConsult;
+
 }
 
