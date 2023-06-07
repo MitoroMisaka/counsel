@@ -33,6 +33,8 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
             "WHERE id = #{arrange.id}")
     void updateArrange(@Param("arrange") Arrange arrange);
 
+
+
     @Select("SELECT * FROM arrange WHERE user = #{user}")
     List<Arrange> findByUser(@Param("user") Long user);
 

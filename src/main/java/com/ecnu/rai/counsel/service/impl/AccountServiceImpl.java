@@ -230,7 +230,17 @@ public class AccountServiceImpl implements AccountService {
             // Check if the counselor exists
             return counselor != null;
         }
+
+    @Override
+    public boolean isUsernameUsedByOtherSupervisor(String username) {
+        // Get the supervisor with the given username
+        Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("username", username));
+        // Check if the supervisor exists
+        return supervisor != null;
     }
+
+
+}
 
     
 

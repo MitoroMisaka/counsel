@@ -1,5 +1,4 @@
 package com.ecnu.rai.counsel.controller;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
@@ -16,6 +15,7 @@ import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.mapper.VisitorMapper;
 import com.ecnu.rai.counsel.service.WXService;
 import com.ecnu.rai.counsel.util.TokenUtil;
+import com.ecnu.rai.counsel.util.VerifyCodeGenUtil;
 import com.ecnu.rai.counsel.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -83,9 +83,16 @@ public class WXController {
         else{
             u = wxService.findByopenid(openid);
         }
+        if(visitorMapper.ifPhoneExist(request.getPhoneNumber())==0)
+        {
+            u.setPhone(request.getPhoneNumber());
+        }
+        else
+        {
+            return Result.fail("该号码已经注册过");
+        }
         u.setName(request.getRealName());
         u.setUsername(request.getUserName());
-        u.setPhone(request.getPhoneNumber());
         u.setEmergentContact(request.getEmergencyContactName());
         u.setEmergentPhone(request.getEmergencyContactPhoneNumber());
         u.setRole("visitor");
@@ -99,6 +106,7 @@ public class WXController {
         user.setName(request.getRealName());
         user.setUsername(request.getUserName());
         user.setRole("visitor");
+        user.setState(1);
         userMapper.updateUser(user);
         return Result.success("信息修改成功");
     }
@@ -128,12 +136,8 @@ public class WXController {
             System.out.println("Token过期或非法");
             return null;
         }
-        LocalDateTime localDateTime = LocalDateTime.of(2023,5,24,19,28,22);
-        List<HashMap<String,Object>> counselorUserviews = visitorMapper.findAvailableCounselor(localDateTime);
-//        for (Object obj : counselorUserviews) {
-//            System.out.println(obj);
-//        }
-        return counselorUserviews;
+        LocalDateTime localDateTime = LocalDateTime.now();
+        return visitorMapper.findAvailableCounselor(localDateTime);
 
     }
 
@@ -141,19 +145,17 @@ public class WXController {
 
     @ResponseBody
     @CrossOrigin
-    @GetMapping("/wx/login")
-    public String login(HttpServletRequest request) throws IOException {
+    @RequestMapping("/wx/login")
+    public Result login(HttpServletRequest request) throws IOException {
 
         String code = request.getParameter("code");
         if (code == null){
             log.error("用户取消登录");
-            return null;
+            return Result.fail("用户取消登录");
         }
-        String url = "https://api.weixin.qq.com/sns/jscode2session?" +
-                "appid=" + wxConfig.getAppId() +
-                "&secret=" + wxConfig.getAppSecret() +
-                "&js_code=" + code +
-                "&grant_type=authorization_code";
+        String url = "https://api.weixin.qq.com/sns/jscode2session?appid="
+                 +wxConfig.getAppId() +"&secret="+wxConfig.getAppSecret()
+                 +"&js_code="+code+"&grant_type=authorization_code";
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = httpClient.execute(httpGet);
@@ -173,13 +175,18 @@ public class WXController {
         }
         else {
             Visitor u = wxService.findByopenid(openid);
-            u.setOpenid(openid);
+            User user = userMapper.findById(u.getId());
+            if(user.getState()==0)
+            {
+                System.out.println("账号已禁用");
+                return Result.fail("账号已禁用");
+            }
             token = TokenGenUtil.TokenGen(u);
         }
 
 
-        return token;
-        //   return "登录成功";
+return Result.success(token);
+     //   return "登录成功";
     }
 
 

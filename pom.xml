@@ -108,6 +108,12 @@
 			<version>3.1.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.tencentcloudapi</groupId>
+			<artifactId>tencentcloud-sdk-java</artifactId>
+			<version>3.1.313</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
@@ -141,14 +147,6 @@
 			<artifactId>shiro-cas</artifactId>
 			<version>1.4.1</version>
 		</dependency>
-
-
-		<!-- Spring Boot Redis 依赖 -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency>
-
 
 		<!--hutool加密解密工具-->
 		<dependency>
@@ -199,12 +197,6 @@
             <version>RELEASE</version>
             <scope>compile</scope>
         </dependency>
-
-		<dependency>
-			<groupId>com.tencentcloudapi</groupId>
-			<artifactId>tencentcloud-sdk-java</artifactId>
-			<version>3.1.460</version>
-		</dependency>
 
 
     </dependencies>
