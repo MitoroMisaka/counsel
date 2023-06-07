@@ -26,7 +26,7 @@ public class Counselor {
 
     @ApiModelProperty(value = "姓名", example = "John Smith")
     @NotNull(message = "姓名不能为空")
-    @Size(min = 1, max = 50, message = "姓名长度必须在1到50个字符之间")
+    @Size(min = 1, max = 50, message = "姓名长度必须在2-16个字符之间")
     private String name;
 
     @ApiModelProperty(value = "用户名", example = "john")

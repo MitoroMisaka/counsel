@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,7 +27,8 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     public Conversation insertConversationByID(Conversation conversation) {
-        return conversationMapper.insertConversationByID(conversation);
+        conversationMapper.insertConversationByID(conversation);
+        return conversationMapper.getLastConversation();
     }
 
     @Override
@@ -39,7 +41,8 @@ public class ConversationServiceImpl implements ConversationService {
         // Update the supervisor properties
         existingConversation.setCreateTime(conversation.getCreateTime());
         existingConversation.setCreator(conversation.getCreator());
-        existingConversation.setLastUpdateTime(conversation.getLastUpdateTime());
+        //update the time now
+        existingConversation.setLastUpdateTime(LocalDateTime.now());
         existingConversation.setLastUpdater(conversation.getLastUpdater());
         existingConversation.setYear(conversation.getYear());
         existingConversation.setMonth(conversation.getMonth());
@@ -51,6 +54,7 @@ public class ConversationServiceImpl implements ConversationService {
         existingConversation.setVisitorName(conversation.getVisitorName());
         existingConversation.setEvaluate(conversation.getEvaluate());
         existingConversation.setConversationType(conversation.getConversationType());
+        existingConversation.setMessage(conversation.getMessage());
 
         // Perform the update in the database
         conversationMapper.updateConversation(existingConversation);

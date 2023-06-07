@@ -21,6 +21,11 @@ public class CounselorServiceImpl implements CounselorService {
     private SupervisorMapper supervisorMapper;
 
     @Override
+    public void addCounselor(Counselor counselor) {
+        counselorMapper.insertCounselor(counselor);
+    }
+
+    @Override
     public Counselor findCounselorByID(Long id) {
         Counselor counselor = counselorMapper.findById(id);
 
