@@ -34,6 +34,8 @@ public interface AccountService {
     boolean isUsernameUsedByOtherUser(String username);
 
     boolean isUsernameUsedByOtherCounselor(String username);
+
+    boolean isUsernameUsedByOtherSupervisor(String username);
 }
 
 

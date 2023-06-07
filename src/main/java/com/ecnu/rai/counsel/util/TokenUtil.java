@@ -5,12 +5,14 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-
+import com.ecnu.rai.counsel.entity.Visitor;
+import com.ecnu.rai.counsel.mapper.VisitorMapper;
 import java.util.Date;
 
 public class TokenUtil {
 
     public static final String secret = "sdjhakdhajdklsl;o653632";
+
 
     public static  boolean token_check(String token) {
         if(token == null) {
@@ -42,6 +44,7 @@ public class TokenUtil {
             System.out.println("Signature verification failed: " + e.getMessage());
             return false;
         }
+
 
     }
 }
