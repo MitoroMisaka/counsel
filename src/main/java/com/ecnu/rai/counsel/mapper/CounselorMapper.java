@@ -49,4 +49,5 @@ public interface CounselorMapper extends BaseMapper<Counselor> {
         "#{counselor.gender}, #{counselor.age}, #{counselor.phone}, #{counselor.email}, #{counselor.department}, #{counselor.title}, #{counselor.createTime}, #{counselor.updateTime} , " +
         "#{counselor.enabled}, #{counselor.deleted}, #{counselor.status},#{counselor.rating}, #{counselor.maxConsult})")
     void insertCounselor(@Param("counselor") Counselor counselor);
+
 }
