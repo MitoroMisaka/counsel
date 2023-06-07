@@ -32,19 +32,19 @@ spring:
     timeout: 1000
 
 wx:
-  appId: wx418a58e02b4066c1
-  appSecret: 9ff73d06c24154a1854999ea6e810733
-#  appId: wx548a99cf2b57984c
-#  appSecret: 20045ded4b565219e4d7116f01d6a1dd
+  appId: wx418a58e02xxx
+  appSecret: 9ff73d06c24154a1854999ea6exxx
+#  appId: wx548a99cf2b5xxx
+#  appSecret: 20045ded4b565219e4d7116f01dxxxx
 
 im:
-  sdkAppId: 1400810659
-  secretKey: 09c3165c7f23871cdbef8f6db600ae2c59ee44b4628b44f7f6896a69cde2282d
+  sdkAppId: 140081xxx
+  secretKey: 09c3165c7f23871cdbef8f6db600ae2c59ee44b4628b44f7f6896a6xxxx
 
 tencent:
   msm:
-    id: AKIDc3GDvObaVBcnjRsDKJ3LOhkY6OQEpAH9
-    secret: e2kDQN4XkL3zg7IEvPdbOzKPGuhPuCI9
+    id: AKIDc3GDvObaVBcnjRsDKJ3LOhkY6OQEpAH9xxx
+    secret: e2kDQN4XkL3zg7IEvPdbOzKPGuhPuCI9xxx
     appId: 1400826946
     signName: 个人Java开发技术分享
     templateId: 1820500
