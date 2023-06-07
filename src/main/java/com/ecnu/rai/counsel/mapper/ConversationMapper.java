@@ -1,7 +1,7 @@
 package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ecnu.rai.counsel.entity.Counselor;
+import com.ecnu.rai.counsel.entity.Arrange;
 import com.ecnu.rai.counsel.entity.Conversation;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
@@ -11,13 +11,6 @@ import java.util.List;
 
 @Repository
 public interface ConversationMapper extends BaseMapper<Conversation> {
-
-
-    @Select("SELECT max_consult FROM counselor WHERE name = #{counselor}")
-    Integer getMaxConsult(@Param("counselor") String counselor);
-
-    @Select("SELECT count(*) FROM conversation WHERE counselor = #{counselor} AND status = 'STARTED'")
-    Integer getConsultNum(@Param("counselor") String counselor);
 
     @Select("SELECT * FROM conversation WHERE id = #{id}")
     Conversation findById(@Param("id") Long id);
@@ -29,10 +22,7 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
             "(#{conversation.id}, #{conversation.createTime}, #{conversation.creator}, #{conversation.lastUpdateTime}, #{conversation.lastUpdater}, " +
             "#{conversation.year}, #{conversation.month}, #{conversation.day}, #{conversation.startTime}, #{conversation.endTime}, #{conversation.user}, #{conversation.counselor}, #{conversation.status}, " +
             "#{conversation.visitorName}, #{conversation.evaluate}, #{conversation.conversationType})")
-    void insertConversationByID(@Param("conversation") Conversation conversation);
-
-    @Select("SELECT * FROM conversation ORDER BY id DESC LIMIT 1")
-    Conversation getLastConversation();
+    Conversation insertConversationByID(@Param("conversation") Conversation conversation);
 
     @Insert("INSERT INTO conversation (create_time, creator, last_update_time, last_updater, year, month, day, start_time, end_time, user, counselor, status, visitor_name, evaluate, conversation_type, message) " +
             "VALUES (#{conversation.createTime}, #{conversation.creator}, #{conversation.lastUpdateTime}, #{conversation.lastUpdater}, #{conversation.year}, #{conversation.month}, #{conversation.day}, #{conversation.startTime}, #{conversation.endTime}, #{conversation.user}, #{conversation.counselor}, #{conversation.status}, #{conversation.visitorName}, #{conversation.evaluate}, #{conversation.conversationType}, #{conversation.message})")
@@ -42,7 +32,7 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     @Update("UPDATE conversation SET " +
             "create_time = #{conversation.createTime}, " +
             "creator = #{conversation.creator}, " +
-            "last_update_time = #{conversation.lastUpdateTime}, " +
+            "last_update_time = #{conversation.lastUpdate_time}, " +
             "last_updater = #{conversation.lastUpdater}, " +
             "year = #{conversation.year}, " +
             "month = #{conversation.month}, " +

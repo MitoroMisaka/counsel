@@ -6,10 +6,6 @@ import com.ecnu.rai.counsel.entity.Supervisor;
 
 public interface SupervisorService {
 
-    Page<Supervisor> getSupervisorList(Integer page, Integer size, String order);
-
-    void addSupervisor(Supervisor supervisor);
-
     Supervisor findSupervisorByID(Long id);
 
     void updateSupervisor(Supervisor supervisor);
