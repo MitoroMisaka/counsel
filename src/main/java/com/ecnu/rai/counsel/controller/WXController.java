@@ -1,4 +1,5 @@
 package com.ecnu.rai.counsel.controller;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
@@ -140,7 +141,7 @@ public class WXController {
 
     @ResponseBody
     @CrossOrigin
-    @RequestMapping("/wx/login")
+    @GetMapping("/wx/login")
     public String login(HttpServletRequest request) throws IOException {
 
         String code = request.getParameter("code");
@@ -148,9 +149,11 @@ public class WXController {
             log.error("用户取消登录");
             return null;
         }
-        String url = "https://api.weixin.qq.com/sns/jscode2session?appid="
-                 +wxConfig.getAppId() +"&secret="+wxConfig.getAppSecret()
-                 +"&js_code="+code+"&grant_type=authorization_code";
+        String url = "https://api.weixin.qq.com/sns/jscode2session?" +
+                "appid=" + wxConfig.getAppId() +
+                "&secret=" + wxConfig.getAppSecret() +
+                "&js_code=" + code +
+                "&grant_type=authorization_code";
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = httpClient.execute(httpGet);
@@ -175,8 +178,8 @@ public class WXController {
         }
 
 
-return token;
-     //   return "登录成功";
+        return token;
+        //   return "登录成功";
     }
 
 
