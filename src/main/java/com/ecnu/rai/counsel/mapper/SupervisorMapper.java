@@ -18,9 +18,6 @@ public interface SupervisorMapper extends BaseMapper<Supervisor> {
     @Select("SELECT * FROM supervisor WHERE id = #{id}")
     Supervisor findById(Long id);
 
-    @Select("SELECT * FROM supervisor")
-    List<Supervisor> getAll();
-
     @Select("SELECT * FROM supervise WHERE counselor_id = #{id}")
     List<Supervise> findSupervisors(@Param("id") Long id);
 

@@ -37,8 +37,5 @@ public class User {
 
     @ApiModelProperty(value = "角色", example = "admin")
     private String role;
-
-    @ApiModelProperty(value = "可用")
-    private Integer state;
 }
 
