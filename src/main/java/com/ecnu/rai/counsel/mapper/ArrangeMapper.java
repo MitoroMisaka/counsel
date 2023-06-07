@@ -60,4 +60,7 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     List<DayNum> findArrangeSupervisorInfoByYearMonthDay(@Param("year") Integer year,
                                                 @Param("month") Integer month);
 
+    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role=\"counselor\"")
+    List<Long> findCounselorByCurrentTime();
+
 }
