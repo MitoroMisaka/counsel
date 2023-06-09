@@ -15,14 +15,14 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
     @Select("SELECT * FROM visitor WHERE id = #{id}")
     Visitor findById(@Param("id") Long id);
 
-    @Update("UPDATE visitor SET name = #{visitor.name}, username = #{visitor.username}, password = #{visitor.password}, role = #{visitor.role}, " +
+    @Update("UPDATE visitor SET name = #{visitor.name}, username = #{visitor.username}, role = #{visitor.role}, " +
             "avatar = #{visitor.avatar}, phone = #{visitor.phone}, gender = #{visitor.gender}, department = #{visitor.department}, " +
             "title = #{visitor.title}, emergent_contact = #{visitor.emergentContact}, emergent_phone = #{visitor.emergentPhone} " +
             "WHERE id = #{visitor.id}")
     void updateVisitor(@Param("visitor") Visitor visitor);
 
 
-    @Insert("INSERT INTO visitor (openid,id,name,available) VALUES (#{openid},#{id},'用户',1)")
+    @Insert("INSERT INTO visitor (openid,id,name) VALUES (#{openid},#{id},'用户')")
     void insertVisitor(@Param("openid")String openid ,@Param("id")Long id);
 
 
