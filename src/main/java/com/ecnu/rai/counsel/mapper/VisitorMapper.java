@@ -22,7 +22,7 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
     void updateVisitor(@Param("visitor") Visitor visitor);
 
 
-    @Insert("INSERT INTO visitor (openid,id,name) VALUES (#{openid},#{id},'用户',1)")
+    @Insert("INSERT INTO visitor (openid,id,name) VALUES (#{openid},#{id},'用户')")
     void insertVisitor(@Param("openid")String openid ,@Param("id")Long id);
 
 
