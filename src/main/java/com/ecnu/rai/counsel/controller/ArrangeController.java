@@ -11,6 +11,8 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -26,6 +28,23 @@ public class ArrangeController {
     public Result getArrangebyID(@RequestParam("id") Long id) {
         Arrange arrange = arrangeService.findArrangeByID(id);
         return Result.success("获取成功", arrange);
+    }
+
+    @PostMapping("/insert")
+    //添加接口的信息,id, creator,updater,updateTime,createTime,year,month,day可以不用给出
+    @ApiOperation("添加排班信息,给出startTime endTime user role weekday 即可")
+    public Result addArrange(@RequestBody Arrange arrange){
+        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
+        arrange.setCreator(currentUser.getId());
+        arrange.setLastUpdater(currentUser.getId());
+        arrange.setLastUpdateTime(LocalDateTime.now());
+        arrange.setCreateTime(LocalDateTime.now());
+        arrange.setYear(LocalDateTime.now().getYear());
+        arrange.setMonth(LocalDateTime.now().getMonthValue());
+        arrange.setDay(LocalDateTime.now().getDayOfMonth());
+        arrange.setLocalDate(LocalDateTime.now());
+        arrangeService.addArrange(arrange);
+        return Result.success("添加成功");
     }
 
     @RequiresRoles("admin")

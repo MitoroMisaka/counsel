@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface ArrangeService {
 
+    void addArrange(Arrange arrange);
+
     Arrange findArrangeByID(Long id);
 
     Arrange updateArrange(Arrange arrange);

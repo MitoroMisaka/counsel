@@ -94,7 +94,6 @@ public class AccountServiceImpl implements AccountService {
             existingVisitor.setName(visitor.getName());
             existingVisitor.setUsername(visitor.getUsername());
             // existingVisitor.setPassword(PasswordUtil.convert(visitor.getPassword()));
-            existingVisitor.setPassword(visitor.getPassword());
             existingVisitor.setRole(visitor.getRole());
             existingVisitor.setAvatar(visitor.getAvatar());
             existingVisitor.setPhone(visitor.getPhone());

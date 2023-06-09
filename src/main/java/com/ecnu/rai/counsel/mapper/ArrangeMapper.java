@@ -3,6 +3,7 @@ package com.ecnu.rai.counsel.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ecnu.rai.counsel.entity.Arrange;
 import com.ecnu.rai.counsel.response.DayNum;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -12,6 +13,10 @@ import java.util.List;
 
 @Repository
 public interface ArrangeMapper extends BaseMapper<Arrange> {
+
+    @Insert("INSERT INTO arrange (create_time, creator, last_update_time, last_updater, year, month, day, start_time, end_time, user, role, weekday, local_date) " +
+            "VALUES (#{arrange.createTime}, #{arrange.creator}, #{arrange.lastUpdate_time}, #{arrange.lastUpdater}, #{arrange.year}, #{arrange.month}, #{arrange.day}, #{arrange.startTime}, #{arrange.endTime}, #{arrange.user}, #{arrange.role}, #{arrange.weekday}, #{arrange.localDate})")
+    void insertArrange(@Param("arrange") Arrange arrange);
 
     @Select("SELECT * FROM arrange WHERE id = #{id}")
     Arrange findById(@Param("id") Long id);
