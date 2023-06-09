@@ -41,6 +41,18 @@ public class SupervisorServiceImpl implements SupervisorService {
     }
 
     @Override
+    public Page<Supervisor> getSupervisorList(Integer page, Integer size, String order) {
+        PageHelper.startPage(page, size, order);
+        List<Supervisor> supervisorList = supervisorMapper.getAll();
+        return new Page<>(new PageInfo<>(supervisorList));
+    }
+
+    @Override
+    public void addSupervisor(Supervisor supervisor) {
+        supervisorMapper.insertSupervisor(supervisor);
+    }
+
+    @Override
     public Supervisor findSupervisorByID(Long id) {
         return supervisorMapper.findById(id);
     }

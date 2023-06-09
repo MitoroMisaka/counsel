@@ -35,6 +35,8 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
     @Delete("DELETE FROM visitor WHERE openid =#{openid}")
     void deleteVisitor(@Param("openid") String openid);
 
+    @Select("SELECT count(*) FROM visitor where phone=#{phone} limit 1")
+    int ifPhoneExist(@Param("phone")String phone);
 
     @Select("SELECT count(*) FROM visitor where openid=#{openid} limit 1")
     int ifVisitorExist(@Param("openid")String openid);

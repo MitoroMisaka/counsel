@@ -38,9 +38,14 @@ public class ConversationController {
         return Result.success("获取成功", conversation);
     }
 
-    @GetMapping("/insert")
-    @ApiOperation("插入会话信息")
-    public Result insertConversationbyID(@Valid @RequestBody Conversation conversation) {
+    @PostMapping("/start")
+    @ApiOperation("开始会话(就是建个表,给出咨询师和用户的姓名就行)")
+    public Result insertConversation(@Valid @RequestBody Conversation conversation) {
+        Integer maxConsult = conversationMapper.getMaxConsult(conversation.getCounselor());
+        if(maxConsult.equals(conversationMapper.getConsultNum(conversation.getCounselor()))){
+            Result.fail("咨询师咨询次数已达上限");
+        }
+        conversation.setStatus("STARTED");
         Conversation new_conversation = conversationService.insertConversationByID(conversation);
         return Result.success("获取成功", new_conversation);
     }
@@ -150,7 +155,7 @@ public class ConversationController {
     }
 
     @PostMapping("/save_group_msg")
-    @ApiOperation(value = "存储群聊信息", notes = "save the conversation ")
+    @ApiOperation(value = "存储群聊信息/结束会话", notes = "save the conversation ")
     @ResponseBody
     public Result saveGroupMsg(@Valid @RequestBody GetGroupMsgResponse getGroupMsgResponse){
         System.out.println(getGroupMsgResponse);
@@ -183,7 +188,7 @@ public class ConversationController {
                 .conversationType("C2C")
                 .message(history)
                 .build();
-        conversationMapper.insertConversation(conversation);
+        conversationMapper.updateConversation(conversation);
         return Result.success("save and insert conversation ");
     }
 

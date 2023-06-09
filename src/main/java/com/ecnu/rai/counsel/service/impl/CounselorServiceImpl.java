@@ -46,6 +46,11 @@ public class CounselorServiceImpl implements CounselorService {
     }
 
     @Override
+    public void addCounselor(Counselor counselor) {
+        counselorMapper.insertCounselor(counselor);
+    }
+
+    @Override
     public Page<Counselor> getAvailableCounselor(Integer page, Integer size, String order) {
         List<Long> availableCounselorIdList = arrangeMapper.findCounselorByCurrentTime();
         List<Counselor> counselorList = new ArrayList<>();

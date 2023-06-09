@@ -99,6 +99,7 @@ public class WXController {
         user.setName(request.getRealName());
         user.setUsername(request.getUserName());
         user.setRole("visitor");
+        user.setState(1);
         userMapper.updateUser(user);
         return Result.success("信息修改成功");
     }
@@ -141,19 +142,17 @@ public class WXController {
 
     @ResponseBody
     @CrossOrigin
-    @GetMapping("/wx/login")
-    public String login(HttpServletRequest request) throws IOException {
+    @RequestMapping("/wx/login")
+    public Result login(HttpServletRequest request) throws IOException {
 
         String code = request.getParameter("code");
         if (code == null){
             log.error("用户取消登录");
-            return null;
+            return Result.fail("用户取消登录");
         }
-        String url = "https://api.weixin.qq.com/sns/jscode2session?" +
-                "appid=" + wxConfig.getAppId() +
-                "&secret=" + wxConfig.getAppSecret() +
-                "&js_code=" + code +
-                "&grant_type=authorization_code";
+        String url = "https://api.weixin.qq.com/sns/jscode2session?appid="
+                +wxConfig.getAppId() +"&secret="+wxConfig.getAppSecret()
+                +"&js_code="+code+"&grant_type=authorization_code";
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = httpClient.execute(httpGet);
@@ -173,12 +172,17 @@ public class WXController {
         }
         else {
             Visitor u = wxService.findByopenid(openid);
-            u.setOpenid(openid);
+            User user = userMapper.findById(u.getId());
+            if(user.getState()==0)
+            {
+                System.out.println("账号已禁用");
+                return Result.fail("账号已禁用");
+            }
             token = TokenGenUtil.TokenGen(u);
         }
 
 
-        return token;
+        return Result.success(token);
         //   return "登录成功";
     }
 
