@@ -333,11 +333,6 @@ public class AccountController {
         if(counselor.getSupervisors().isEmpty()) {
             return Result.fail("Should bind at least one supervisor.");
         }
-        //Bind counselor and supervisors
-        for(Supervisor supervisor: counselor.getSupervisors())
-        {
-            superviseMapper.makeSupervise(counselor.getId(), supervisor.getId());
-        }
         // Build the user object
         User user = User.builder()
                 .name(counselor.getName())
@@ -371,6 +366,11 @@ public class AccountController {
             counselorMapper.insertCounselor(counselor);
         }
         // Return the inserted counselor
+        //Bind counselor and supervisors
+        for(Supervisor supervisor: counselor.getSupervisors())
+        {
+            superviseMapper.makeSupervise(counselor.getId(), supervisor.getId());
+        }
         return Result.success("Insert counselor successfully", counselor);
     }
 

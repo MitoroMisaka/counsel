@@ -35,6 +35,6 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Options(useGeneratedKeys = true, keyProperty = "id")
     @Insert("INSERT INTO user(role) values ('visitor')")
-    Long addVisitor(@Param("user")User user);
+    void addVisitor(@Param("user")User user);
 
 }

@@ -49,7 +49,7 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     @Select("SELECT day, COUNT(DISTINCT(user)) AS num FROM arrange WHERE " +
             "year = #{year} AND " +
             "month = #{month} AND " +
-            "role = \"counselor\" " +
+            "role = 'counselor' " +
             "GROUP BY day")
     List<DayNum> findArrangeCounselorInfoByYearMonthDay(@Param("year") Integer year,
                                                         @Param("month") Integer month);
@@ -57,12 +57,15 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     @Select("SELECT day, COUNT(DISTINCT(user)) AS num FROM arrange WHERE " +
             "year = #{year} AND " +
             "month = #{month} AND " +
-            "role = \"supervisor\" " +
+            "role = 'supervisor' " +
             "GROUP BY day")
     List<DayNum> findArrangeSupervisorInfoByYearMonthDay(@Param("year") Integer year,
                                                 @Param("month") Integer month);
 
-    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role=\"counselor\"")
+    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='counselor' ")
     List<Long> findCounselorByCurrentTime();
+
+    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='supervisor' ")
+    List<Long> findSupervisorByCurrentTime();
 
 }
