@@ -43,13 +43,13 @@ wx:
 #  appSecret: 20045ded4b565219e4d7116f01dxxxx
 
 im:
-  sdkAppId: 140081xxx
-  secretKey: 09c3165c7f23871cdbef8f6db600ae2c59ee44b4628b44f7f6896a6xxxx
+  sdkAppId: 1400810789
+  secretKey: 0cec25940a6e8b81c8e2f75b45796101920657dc1789679e10969f04ce037e52
 
 tencent:
   msm:
-    id: AKIDc3GDvObaVBcnjRsDKJ3LOhkY6OQEpAH9xxx
-    secret: e2kDQN4XkL3zg7IEvPdbOzKPGuhPuCI9xxx
+    id: AKIDc3GDvObaVBcnjRsDKJ3LOhkY6OQEpAH9
+    secret: e2kDQN4XkL3zg7IEvPdbOzKPGuhPuCI9
     appId: 1400826946
     signName: 个人Java开发技术分享
     templateId: 1820500
