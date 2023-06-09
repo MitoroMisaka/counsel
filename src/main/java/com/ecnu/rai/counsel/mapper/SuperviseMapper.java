@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface SuperviseMapper {
     @Insert("INSERT INTO supervise values (#{counselorid},#{supervisorid})")
-    void makeSupervise(@Param("counselor")Long counselorid, @Param("supervisor")Long supervisorid);
+    void makeSupervise(@Param("counselorid")Long counselorid, @Param("supervisorid")Long supervisorid);
 
     @Select("Select supervisor_id,name from supervisor where counselor_id = #{counselor.id}")
     List<HashMap<String,Object>> selectBindedSupervisor(@Param("counselor")Counselor counselor);
@@ -26,6 +26,9 @@ public interface SuperviseMapper {
     @Select("SELECT * FROM supervise WHERE supervisor_id = #{id}")
     List<Supervise> findCounselors(@Param("id") Long id);
 
-    @Delete("DELETE FROM supervise WHERE counselor_id = #{counselor.id} and supervisor_id = #{supervisor.id}")
-    void deleteSupervise(@Param("counselor")Long counselorid, @Param("supervisor")Long supervisorid);
+    @Select("SELECT count(*) FROM supervise WHERE supervisor_id = #{supervisorid} and counselor_id = #{counselorid} limit 1")
+    int findSupervise(@Param("counselorid") Long counselorid,@Param("supervisorid") Long supervisorid);
+
+    @Delete("DELETE FROM supervise WHERE counselor_id = #{counselorid} and supervisor_id = #{supervisorid}")
+    void deleteSupervise(@Param("counselorid")Long counselorid, @Param("supervisorid")Long supervisorid);
 }

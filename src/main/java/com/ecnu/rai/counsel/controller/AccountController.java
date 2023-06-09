@@ -612,53 +612,78 @@ public class AccountController {
 
     //咨询师页面绑定
     @RequiresRoles("admin")
-    @PostMapping("/counselor/{id}/binding")
+    @GetMapping("/counselor/binding/{id}")
     public Result makeSuperviseByCounselor(@PathVariable Long id,
-                                          @Valid @RequestBody List<Supervisor> supervisors)
+                                          @Valid @RequestBody List<Long> supervisorsId)
     {
-        if(supervisors.isEmpty())
+        if(!Objects.equals(userMapper.findRoleById(id), "counselor"))
+            return Result.fail("Unauthorized.");
+        if(supervisorsId.isEmpty())
             return Result.fail("No supervisors to bind.");
-        for(Supervisor supervisor:supervisors)
-            superviseMapper.makeSupervise(id,supervisor.getId());
+        for(Long supervisorid:supervisorsId)
+        {
+            if(superviseMapper.findSupervise(id,supervisorid)==1||!Objects.equals(userMapper.findRoleById(supervisorid), "supervisor"))
+                continue;
+            superviseMapper.makeSupervise(id,supervisorid);
+        }
+
         return Result.success("Bind successfully!");
     }
 
     //督导页面绑定
     @RequiresRoles("admin")
-    @PostMapping("/supervisor/{id}/binding")
+    @GetMapping("/supervisor/binding/{id}")
     public Result makeSuperviseBySupervisor(@PathVariable Long id,
-                                           @Valid @RequestBody List<Counselor> counselors)
+                                           @Valid @RequestBody List<Long> counselorsId)
     {
-        if(counselors.isEmpty())
+        if(!Objects.equals(userMapper.findRoleById(id), "supervisor"))
+        return Result.fail("Unauthorized.");
+        if(counselorsId.isEmpty())
             return Result.fail("No counselors to bind.");
-        for(Counselor counselor:counselors)
-            superviseMapper.makeSupervise(counselor.getId(),id);
+        for(Long counselorid:counselorsId){
+            if(superviseMapper.findSupervise(counselorid,id)==1|| !Objects.equals(userMapper.findRoleById(counselorid), "counselor"))
+                continue;
+            superviseMapper.makeSupervise(counselorid,id);
+        }
+
         return Result.success("Bind successfully!");
     }
 
     //咨询师页面解绑
     @RequiresRoles("admin")
-    @PostMapping("/counselor/{id}/unbinding")
+    @GetMapping("/counselor/unbinding/{id}")
     public Result delSuperviseByCounselor(@PathVariable Long id,
-                               @Valid @RequestBody List<Supervisor> supervisors)
+                               @Valid @RequestBody List<Long> supervisorsId)
     {
-        if(supervisors.isEmpty())
+        if(!Objects.equals(userMapper.findRoleById(id), "counselor"))
+            return Result.fail("Unauthorized.");
+        if(supervisorsId.isEmpty())
             return Result.fail("No supervisors to unbind.");
-        for(Supervisor supervisor:supervisors)
-            superviseMapper.deleteSupervise(id,supervisor.getId());
+        for(Long supervisorid:supervisorsId){
+            if(superviseMapper.findSupervise(id,supervisorid)==0|| !Objects.equals(userMapper.findRoleById(supervisorid), "supervisor"))
+                continue;
+            superviseMapper.deleteSupervise(id,supervisorid);
+        }
+
         return Result.success("Unbinding successfully!");
     }
 
     //督导页面解绑
     @RequiresRoles("admin")
-    @PostMapping("/supervisor/{id}/unbinding")
+    @GetMapping("/supervisor/unbinding/{id}")
     public Result delSuperviseBySupervisor(@PathVariable Long id,
-                               @Valid @RequestBody List<Counselor> counselors)
+                               @Valid @RequestBody List<Long> counselorsId)
     {
-        if(counselors.isEmpty())
+        if(!Objects.equals(userMapper.findRoleById(id), "supervisor"))
+            return Result.fail("Unauthorized.");
+        if(counselorsId.isEmpty())
             return Result.fail("No counselors to unbind.");
-        for(Counselor counselor:counselors)
-            superviseMapper.deleteSupervise(counselor.getId(),id);
+        for(Long counselorid:counselorsId){
+            if(superviseMapper.findSupervise(counselorid,id)==0|| !Objects.equals(userMapper.findRoleById(counselorid), "counselor"))
+                continue;
+            superviseMapper.deleteSupervise(counselorid,id);
+        }
+
         return Result.success("Bind successfully!");
     }
 

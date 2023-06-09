@@ -31,15 +31,19 @@ spring:
     # 连接超时时间（毫秒）
     timeout: 1000
 
-wx:
-  appId: wx418a58e02xxx
-  appSecret: 9ff73d06c24154a1854999ea6exxx
+#wx:
+#  appId: wx418a58e02xxx
+#  appSecret: 9ff73d06c24154a1854999ea6exxx
 #  appId: wx548a99cf2b5xxx
 #  appSecret: 20045ded4b565219e4d7116f01dxxxx
-
+wx:
+#  appId: wx548a99cf2b57984c
+#  appSecret: 20045ded4b565219e4d7116f01d6a1dd
+  appId: wx418a58e02b4066c1
+  appSecret: 9ff73d06c24154a1854999ea6e810733
 im:
-  sdkAppId: 140081xxx
-  secretKey: 09c3165c7f23871cdbef8f6db600ae2c59ee44b4628b44f7f6896a6xxxx
+  sdkAppId: 1400810789
+  secretKey: 0cec25940a6e8b81c8e2f75b45796101920657dc1789679e10969f04ce037e52
 
 tencent:
   msm:

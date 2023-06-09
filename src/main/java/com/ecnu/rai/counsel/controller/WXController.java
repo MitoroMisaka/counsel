@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 
 @Slf4j
@@ -83,14 +84,18 @@ public class WXController {
         else{
             u = wxService.findByopenid(openid);
         }
-        if(visitorMapper.ifPhoneExist(request.getPhoneNumber())==0)
-        {
-            u.setPhone(request.getPhoneNumber());
+        if (!(Objects.equals(u.getPhone(), request.getPhoneNumber()))){
+            if(visitorMapper.ifPhoneExist(request.getPhoneNumber())==0)
+            {
+
+                u.setPhone(request.getPhoneNumber());
+            }
+            else
+            {
+                return Result.fail("该号码已经注册过");
+            }
         }
-        else
-        {
-            return Result.fail("该号码已经注册过");
-        }
+
         u.setName(request.getRealName());
         u.setUsername(request.getUserName());
         u.setEmergentContact(request.getEmergencyContactName());
@@ -156,6 +161,7 @@ public class WXController {
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid="
                  +wxConfig.getAppId() +"&secret="+wxConfig.getAppSecret()
                  +"&js_code="+code+"&grant_type=authorization_code";
+
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = httpClient.execute(httpGet);
@@ -166,6 +172,9 @@ public class WXController {
 
         JSONObject bodyJson = JSON.parseObject(body);
         String openid = bodyJson.getString("openid");
+        if(openid==null)
+            return Result.fail("code已过期");
+        System.out.println(openid);
         String token = "";
         if(!wxService.visitorExist(openid)) {
             Visitor u = new Visitor();
@@ -175,6 +184,7 @@ public class WXController {
         }
         else {
             Visitor u = wxService.findByopenid(openid);
+            System.out.println(u.getId());
             User user = userMapper.findById(u.getId());
             if(user.getState()==0)
             {
