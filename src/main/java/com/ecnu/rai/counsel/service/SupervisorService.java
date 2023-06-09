@@ -18,4 +18,6 @@ public interface SupervisorService {
 
     Page<Counselor> getAvailableCounselor(Long id, Integer page, Integer size, String order);
 
+    Page<Supervisor> getAvailableSupervisor(Integer page, Integer size, String order);
+
 }

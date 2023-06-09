@@ -2,6 +2,7 @@ package com.ecnu.rai.counsel.controller;
 
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervisor;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.mapper.UserMapper;
@@ -139,6 +140,14 @@ public class SupervisorController {
         user.setRole("supervisor");
         userMapper.updateUser(user);
         return Result.success("更新成功");
+    }
+
+    @GetMapping("getAvailableSupervisor")
+    @ApiOperation("获取可用咨询师,目前只能根据排班判断，无法根据繁忙程度判断")
+    public Page<Supervisor> getAvailableCounselor(@RequestParam("page") Integer page,
+                                                 @RequestParam("size") Integer size,
+                                                 @RequestParam("order") String order) {
+        return supervisorService.getAvailableSupervisor(page, size, order);
     }
 
 }

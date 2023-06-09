@@ -30,8 +30,6 @@ public class WXServiceImpl implements WXService {
         User visitor = new User();
         userMapper.addVisitor(visitor);
         Long id = visitor.getId();
-        System.out.println(id);
-        System.out.println(openid);
         visitorMapper.insertVisitor(openid,id);
     }
 
