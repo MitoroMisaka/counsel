@@ -29,8 +29,15 @@ public class SupervisorServiceImpl implements SupervisorService {
     private ArrangeMapper arrangeMapper;
 
     @Override
-    public void addSupervisor(Supervisor supervisor) {
-        supervisorMapper.insertSupervisor(supervisor);
+    public Page<Supervisor> getAvailableSupervisorList(Integer page, Integer size, String order){
+        List<Long> availableSupervisorIdList = supervisorMapper.findSupervisorByCurrentTime();
+        List<Supervisor> supervisorList = new ArrayList<>();
+
+        PageHelper.startPage(page, size, order);
+        for (Long availableSupervisorId : availableSupervisorIdList) {
+            supervisorList.add(supervisorMapper.findById(availableSupervisorId));
+        }
+        return new Page<>(new PageInfo<>(supervisorList));
     }
 
     @Override
@@ -38,6 +45,11 @@ public class SupervisorServiceImpl implements SupervisorService {
         PageHelper.startPage(page, size, order);
         List<Supervisor> supervisorList = supervisorMapper.getAll();
         return new Page<>(new PageInfo<>(supervisorList));
+    }
+
+    @Override
+    public void addSupervisor(Supervisor supervisor) {
+        supervisorMapper.insertSupervisor(supervisor);
     }
 
     @Override
