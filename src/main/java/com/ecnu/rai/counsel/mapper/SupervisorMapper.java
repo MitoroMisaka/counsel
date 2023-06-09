@@ -47,4 +47,7 @@ public interface SupervisorMapper extends BaseMapper<Supervisor> {
             "#{supervisor.avatar}, #{supervisor.gender}, #{supervisor.phone}, " +
             "#{supervisor.department}, #{supervisor.title}, #{supervisor.qualification}, #{supervisor.qualificationCode})")
     void insertSupervisor(@Param("supervisor") Supervisor supervisor);
+
+    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='supervisor'")
+    List<Long> findSupervisorByCurrentTime();
 }

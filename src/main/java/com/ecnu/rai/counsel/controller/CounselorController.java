@@ -141,7 +141,7 @@ public class CounselorController {
                                                  @RequestParam("size") Integer size,
                                                  @RequestParam("order") String order) {
         return counselorService.getAvailableCounselor(page, size, order);
-
+    }
     @PostMapping("/getAsupervisors")
     @ApiOperation("查看绑定督导")
     public Result askForBinding(@RequestBody Counselor counselor) {

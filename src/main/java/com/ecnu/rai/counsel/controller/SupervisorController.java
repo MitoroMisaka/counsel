@@ -85,6 +85,16 @@ public class SupervisorController {
         return supervisorService.getSupervisorList(page, size, order);
     }
 
+    @GetMapping("/available")
+    @ApiOperation("获取可用督导列表")
+    public Page<Supervisor> getAvailableSupervisorList(
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "size", defaultValue = "20") Integer size,
+            @RequestParam(value = "order", defaultValue = "id_asc") String order
+    ) {
+        return supervisorService.getAvailableSupervisorList(page, size, order);
+    }
+
     @PostMapping("/update")
     @ApiOperation("更新督导基本信息")
     public Result updateCounselorInfo(@RequestBody Supervisor supervisor) {

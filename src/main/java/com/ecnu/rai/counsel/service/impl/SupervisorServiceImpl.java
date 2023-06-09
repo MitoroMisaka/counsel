@@ -25,6 +25,18 @@ public class SupervisorServiceImpl implements SupervisorService {
     private CounselorMapper counselorMapper;
 
     @Override
+    public Page<Supervisor> getAvailableSupervisorList(Integer page, Integer size, String order){
+        List<Long> availableSupervisorIdList = supervisorMapper.findSupervisorByCurrentTime();
+        List<Supervisor> supervisorList = new ArrayList<>();
+
+        PageHelper.startPage(page, size, order);
+        for (Long availableSupervisorId : availableSupervisorIdList) {
+            supervisorList.add(supervisorMapper.findById(availableSupervisorId));
+        }
+        return new Page<>(new PageInfo<>(supervisorList));
+    }
+
+    @Override
     public void addSupervisor(Supervisor supervisor) {
         supervisorMapper.insertSupervisor(supervisor);
     }
