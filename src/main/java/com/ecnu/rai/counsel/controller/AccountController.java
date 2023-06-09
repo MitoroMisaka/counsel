@@ -175,7 +175,7 @@ public class AccountController {
         }
 
         // Check if all required fields are filled
-        if(visitor.getName() == null || visitor.getUsername() == null || visitor.getPassword() == null || visitor.getRole() == null ||
+        if(visitor.getName() == null || visitor.getUsername() == null || visitor.getRole() == null ||
                 visitor.getAvatar() == null || visitor.getGender() == null || visitor.getPhone() == null ||
                 visitor.getDepartment() == null || visitor.getTitle() == null || visitor.getEmergentContact() == null ||visitor.getEmergentPhone() == null ||
                 visitor.getOpenid() == null) {
@@ -190,9 +190,6 @@ public class AccountController {
             return Result.fail("Invalid username.");
         }
         // Check if the password is valid
-        if(visitor.getPassword().length() < 6) {
-            return Result.fail("Password must be at least 6 characters long.");
-        }
         // Check if the phone number is valid
         if(!visitor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
             return Result.fail("Invalid phone number.");
@@ -220,7 +217,6 @@ public class AccountController {
                 .id(updatedVisitor.getId())
                 .name(updatedVisitor.getName())
                 .username(updatedVisitor.getUsername())
-                .password(updatedVisitor.getPassword())
                 .role("visitor")
                 .state(1)
                 .build();
@@ -515,9 +511,6 @@ public class AccountController {
 
 
     // update Supervisor
-
-
-    //update Supervisor
     @PutMapping("/supervisor/{id}")
     public Result updateSupervisor(
             @PathVariable Long id,

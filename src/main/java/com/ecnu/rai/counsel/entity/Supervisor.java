@@ -61,7 +61,6 @@ public class Supervisor {
     @ApiModelProperty(value = "职称")
     private String qualificationCode;
 
-
     // 省略其他方法...
 }
 

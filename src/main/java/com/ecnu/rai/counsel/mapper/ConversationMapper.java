@@ -1,7 +1,7 @@
 package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ecnu.rai.counsel.entity.Counselor;
+import com.ecnu.rai.counsel.entity.Arrange;
 import com.ecnu.rai.counsel.entity.Conversation;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;

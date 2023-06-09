@@ -154,8 +154,6 @@ public class ConversationController {
         return Result.success("save and insert conversation ");
     }
 
-
-
     @PostMapping("/save_group_msg")
     @ApiOperation(value = "存储群聊信息/结束会话", notes = "save the conversation ")
     @ResponseBody

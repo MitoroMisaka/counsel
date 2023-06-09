@@ -28,11 +28,6 @@ public class CounselorServiceImpl implements CounselorService {
     private ArrangeMapper arrangeMapper;
 
     @Override
-    public void addCounselor(Counselor counselor) {
-        counselorMapper.insertCounselor(counselor);
-    }
-
-    @Override
     public Counselor findCounselorByID(Long id) {
         Counselor counselor = counselorMapper.findById(id);
 
@@ -48,6 +43,11 @@ public class CounselorServiceImpl implements CounselorService {
     @Override
     public void updateCounselor(Counselor counselor) {
         counselorMapper.updateCounselor(counselor);
+    }
+
+    @Override
+    public void addCounselor(Counselor counselor) {
+        counselorMapper.insertCounselor(counselor);
     }
 
     @Override
