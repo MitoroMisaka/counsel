@@ -56,6 +56,7 @@ public class Visitor {
 
     @ApiModelProperty(value = "微信标识符")
     private String openid;
+
     // 省略其他方法...
 }
 

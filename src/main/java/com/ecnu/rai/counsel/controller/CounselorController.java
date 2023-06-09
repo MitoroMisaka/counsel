@@ -27,8 +27,8 @@ public class CounselorController {
     @Autowired
     private UserMapper userMapper;
   
-  @Autowired
-  private SuperviseMapper superviseMapper;
+    @Autowired
+    private SuperviseMapper superviseMapper;
 
     @PostMapping("/add")
     @ApiOperation("添加咨询师(弃用，参考AccountController里面接口)")

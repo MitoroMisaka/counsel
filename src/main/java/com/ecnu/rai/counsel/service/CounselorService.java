@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 public interface CounselorService {
 
-    void addCounselor(Counselor counselor);
-
     Counselor findCounselorByID(Long id);
 
     void updateCounselor(Counselor counselor);

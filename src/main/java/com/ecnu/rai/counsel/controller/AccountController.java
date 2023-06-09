@@ -511,9 +511,6 @@ public class AccountController {
 
 
     // update Supervisor
-
-
-    //update Supervisor
     @PutMapping("/supervisor/{id}")
     public Result updateSupervisor(
             @PathVariable Long id,

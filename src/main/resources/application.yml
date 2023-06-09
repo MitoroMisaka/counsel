@@ -37,10 +37,10 @@ spring:
     timeout: 1000
 
 wx:
-  appId: wx418a58e02xxx
-  appSecret: 9ff73d06c24154a1854999ea6exxx
-#  appId: wx548a99cf2b5xxx
-#  appSecret: 20045ded4b565219e4d7116f01dxxxx
+  appId: wx418a58e02b4066c1
+  appSecret: 9ff73d06c24154a1854999ea6e810733
+#  appId: wx548a99cf2b57984c
+#  appSecret: 20045ded4b565219e4d7116f01d6a1dd
 
 im:
   sdkAppId: 1400810789
