@@ -94,7 +94,6 @@ public class AccountServiceImpl implements AccountService {
             existingVisitor.setName(visitor.getName());
             existingVisitor.setUsername(visitor.getUsername());
             // existingVisitor.setPassword(PasswordUtil.convert(visitor.getPassword()));
-            existingVisitor.setPassword(visitor.getPassword());
             existingVisitor.setRole(visitor.getRole());
             existingVisitor.setAvatar(visitor.getAvatar());
             existingVisitor.setPhone(visitor.getPhone());
@@ -231,16 +230,14 @@ public class AccountServiceImpl implements AccountService {
             return counselor != null;
         }
 
-    @Override
-    public boolean isUsernameUsedByOtherSupervisor(String username) {
-        // Get the supervisor with the given username
-        Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("username", username));
-        // Check if the supervisor exists
-        return supervisor != null;
+        @Override
+        public boolean isUsernameUsedByOtherSupervisor(String username) {
+            // Get the supervisor with the given username
+            Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("username", username));
+            // Check if the supervisor exists
+            return supervisor != null;
+        }
     }
-
-
-}
 
     
 

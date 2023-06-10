@@ -2,6 +2,7 @@ package com.ecnu.rai.counsel.service.impl;
 
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.entity.Conversation;
+import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.mapper.ConversationMapper;
 import com.ecnu.rai.counsel.response.ConsultInfo;
@@ -41,7 +42,6 @@ public class ConversationServiceImpl implements ConversationService {
         // Update the supervisor properties
         existingConversation.setCreateTime(conversation.getCreateTime());
         existingConversation.setCreator(conversation.getCreator());
-        //update the time now
         existingConversation.setLastUpdateTime(LocalDateTime.now());
         existingConversation.setLastUpdater(conversation.getLastUpdater());
         existingConversation.setYear(conversation.getYear());

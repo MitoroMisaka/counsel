@@ -38,7 +38,6 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
     @Select("SELECT count(*) FROM visitor where phone=#{phone} limit 1")
     int ifPhoneExist(@Param("phone")String phone);
 
-
     @Select("SELECT count(*) FROM visitor where openid=#{openid} limit 1")
     int ifVisitorExist(@Param("openid")String openid);
 
