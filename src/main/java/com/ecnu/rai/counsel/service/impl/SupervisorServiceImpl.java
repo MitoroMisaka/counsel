@@ -4,6 +4,7 @@ import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
+import com.ecnu.rai.counsel.mapper.ArrangeMapper;
 import com.ecnu.rai.counsel.mapper.CounselorMapper;
 import com.ecnu.rai.counsel.mapper.SupervisorMapper;
 import com.ecnu.rai.counsel.service.SupervisorService;
@@ -24,9 +25,19 @@ public class SupervisorServiceImpl implements SupervisorService {
     @Autowired
     private CounselorMapper counselorMapper;
 
+    @Autowired
+    private ArrangeMapper arrangeMapper;
+
     @Override
-    public void addSupervisor(Supervisor supervisor) {
-        supervisorMapper.insertSupervisor(supervisor);
+    public Page<Supervisor> getAvailableSupervisorList(Integer page, Integer size, String order){
+        List<Long> availableSupervisorIdList = supervisorMapper.findSupervisorByCurrentTime();
+        List<Supervisor> supervisorList = new ArrayList<>();
+
+        PageHelper.startPage(page, size, order);
+        for (Long availableSupervisorId : availableSupervisorIdList) {
+            supervisorList.add(supervisorMapper.findById(availableSupervisorId));
+        }
+        return new Page<>(new PageInfo<>(supervisorList));
     }
 
     @Override
@@ -34,6 +45,11 @@ public class SupervisorServiceImpl implements SupervisorService {
         PageHelper.startPage(page, size, order);
         List<Supervisor> supervisorList = supervisorMapper.getAll();
         return new Page<>(new PageInfo<>(supervisorList));
+    }
+
+    @Override
+    public void addSupervisor(Supervisor supervisor) {
+        supervisorMapper.insertSupervisor(supervisor);
     }
 
     @Override
@@ -56,6 +72,18 @@ public class SupervisorServiceImpl implements SupervisorService {
         }
         return new Page<>(new PageInfo<>(availableCounselorList));
 
+    }
+
+    @Override
+    public Page<Supervisor> getAvailableSupervisor(Integer page, Integer size, String order) {
+        List<Long> availableSupervisorIdList = arrangeMapper.findSupervisorByCurrentTime();
+        List<Supervisor> supervisorList = new ArrayList<>();
+
+        PageHelper.startPage(page, size, order);
+        for (Long availableSupervisorId : availableSupervisorIdList) {
+            supervisorList.add(supervisorMapper.findById(availableSupervisorId));
+        }
+        return new Page<>(new PageInfo<>(supervisorList));
     }
 
 }

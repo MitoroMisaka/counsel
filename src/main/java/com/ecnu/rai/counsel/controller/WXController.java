@@ -1,4 +1,5 @@
 package com.ecnu.rai.counsel.controller;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
@@ -15,7 +16,6 @@ import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.mapper.VisitorMapper;
 import com.ecnu.rai.counsel.service.WXService;
 import com.ecnu.rai.counsel.util.TokenUtil;
-import com.ecnu.rai.counsel.util.VerifyCodeGenUtil;
 import com.ecnu.rai.counsel.utils.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 
 @Slf4j
@@ -83,16 +84,20 @@ public class WXController {
         else{
             u = wxService.findByopenid(openid);
         }
-        if(visitorMapper.ifPhoneExist(request.getPhoneNumber())==0)
-        {
-            u.setPhone(request.getPhoneNumber());
-        }
-        else
-        {
-            return Result.fail("该号码已经注册过");
+        if (!(Objects.equals(u.getPhone(), request.getPhoneNumber()))){
+            if(visitorMapper.ifPhoneExist(request.getPhoneNumber())==0)
+            {
+
+                u.setPhone(request.getPhoneNumber());
+            }
+            else
+            {
+                return Result.fail("该号码已经注册过");
+            }
         }
         u.setName(request.getRealName());
         u.setUsername(request.getUserName());
+        u.setPhone(request.getPhoneNumber());
         u.setEmergentContact(request.getEmergencyContactName());
         u.setEmergentPhone(request.getEmergencyContactPhoneNumber());
         u.setRole("visitor");
@@ -136,8 +141,12 @@ public class WXController {
             System.out.println("Token过期或非法");
             return null;
         }
-        LocalDateTime localDateTime = LocalDateTime.now();
-        return visitorMapper.findAvailableCounselor(localDateTime);
+        LocalDateTime localDateTime = LocalDateTime.of(2023,5,24,19,28,22);
+        List<HashMap<String,Object>> counselorUserviews = visitorMapper.findAvailableCounselor(localDateTime);
+//        for (Object obj : counselorUserviews) {
+//            System.out.println(obj);
+//        }
+        return counselorUserviews;
 
     }
 
@@ -166,6 +175,9 @@ public class WXController {
 
         JSONObject bodyJson = JSON.parseObject(body);
         String openid = bodyJson.getString("openid");
+        if(openid==null)
+            return Result.fail("code已过期");
+        System.out.println(openid);
         String token = "";
         if(!wxService.visitorExist(openid)) {
             Visitor u = new Visitor();
@@ -175,6 +187,7 @@ public class WXController {
         }
         else {
             Visitor u = wxService.findByopenid(openid);
+            System.out.println(u.getId());
             User user = userMapper.findById(u.getId());
             if(user.getState()==0)
             {
@@ -185,8 +198,8 @@ public class WXController {
         }
 
 
-return Result.success(token);
-     //   return "登录成功";
+        return Result.success(token);
+        //   return "登录成功";
     }
 
 

@@ -18,6 +18,9 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("SELECT * FROM user WHERE id = #{id}")
     User findById(@Param("id") Long id);
 
+    @Select("SELECT * FROM user WHERE name = #{name}")
+    User findByName(@Param("name") String name);
+
     @Select("SELECT * FROM user WHERE username = #{username}")
     User findByUsername(@Param("username") String username);
 
@@ -28,13 +31,20 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("SELECT * FROM user")
     List<User> getUserList();
 
-
     @Insert("INSERT INTO user (name, username, password, role) " +
         "VALUES (#{user.name}, #{user.username}, #{user.password}, #{user.role})")
     void insertUser(@Param("user") User user);
 
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    @Insert("INSERT INTO user(role) values ('visitor')")
-    Long addVisitor(@Param("user")User user);
+    @Insert("INSERT INTO user(role,state) values ('visitor',1)")
+    void addVisitor(@Param("user")User user);
+
+    @Select("SELECT state FROM user WHERE id = #{id}")
+    int findStateById(@Param("id") Long id);
+
+    @Select("SELECT role FROM user WHERE id = #{id}")
+    String findRoleById(@Param("id") Long id);
+
+
 
 }

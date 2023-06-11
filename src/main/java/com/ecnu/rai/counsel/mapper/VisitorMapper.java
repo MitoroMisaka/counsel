@@ -15,7 +15,7 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
     @Select("SELECT * FROM visitor WHERE id = #{id}")
     Visitor findById(@Param("id") Long id);
 
-    @Update("UPDATE visitor SET name = #{visitor.name}, username = #{visitor.username}, password = #{visitor.password}, role = #{visitor.role}, " +
+    @Update("UPDATE visitor SET name = #{visitor.name}, username = #{visitor.username}, role = #{visitor.role}, " +
             "avatar = #{visitor.avatar}, phone = #{visitor.phone}, gender = #{visitor.gender}, department = #{visitor.department}, " +
             "title = #{visitor.title}, emergent_contact = #{visitor.emergentContact}, emergent_phone = #{visitor.emergentPhone} " +
             "WHERE id = #{visitor.id}")
@@ -37,7 +37,6 @@ public interface VisitorMapper extends BaseMapper<Visitor> {
 
     @Select("SELECT count(*) FROM visitor where phone=#{phone} limit 1")
     int ifPhoneExist(@Param("phone")String phone);
-
 
     @Select("SELECT count(*) FROM visitor where openid=#{openid} limit 1")
     int ifVisitorExist(@Param("openid")String openid);

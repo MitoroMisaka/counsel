@@ -6,6 +6,9 @@ public enum EnumExceptionType {
     USER_ALREADY_EXIST(-3,"用户名重复"),
     LOGIN_INVALID(-4,"登录状态失效，请重新登录");
 
+
+
+
     private int errorCode;
 
     private String codeMessage;

@@ -53,6 +53,9 @@ public class AccountController {
     @Autowired
     private SupervisorMapper supervisorMapper;
 
+    @Autowired
+    private SuperviseMapper superviseMapper;
+
 
     @PostMapping("/login")
     @ApiOperation("登录")
@@ -172,7 +175,7 @@ public class AccountController {
         }
 
         // Check if all required fields are filled
-        if(visitor.getName() == null || visitor.getUsername() == null || visitor.getPassword() == null || visitor.getRole() == null ||
+        if(visitor.getName() == null || visitor.getUsername() == null || visitor.getRole() == null ||
                 visitor.getAvatar() == null || visitor.getGender() == null || visitor.getPhone() == null ||
                 visitor.getDepartment() == null || visitor.getTitle() == null || visitor.getEmergentContact() == null ||visitor.getEmergentPhone() == null ||
                 visitor.getOpenid() == null) {
@@ -187,9 +190,6 @@ public class AccountController {
             return Result.fail("Invalid username.");
         }
         // Check if the password is valid
-        if(visitor.getPassword().length() < 6) {
-            return Result.fail("Password must be at least 6 characters long.");
-        }
         // Check if the phone number is valid
         if(!visitor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
             return Result.fail("Invalid phone number.");
@@ -217,8 +217,8 @@ public class AccountController {
                 .id(updatedVisitor.getId())
                 .name(updatedVisitor.getName())
                 .username(updatedVisitor.getUsername())
-                .password(updatedVisitor.getPassword())
                 .role("visitor")
+                .state(1)
                 .build();
         User updatedUser = accountService.updateUser(id, user);
         return Result.success("更新访客数据", updatedVisitor);
@@ -277,67 +277,6 @@ public class AccountController {
         User updatedUser = accountService.updateUser(id, user);
         return Result.success("更新机构管理员信息成功", updatedAdmin);
     }
-//    @PostMapping("/supervisor")
-//    public ResponseEntity<Object> insertSupervisor(@Valid @RequestBody Supervisor supervisor) {
-//        // Check if all required fields are filled
-//        if(supervisor.getName() == null || supervisor.getGender() == null ||
-//           supervisor.getPhone() == null  || supervisor.getUsername() == null ||
-//           supervisor.getPassword() == null  || supervisor.getQualification() == null ||
-//           supervisor.getQualificationCode() == null || supervisor.getAvatar() == null ||
-//           supervisor.getDepartment() == null || supervisor.getTitle() == null ) {
-//            return ResponseEntity.badRequest().body("Required fields are not filled");
-//        }
-//        // Check if the name is valid
-//        if(!supervisor.getName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
-//            return ResponseEntity.badRequest().body("Invalid name");
-//        }
-//
-//        supervisor.setPassword(PasswordUtil.convert(supervisor.getPassword()));
-//        // Check if the phone number is valid
-//        if(!supervisor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
-//            return ResponseEntity.badRequest().body("Invalid phone number");
-//        }
-//        // Check if the username is valid
-//        if(!supervisor.getUsername().matches("^[A-Za-z0-9_]+$")) {
-//            return ResponseEntity.badRequest().body("Invalid username");
-//        }
-//        // Check if the password is valid
-//        if(supervisor.getPassword().length() < 6) {
-//            return ResponseEntity.badRequest().body("Invalid password");
-//        }
-//        // Check if the phone number is used by another supervisor
-//        if(accountService.isPhoneUsedByOtherSupervisor(null, supervisor.getPhone())) {
-//            return ResponseEntity.badRequest().body("Phone number is used by another supervisor");
-//        }
-//        // Build the user object
-//        User user = User.builder()
-//                .name(supervisor.getName())
-//                .username(supervisor.getUsername())
-//                .password(supervisor.getPassword())
-//                .role("supervisor")
-//                .build();
-//        // Insert the user
-//        //if the username is used by another user
-//        if(accountService.isUsernameUsedByOtherUser(user.getUsername())) {
-//            return ResponseEntity.badRequest().body("Username is used by another user");
-//        }else {
-//            userMapper.insertUser(user);
-//        }
-//        User insertedUser = userMapper.findByUsername(user.getUsername());
-//        // Set the ID of the supervisor to the ID of the user
-//        supervisor.setId(insertedUser.getId());
-//        // Set default values for role, create time, update time, enabled, deleted, and rating
-//        supervisor.setRole("supervisor");
-//        // Insert the supervisor
-//        if(accountService.isUsernameUsedByOtherSupervisor(user.getUsername())) {
-//            return ResponseEntity.badRequest().body("Username is used by another supervisor");
-//        }else {
-//            supervisorMapper.insertSupervisor(supervisor);
-//        }
-//        // Return the inserted supervisor
-//        return ResponseEntity.ok(Result.success("Insert supervisor successfully", supervisor));
-//    }
-//
 
     // insert Counselor
     @RequiresRoles("admin")
@@ -386,6 +325,10 @@ public class AccountController {
         if(accountService.isEmailUsedByOtherCounselor(null, counselor.getEmail())) {
             return Result.fail("Email is used by another counselor");
         }
+        // Check if bind to supervisor
+        if(counselor.getSupervisors().isEmpty()) {
+            return Result.fail("Should bind at least one supervisor.");
+        }
         // Build the user object
         User user = User.builder()
                 .name(counselor.getName())
@@ -419,6 +362,11 @@ public class AccountController {
             counselorMapper.insertCounselor(counselor);
         }
         // Return the inserted counselor
+        //Bind counselor and supervisors
+        for(Supervisor supervisor: counselor.getSupervisors())
+        {
+            superviseMapper.makeSupervise(counselor.getId(), supervisor.getId());
+        }
         return Result.success("Insert counselor successfully", counselor);
     }
 
@@ -533,6 +481,7 @@ public class AccountController {
                 .username(supervisor.getUsername())
                 .password(supervisor.getPassword())
                 .role("supervisor")
+                .state(1)
                 .build();
 
         // Insert the user
@@ -562,9 +511,6 @@ public class AccountController {
 
 
     // update Supervisor
-
-
-    //update Supervisor
     @PutMapping("/supervisor/{id}")
     public Result updateSupervisor(
             @PathVariable Long id,
@@ -620,13 +566,13 @@ public class AccountController {
         User updatedUser = accountService.updateUser(id, user);
         return Result.success("更新督导信息成功", updatedSupervisor);
     }
-
-
+//禁用用户
+    @RequiresRoles("admin")
     @PostMapping("/banUser")
-    public ResponseEntity<Result> banUser(@Valid @RequestBody List<Long> ids)
+    public Result banUser(@Valid @RequestBody List<Long> ids)
     {
         if (ids == null)
-            return ResponseEntity.badRequest().body(Result.fail("No valid user."));
+            return Result.fail("No valid user.");
 
         for (Long id:ids) {
             User user = userMapper.selectById(id);
@@ -637,14 +583,16 @@ public class AccountController {
             user.setState(0);
             userMapper.updateUser(user);
         }
-        return ResponseEntity.ok(Result.success("Ban users successfully."));
+        return Result.success("Ban users successfully.");
     }
 
+    //启用用户
+    @RequiresRoles("admin")
     @PostMapping("/enableUser")
-    public ResponseEntity<Result> enableUser(@Valid @RequestBody List<Long> ids)
+    public Result enableUser(@Valid @RequestBody List<Long> ids)
     {
         if (ids == null)
-            return ResponseEntity.badRequest().body(Result.fail("No valid user."));
+            return Result.fail("No valid user.");
         for (Long id:ids) {
             User user = userMapper.selectById(id);
             if (user == null)
@@ -652,8 +600,86 @@ public class AccountController {
             user.setState(1);
             userMapper.updateUser(user);
         }
-        return ResponseEntity.ok(Result.success("Enable users successfully."));
+        return Result.success("Enable users successfully.");
     }
+
+    //咨询师页面绑定
+    @RequiresRoles("admin")
+    @GetMapping("/counselor/binding/{id}")
+    public Result makeSuperviseByCounselor(@PathVariable Long id,
+                                          @Valid @RequestBody List<Long> supervisorsId)
+    {
+        if(!Objects.equals(userMapper.findRoleById(id), "counselor"))
+            return Result.fail("Unauthorized.");
+        if(supervisorsId.isEmpty())
+            return Result.fail("No supervisors to bind.");
+        for(Long supervisorid:supervisorsId)
+        {
+            if(superviseMapper.findSupervise(id,supervisorid)==1||!Objects.equals(userMapper.findRoleById(supervisorid), "supervisor"))
+                continue;
+            superviseMapper.makeSupervise(id,supervisorid);
+        }
+
+        return Result.success("Bind successfully!");
+    }
+
+    //督导页面绑定
+    @RequiresRoles("admin")
+    @GetMapping("/supervisor/binding/{id}")
+    public Result makeSuperviseBySupervisor(@PathVariable Long id,
+                                           @Valid @RequestBody List<Long> counselorsId)
+    {
+        if(!Objects.equals(userMapper.findRoleById(id), "supervisor"))
+        return Result.fail("Unauthorized.");
+        if(counselorsId.isEmpty())
+            return Result.fail("No counselors to bind.");
+        for(Long counselorid:counselorsId){
+            if(superviseMapper.findSupervise(counselorid,id)==1|| !Objects.equals(userMapper.findRoleById(counselorid), "counselor"))
+                continue;
+            superviseMapper.makeSupervise(counselorid,id);
+        }
+
+        return Result.success("Bind successfully!");
+    }
+
+    //咨询师页面解绑
+    @RequiresRoles("admin")
+    @GetMapping("/counselor/unbinding/{id}")
+    public Result delSuperviseByCounselor(@PathVariable Long id,
+                               @Valid @RequestBody List<Long> supervisorsId)
+    {
+        if(!Objects.equals(userMapper.findRoleById(id), "counselor"))
+            return Result.fail("Unauthorized.");
+        if(supervisorsId.isEmpty())
+            return Result.fail("No supervisors to unbind.");
+        for(Long supervisorid:supervisorsId){
+            if(superviseMapper.findSupervise(id,supervisorid)==0|| !Objects.equals(userMapper.findRoleById(supervisorid), "supervisor"))
+                continue;
+            superviseMapper.deleteSupervise(id,supervisorid);
+        }
+
+        return Result.success("Unbinding successfully!");
+    }
+
+    //督导页面解绑
+    @RequiresRoles("admin")
+    @GetMapping("/supervisor/unbinding/{id}")
+    public Result delSuperviseBySupervisor(@PathVariable Long id,
+                               @Valid @RequestBody List<Long> counselorsId)
+    {
+        if(!Objects.equals(userMapper.findRoleById(id), "supervisor"))
+            return Result.fail("Unauthorized.");
+        if(counselorsId.isEmpty())
+            return Result.fail("No counselors to unbind.");
+        for(Long counselorid:counselorsId){
+            if(superviseMapper.findSupervise(counselorid,id)==0|| !Objects.equals(userMapper.findRoleById(counselorid), "counselor"))
+                continue;
+            superviseMapper.deleteSupervise(counselorid,id);
+        }
+
+        return Result.success("Bind successfully!");
+    }
+
 
 }
 

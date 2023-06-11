@@ -16,6 +16,11 @@ public class ArrangeServiceImpl implements ArrangeService {
     private ArrangeMapper arrangeMapper;
 
     @Override
+    public void addArrange(Arrange arrange) {
+        arrangeMapper.insertArrange(arrange);
+    }
+
+    @Override
     public Arrange findArrangeByID(Long id) {
         return arrangeMapper.findById(id);
     }
