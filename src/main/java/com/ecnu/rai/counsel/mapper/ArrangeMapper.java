@@ -68,7 +68,7 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='counselor' ")
     List<Long> findCounselorByCurrentTime();
 
-    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='supervisor' ")
+    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='supervisor' AND state <> 0")
     List<Long> findSupervisorByCurrentTime();
 
 }

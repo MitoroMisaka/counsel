@@ -4,8 +4,11 @@ import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervisor;
 
+import java.util.List;
+
 public interface SupervisorService {
 
+    void addCounselors(Long id, Long counselorIds);
 
     Page<Supervisor> getAvailableSupervisorList(Integer page, Integer size, String order);
 

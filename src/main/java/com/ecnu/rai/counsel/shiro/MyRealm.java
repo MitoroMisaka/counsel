@@ -2,7 +2,9 @@ package com.ecnu.rai.counsel.shiro;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.entity.User;
+import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.mapper.UserMapper;
+import com.ecnu.rai.counsel.mapper.VisitorMapper;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -16,6 +18,9 @@ public class MyRealm extends AuthorizingRealm {
 
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    VisitorMapper visitorMapper;
 
     //授权
     @Override

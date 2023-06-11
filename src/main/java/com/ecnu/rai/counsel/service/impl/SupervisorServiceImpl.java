@@ -6,6 +6,7 @@ import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
 import com.ecnu.rai.counsel.mapper.ArrangeMapper;
 import com.ecnu.rai.counsel.mapper.CounselorMapper;
+import com.ecnu.rai.counsel.mapper.SuperviseMapper;
 import com.ecnu.rai.counsel.mapper.SupervisorMapper;
 import com.ecnu.rai.counsel.service.SupervisorService;
 import com.github.pagehelper.PageHelper;
@@ -27,6 +28,14 @@ public class SupervisorServiceImpl implements SupervisorService {
 
     @Autowired
     private ArrangeMapper arrangeMapper;
+
+    @Autowired
+    private SuperviseMapper superviseMapper;
+
+    @Override
+    public void addCounselors(Long id, Long counselorIds) {
+        superviseMapper.makeSupervise(id, counselorIds);
+    }
 
     @Override
     public Page<Supervisor> getAvailableSupervisorList(Integer page, Integer size, String order){

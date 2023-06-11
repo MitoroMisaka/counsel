@@ -93,6 +93,12 @@ public class AccountController {
         User principal = (User) SecurityUtils.getSubject().getPrincipal();
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         info.addRole(principal.getRole());
+
+        if(principal.getRole().equals("counselor"))
+        {
+            visitorMapper.setStatusOnline(username);
+        }
+
         if(principal.getState()==null)
             return Result.fail("用户处于未知状态");
         else if(principal.getState()==0)
@@ -107,6 +113,11 @@ public class AccountController {
     @PostMapping("/logout")
     @ApiOperation("登出")
     public Result logout() throws IOException {
+        //get principle
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if(user.getRole().equals("counselor")){
+            counselorMapper.setStatusOffline(user.getUsername());
+        }
         SecurityUtils.getSubject().logout();
         return Result.success(null);
     }
