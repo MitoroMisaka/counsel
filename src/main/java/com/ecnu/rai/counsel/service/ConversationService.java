@@ -1,6 +1,7 @@
 package com.ecnu.rai.counsel.service;
 
 import com.ecnu.rai.counsel.common.Page;
+import com.ecnu.rai.counsel.dao.ConversationResponse;
 import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.response.ConsultInfo;
 
@@ -8,6 +9,8 @@ import java.sql.Date;
 import java.util.List;
 
 public interface ConversationService {
+
+    Page<ConversationResponse> findGroupMsgByCounselorUser(String counselor, String user, Integer page, Integer size, String order);
 
     Conversation findConversationByID(Long id);
 

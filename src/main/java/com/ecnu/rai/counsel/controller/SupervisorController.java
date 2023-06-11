@@ -14,6 +14,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/supervisor")
 public class SupervisorController {
@@ -23,6 +25,8 @@ public class SupervisorController {
 
     @Autowired
     private SupervisorService supervisorService;
+
+
 
     @PostMapping("/add")
     @ApiOperation("添加督导")
@@ -157,6 +161,19 @@ public class SupervisorController {
                                                  @RequestParam("size") Integer size,
                                                  @RequestParam("order") String order) {
         return supervisorService.getAvailableCounselor(id, page, size, order);
+    }
+
+    @GetMapping("/addCounselor")
+    @ApiOperation("添加督导所管理的咨询师")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "supervisor_d", value = "督导id", required = true, dataType = "Long"),
+            @ApiImplicitParam(name = "counselor_id", value = "咨询师id", required = true, dataType = "Long")
+    })
+    public Result addCounselors(@RequestParam("supervisor_d") Long supervisor_id,
+                                @RequestParam("counselor_id") Long counselor_id) {
+
+        supervisorService.addCounselors(supervisor_id, counselor_id);
+        return Result.success("添加成功");
     }
 
     @GetMapping("getAvailableSupervisor")
