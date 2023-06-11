@@ -1,6 +1,7 @@
 package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ecnu.rai.counsel.dao.CounselorBasicInfo;
 import com.ecnu.rai.counsel.entity.Arrange;
 import com.ecnu.rai.counsel.response.DayNum;
 import org.apache.ibatis.annotations.Insert;
@@ -54,7 +55,7 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
             "month = #{month} AND " +
             "role = 'counselor' " +
             "GROUP BY day")
-    List<DayNum> findArrangeCounselorInfoByYearMonthDay(@Param("year") Integer year,
+    List<DayNum> findCounselorInfoByMonth(@Param("year") Integer year,
                                                         @Param("month") Integer month);
 
     @Select("SELECT day, COUNT(DISTINCT(user)) AS num FROM arrange WHERE " +
@@ -62,8 +63,26 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
             "month = #{month} AND " +
             "role = 'supervisor' " +
             "GROUP BY day")
-    List<DayNum> findArrangeSupervisorInfoByYearMonthDay(@Param("year") Integer year,
+    List<DayNum> findSupervisorInfoByMonth(@Param("year") Integer year,
                                                 @Param("month") Integer month);
+
+    @Select("SELECT DISTINCT(user) FROM arrange WHERE " +
+            "year = #{year} AND " +
+            "month = #{month} AND " +
+            "day = #{day} AND " +
+            "role = 'counselor' ")
+    List<Long> findCounselorIDListByDay(@Param("year") Integer year,
+                                                    @Param("month") Integer month,
+                                                    @Param("day") Integer day);
+
+    @Select("SELECT DISTINCT(user) FROM arrange WHERE " +
+            "year = #{year} AND " +
+            "month = #{month} AND " +
+            "day = #{day} AND " +
+            "role = 'supervisor' ")
+    List<Long> findSupervisorIDListByDay(@Param("year") Integer year,
+                                        @Param("month") Integer month,
+                                        @Param("day") Integer day);
 
     @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='counselor' ")
     List<Long> findCounselorByCurrentTime();

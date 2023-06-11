@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.ecnu.rai.counsel.common.Page;
 
-import com.ecnu.rai.counsel.dao.UserBasicInfoResponse;
+import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.MyMapper;
 import com.ecnu.rai.counsel.mapper.UserMapper;
@@ -48,9 +48,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Page<UserBasicInfoResponse> findUserList(Integer page, Integer size, String order) {
+    public Page<UserBasicInfo> findUserList(Integer page, Integer size, String order) {
         PageHelper.startPage(page, size, order);
-        List<UserBasicInfoResponse> userList = userMapper.findAllUsers();
+        List<UserBasicInfo> userList = userMapper.findAllUsers();
         return new Page<>(new PageInfo<>(userList));
     }
 

@@ -1,12 +1,18 @@
 package com.ecnu.rai.counsel.service.impl;
 
+import com.ecnu.rai.counsel.dao.CounselorBasicInfo;
+import com.ecnu.rai.counsel.dao.SupervisorBasicInfo;
+import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.entity.Arrange;
 import com.ecnu.rai.counsel.mapper.ArrangeMapper;
+import com.ecnu.rai.counsel.mapper.CounselorMapper;
+import com.ecnu.rai.counsel.mapper.SupervisorMapper;
 import com.ecnu.rai.counsel.response.DayNum;
 import com.ecnu.rai.counsel.service.ArrangeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -14,6 +20,12 @@ public class ArrangeServiceImpl implements ArrangeService {
 
     @Autowired
     private ArrangeMapper arrangeMapper;
+
+    @Autowired
+    private CounselorMapper counselorMapper;
+
+    @Autowired
+    private SupervisorMapper supervisorMapper;
 
     @Override
     public void addArrange(Arrange arrange) {
@@ -64,12 +76,30 @@ public class ArrangeServiceImpl implements ArrangeService {
         return arrangeMapper.findByUserYearMonth(user, year, month);
     }
 
-    public List<DayNum> findArrangeCounselorInfoByYearMonthDay(Integer year, Integer month) {
-        return arrangeMapper.findArrangeCounselorInfoByYearMonthDay(year, month);
+    public List<DayNum> findCounselorInfoByMonth(Integer year, Integer month) {
+        return arrangeMapper.findCounselorInfoByMonth(year, month);
     }
 
-    public List<DayNum> findArrangeSupervisorInfoByYearMonthDay(Integer year, Integer month) {
-        return arrangeMapper.findArrangeSupervisorInfoByYearMonthDay(year, month);
+    public List<DayNum> findSupervisorInfoByMonth(Integer year, Integer month) {
+        return arrangeMapper.findSupervisorInfoByMonth(year, month);
+    }
+
+    public List<CounselorBasicInfo> findCounselorListByDay(Integer year, Integer month, Integer day) {
+        List<Long> CounselorIdList = arrangeMapper.findCounselorIDListByDay(year, month, day);
+        List<CounselorBasicInfo> CounselorBasicInfoList = new ArrayList<>();
+        for(Long id : CounselorIdList) {
+            CounselorBasicInfoList.add(new CounselorBasicInfo(counselorMapper.findById(id)));
+        }
+        return CounselorBasicInfoList;
+    }
+
+    public List<SupervisorBasicInfo> findSupervisorListByDay(Integer year, Integer month, Integer day) {
+        List<Long> SupervisorIdList = arrangeMapper.findSupervisorIDListByDay(year, month, day);
+        List<SupervisorBasicInfo> SupervisorBasicInfoList = new ArrayList<>();
+        for(Long id : SupervisorIdList) {
+            SupervisorBasicInfoList.add(new SupervisorBasicInfo(supervisorMapper.findById(id)));
+        }
+        return SupervisorBasicInfoList;
     }
 
 }

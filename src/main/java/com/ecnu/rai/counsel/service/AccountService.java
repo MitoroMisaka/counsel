@@ -1,20 +1,18 @@
 package com.ecnu.rai.counsel.service;
 
 import com.ecnu.rai.counsel.common.Page;
-import com.ecnu.rai.counsel.dao.UserBasicInfoResponse;
+import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.entity.Admin;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervisor;
 
-import java.util.List;
-
 public interface AccountService {
 
     User findUserByID(Long id);
 
-    Page<UserBasicInfoResponse> findUserList(Integer page, Integer size, String order);
+    Page<UserBasicInfo> findUserList(Integer page, Integer size, String order);
 
     boolean isPhoneUsedByOtherCounselor(Long id,String phone);
 

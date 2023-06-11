@@ -3,10 +3,10 @@ package com.ecnu.rai.counsel.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
-import com.ecnu.rai.counsel.dao.UserBasicInfoResponse;
+import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
-import com.ecnu.rai.counsel.dao.UserLoginInfoResponse;
+import com.ecnu.rai.counsel.dao.UserLoginInfo;
 import com.ecnu.rai.counsel.service.AccountService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
@@ -98,7 +98,7 @@ public class AccountController {
         QueryWrapper wrapper = new QueryWrapper();
         wrapper.eq("username",username);
 
-        return Result.success("登录成功",new UserLoginInfoResponse(userMapper.selectOne(wrapper)));
+        return Result.success("登录成功",new UserLoginInfo(userMapper.selectOne(wrapper)));
     }
 
     @PostMapping("/logout")
@@ -123,9 +123,9 @@ public class AccountController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<UserBasicInfoResponse> getUserList(@RequestParam("page") Integer page,
-                                                   @RequestParam("size") Integer size,
-                                                   @RequestParam("order") String order) {
+    public Page<UserBasicInfo> getUserList(@RequestParam("page") Integer page,
+                                           @RequestParam("size") Integer size,
+                                           @RequestParam("order") String order) {
         return accountService.findUserList(page, size, order);
     }
 

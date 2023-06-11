@@ -1,5 +1,6 @@
 package com.ecnu.rai.counsel.dao;
 
+import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.User;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -14,8 +15,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ApiModel("用户基本信息返回（仅包括id，name，username和role）")
-public class UserBasicInfoResponse implements Serializable {
+@ApiModel("咨询师基本信息返回（仅包括id，name，username和role）")
+public class CounselorBasicInfo implements Serializable {
     @ApiModelProperty("用户id")
     private Long id;
 
@@ -28,10 +29,14 @@ public class UserBasicInfoResponse implements Serializable {
     @ApiModelProperty("类别")
     private String role;
 
-    public UserBasicInfoResponse(User user){
-        this.id = user.getId();
-        this.name = user.getName();
-        this.username = user.getUsername();
-        this.role = user.getRole();
+    @ApiModelProperty("头像")
+    private String avatar;
+
+    public CounselorBasicInfo(Counselor counselor){
+        this.id = counselor.getId();
+        this.name = counselor.getName();
+        this.username = counselor.getUsername();
+        this.role = counselor.getRole();
+        this.avatar = counselor.getAvatar();
     }
 }
