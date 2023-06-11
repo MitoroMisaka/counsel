@@ -5,11 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.ecnu.rai.counsel.common.Page;
 
-import com.ecnu.rai.counsel.entity.Admin;
-import com.ecnu.rai.counsel.entity.Counselor;
-import com.ecnu.rai.counsel.entity.Supervisor;
-import com.ecnu.rai.counsel.entity.User;
-import com.ecnu.rai.counsel.entity.Visitor;
+import com.ecnu.rai.counsel.dao.UserBasicInfoResponse;
+import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.MyMapper;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.mapper.AdminMapper;
@@ -48,6 +45,13 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public User findUserByID(Long id) {
         return userMapper.selectById(id);
+    }
+
+    @Override
+    public Page<UserBasicInfoResponse> findUserList(Integer page, Integer size, String order) {
+        PageHelper.startPage(page, size, order);
+        List<UserBasicInfoResponse> userList = userMapper.findAllUsers();
+        return new Page<>(new PageInfo<>(userList));
     }
 
     public User findUserByUsername(String username) {

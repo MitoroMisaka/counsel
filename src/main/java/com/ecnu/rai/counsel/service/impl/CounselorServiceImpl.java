@@ -1,6 +1,8 @@
 package com.ecnu.rai.counsel.service.impl;
 
 import com.ecnu.rai.counsel.common.Page;
+import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
+import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
@@ -38,6 +40,26 @@ public class CounselorServiceImpl implements CounselorService {
         }
         counselor.setSupervisors(availablesupervisorList);
         return counselor;
+    }
+
+    @Override
+    public List<CounselorMonthlyWork> getCounselorRankingByWork(Integer len) {
+        List<CounselorMonthlyWork> list = counselorMapper.findCounselorRankingByWork(len);
+        for (CounselorMonthlyWork item : list) {
+            item.setName(counselorMapper.findById(item.getCounselorId()).getName());
+            item.setUsername(counselorMapper.findById(item.getCounselorId()).getUsername());
+        }
+        return list;
+    }
+
+    @Override
+    public List<CounselorMonthlyStar> getCounselorRankingByStar(Integer len) {
+        List<CounselorMonthlyStar> list = counselorMapper.findCounselorRankingByComments(len);
+        for (CounselorMonthlyStar item : list) {
+            item.setName(counselorMapper.findById(item.getCounselorId()).getName());
+            item.setUsername(counselorMapper.findById(item.getCounselorId()).getUsername());
+        }
+        return list;
     }
 
     @Override
