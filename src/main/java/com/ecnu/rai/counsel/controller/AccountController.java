@@ -1,10 +1,12 @@
 package com.ecnu.rai.counsel.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
-import com.ecnu.rai.counsel.response.GetUserResponse;
+import com.ecnu.rai.counsel.dao.UserLoginInfo;
 import com.ecnu.rai.counsel.service.AccountService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
@@ -13,11 +15,8 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,8 +26,6 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -107,7 +104,7 @@ public class AccountController {
         QueryWrapper wrapper = new QueryWrapper();
         wrapper.eq("username",username);
 
-        return Result.success("登录成功",new GetUserResponse(userMapper.selectOne(wrapper), principal.getRole()));
+        return Result.success("登录成功",new UserLoginInfo(userMapper.selectOne(wrapper)));
     }
 
     @PostMapping("/logout")
@@ -132,16 +129,21 @@ public class AccountController {
     @RequiresRoles("admin")
     @GetMapping("/users")
     @ApiOperation("获取用户列表")
-    public Result getUsers() {
-        return Result.success("获取成功", userMapper.getUserList());
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
+    public Page<UserBasicInfo> getUserList(@RequestParam("page") Integer page,
+                                           @RequestParam("size") Integer size,
+                                           @RequestParam("order") String order) {
+        return accountService.findUserList(page, size, order);
     }
-
-
 
 
     //获取用户信息
     @GetMapping("/{id}")
-    public Result getUser(@PathVariable Long id) {
+    public Result getUserInfo(@PathVariable Long id) {
 
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
         if (!currentUser.getRole().equals("admin")) {
