@@ -158,17 +158,11 @@ public class CounselorController {
 
 
     @GetMapping("getAvailableCounselor")
-    @ApiOperation("获取可用咨询师,目前只能根据排班判断，无法根据繁忙程度判断")
-    public Page<Counselor> getAvailableCounselor(@RequestParam("page") Integer page,
+    @ApiOperation("获取可用咨询师,可根据排班,是否繁忙查询(需要先登录)")
+    public Result getAvailableCounselor(@RequestParam("page") Integer page,
                                                  @RequestParam("size") Integer size,
                                                  @RequestParam("order") String order) {
-        return counselorService.getAvailableCounselor(page, size, order);
-    }
-    @PostMapping("/getAsupervisors")
-    @ApiOperation("查看绑定督导")
-    public Result askForBinding(@RequestBody Counselor counselor) {
-        List<HashMap<String,Object>> Asupervisors = superviseMapper.selectBindedSupervisor(counselor);
-        return Result.success("获取成功",Asupervisors);
+        return Result.success("获取成功",counselorService.getAvailableCounselor(page, size, order));
     }
 
 }

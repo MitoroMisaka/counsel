@@ -16,6 +16,11 @@ import java.util.List;
 
 @Repository
 public interface CounselorMapper extends BaseMapper<Counselor> {
+
+    //set Status offline
+    @Update("UPDATE counselor SET status = 'OFFLINE' WHERE username = #{username}")
+    void setStatusOffline(@Param("username") String username);
+
     //find by id
     @Select("SELECT * FROM counselor WHERE id = #{id}")
     Counselor findById(@Param("id") Long id);

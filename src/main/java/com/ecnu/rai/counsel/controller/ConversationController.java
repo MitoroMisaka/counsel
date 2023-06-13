@@ -192,4 +192,21 @@ public class ConversationController {
         return Result.success("save and insert conversation ");
     }
 
+    @GetMapping("/get_group_msg")
+    @ApiOperation(value = "获取群聊信息", notes = "get the conversation ")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "counselor_name", value = "咨询师姓名", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "user_name", value = "咨询人姓名", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
+    public Result getGroupMsg(@RequestParam("counselor_name") String counselor_name,
+                              @RequestParam("user_name") String user_name,
+                              @RequestParam("page") Integer page,
+                              @RequestParam("size") Integer size,
+                              @RequestParam("order") String order) {
+        return Result.success("获取成功", conversationService.findGroupMsgByCounselorUser(counselor_name, user_name, page, size, order));
+    }
+
 }
