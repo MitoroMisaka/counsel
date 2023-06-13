@@ -21,7 +21,7 @@ public class ConsultInfo {
     private Integer todayNum;
 
     @ApiModelProperty("今日咨询时长")
-    private Integer todayTotal;
+    private Integer todayTotal = 0;
 
     @ApiModelProperty("当前会话数")
     private Integer currentNum;
