@@ -15,6 +15,10 @@ import java.util.List;
 @Repository
 public interface CounselorMapper extends BaseMapper<Counselor> {
 
+    //update counselor rating
+    @Update("UPDATE counselor SET rating = #{rating} WHERE name = #{name}")
+    void updateCounselorRating(@Param("name") String name, @Param("rating") Integer rating);
+
     //set Status offline
     @Update("UPDATE counselor SET status = 'OFFLINE' WHERE username = #{username}")
     void setStatusOffline(@Param("username") String username);

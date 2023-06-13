@@ -9,6 +9,8 @@ import com.ecnu.rai.counsel.dao.single.IMRequest;
 import com.ecnu.rai.counsel.dao.single.Message;
 import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.mapper.ConversationMapper;
+import com.ecnu.rai.counsel.mapper.CounselorMapper;
+import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.service.ConversationService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -30,6 +32,12 @@ public class ConversationController {
 
     @Autowired
     private ConversationMapper conversationMapper;
+
+    @Autowired
+    private CounselorMapper counselorMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @GetMapping("/id")
     @ApiOperation("根据ID获取会话信息")
@@ -169,26 +177,44 @@ public class ConversationController {
             }
         }
         String history = JSON.toJSONString(messages);
+
+        Long counselor_id = userMapper.findIdByName(getGroupMsgResponse.getCounselorname());
+        Long user_id = userMapper.findIdByName(getGroupMsgResponse.getUsername());
+
+        String counselor_id_str = String.valueOf(counselor_id);
+        String user_id_str = String.valueOf(user_id);
+
         Conversation conversation = Conversation.builder()
-                .id(null)
+                .id(getGroupMsgResponse.getId())
                 .createTime(LocalDateTime.now())
-                .creator(getGroupMsgResponse.getCounselorname())
+                .creator(counselor_id_str)
                 .lastUpdateTime(LocalDateTime.now())
-                .lastUpdater(getGroupMsgResponse.getCounselorname())
+                .lastUpdater(counselor_id_str)
                 .year(getGroupMsgResponse.getStartTime().toLocalDateTime().getYear())
                 .month(getGroupMsgResponse.getStartTime().toLocalDateTime().getMonth())
                 .day(getGroupMsgResponse.getStartTime().toLocalDateTime().getDayOfMonth())
                 .startTime(getGroupMsgResponse.getStartTime())
                 .endTime(getGroupMsgResponse.getEndTime())
-                .user(getGroupMsgResponse.getUsername())
-                .counselor(getGroupMsgResponse.getCounselorname())
+                .user(user_id_str)
+                .counselor(counselor_id_str)
                 .status("FINISHED")
                 .visitorName(getGroupMsgResponse.getUsername())
-                .evaluate(0)
-                .conversationType("C2C")
+                .evaluate(getGroupMsgResponse.getRating())
+                .conversationType("C2V")
                 .message(history)
                 .build();
         conversationMapper.updateConversation(conversation);
+        String counselorid = String.valueOf(userMapper.findIdByName(getGroupMsgResponse.getCounselorname()));
+        List<Conversation> conversations1 = conversationMapper.findGroupMsgByCounselor(counselorid);
+        Double sum = 0.0;
+        for(Conversation conversation1 : conversations1){
+            sum += conversation1.getEvaluate();
+        }
+        //average 四舍五入
+        Integer average = (int) Math.round(sum/conversations1.size());
+        String name = getGroupMsgResponse.getCounselorname();
+        counselorMapper.updateCounselorRating(name , average);
+
         return Result.success("save and insert conversation ");
     }
 

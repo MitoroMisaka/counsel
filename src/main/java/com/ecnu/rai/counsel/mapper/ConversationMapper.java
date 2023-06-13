@@ -15,6 +15,9 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND user = #{user} AND status = 'FINISHED' ORDER BY id DESC")
     List<Conversation> findGroupMsgByCounselorUser(String counselor, String user);
 
+    @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND status = 'FINISHED' ORDER BY id DESC")
+    List<Conversation> findGroupMsgByCounselor(String counselor);
+
     @Select("SELECT max_consult FROM counselor WHERE name = #{counselor}")
     Integer getMaxConsult(@Param("counselor") String counselor);
 

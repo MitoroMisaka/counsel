@@ -22,6 +22,8 @@ public class GetGroupMsgResponse {
     private Timestamp startTime;
     @ApiModelProperty(value = "结束时间")
     private Timestamp endTime;
+    @ApiModelProperty(value = "评分")
+    private Integer rating;
     private String actionStatus;
     private String errorInfo;
     private int errorCode;

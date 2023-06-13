@@ -6,6 +6,7 @@ import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.mapper.ConversationMapper;
+import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.response.ConsultInfo;
 import com.ecnu.rai.counsel.service.ConversationService;
 import com.github.pagehelper.PageHelper;
@@ -24,10 +25,15 @@ public class ConversationServiceImpl implements ConversationService {
     @Autowired
     private ConversationMapper conversationMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public Page<ConversationResponse> findGroupMsgByCounselorUser(String counselor, String user, Integer page, Integer size, String order){
         PageHelper.startPage(page, size, order);
-        List<Conversation> conversationList = conversationMapper.findGroupMsgByCounselorUser(counselor, user);
+        String counselor_id = String.valueOf(userMapper.findIdByName(counselor));
+        String user_id = String.valueOf(userMapper.findIdByName(user));
+        List<Conversation> conversationList = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id);
         List<ConversationResponse> conversationResponseList = new ArrayList<>();
         for(Conversation conversation : conversationList){
             ConversationResponse conversationResponse = new ConversationResponse(conversation);
