@@ -2,15 +2,19 @@ package com.ecnu.rai.counsel.controller;
 
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
+import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.mapper.SuperviseMapper;
 import com.ecnu.rai.counsel.service.CounselorService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.apache.ibatis.annotations.Param;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -92,6 +96,24 @@ public class CounselorController {
 
         Counselor counselor = counselorService.findCounselorByID(id);
         return Result.success("获取成功", counselor);
+    }
+
+    @RequiresRoles("admin")
+    @GetMapping("/getCounselorRankingByWork")
+    @ApiOperation("获取咨询师月咨询数量排名")
+    @ApiImplicitParam(name = "listSize", value = "排名列表长度", required = true, dataType = "Integer")
+    public Result getCounselorRankingByWork(@RequestParam Integer len) {
+        List<CounselorMonthlyWork> counselorRanking = counselorService.getCounselorRankingByWork(len);
+        return Result.success("获取成功", counselorRanking);
+    }
+
+    @RequiresRoles("admin")
+    @GetMapping("/getCounselorRankingByStar")
+    @ApiOperation("获取咨询师月好评数量排名")
+    @ApiImplicitParam(name = "listSize", value = "排名列表长度", required = true, dataType = "Integer")
+    public Result getCounselorRankingByStar(@RequestParam Integer len) {
+        List<CounselorMonthlyStar> counselorRanking = counselorService.getCounselorRankingByStar(len);
+        return Result.success("获取成功", counselorRanking);
     }
 
     @PostMapping("/update")
