@@ -15,6 +15,14 @@ import java.util.List;
 @Repository
 public interface UserMapper extends BaseMapper<User> {
 
+    //get id by name
+    @Select("SELECT id FROM user WHERE name = #{name}")
+    Long findIdByName(@Param("name") String name);
+
+    //get name by id
+    @Select("SELECT name FROM user WHERE id = #{id}")
+    String findNameById(@Param("id") String id);
+
     @Select("SELECT * FROM user WHERE id = #{id}")
     User findById(@Param("id") Long id);
 

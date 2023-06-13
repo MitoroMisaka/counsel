@@ -8,10 +8,7 @@ import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
 import com.ecnu.rai.counsel.dao.AvailableCounselor;
 import com.ecnu.rai.counsel.entity.*;
-import com.ecnu.rai.counsel.mapper.ArrangeMapper;
-import com.ecnu.rai.counsel.mapper.ConversationMapper;
-import com.ecnu.rai.counsel.mapper.CounselorMapper;
-import com.ecnu.rai.counsel.mapper.SupervisorMapper;
+import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.CounselorService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -35,6 +32,9 @@ public class CounselorServiceImpl implements CounselorService {
 
     @Autowired
     private ArrangeMapper arrangeMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
     public Counselor findCounselorByID(Long id) {
@@ -89,13 +89,15 @@ public class CounselorServiceImpl implements CounselorService {
             Counselor counselor = counselorMapper.findById(availableCounselorId);
             AvailableCounselor availableCounselor = new AvailableCounselor(counselor);
             Integer currentConsult = conversationMapper.getConsultNum(counselor.getName());
-            if(currentConsult <= counselor.getMaxConsult()/2){
+            if(currentConsult <= 5){
                 availableCounselor.setBusy("空闲");
             }else if(currentConsult < counselor.getMaxConsult()) {
                 availableCounselor.setBusy("繁忙");
             }
             User user = (User) SecurityUtils.getSubject().getPrincipal();
-            List<Conversation> conversations = conversationMapper.findGroupMsgByCounselorUser(counselor.getName(), user.getName());
+            String counselor_id = String.valueOf(userMapper.findIdByName(counselor.getName()));
+            String user_id = String.valueOf(userMapper.findIdByName(user.getName()));
+            List<Conversation> conversations = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id);
             if(conversations.size() > 0){
                 availableCounselor.setConsulted("已咨询");
             }else {
