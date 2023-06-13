@@ -89,7 +89,7 @@ public class CounselorServiceImpl implements CounselorService {
             Counselor counselor = counselorMapper.findById(availableCounselorId);
             AvailableCounselor availableCounselor = new AvailableCounselor(counselor);
             Integer currentConsult = conversationMapper.getConsultNum(counselor.getName());
-            if(currentConsult <= counselor.getMaxConsult()/2){
+            if(currentConsult <= 5){
                 availableCounselor.setBusy("空闲");
             }else if(currentConsult < counselor.getMaxConsult()) {
                 availableCounselor.setBusy("繁忙");
