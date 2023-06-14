@@ -4,11 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.dao.UserBasicInfo;
+import com.ecnu.rai.counsel.dao.UserLoginInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
-import com.ecnu.rai.counsel.response.GetUserResponse;
 import com.ecnu.rai.counsel.service.AccountService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
+import com.tencentcloudapi.cam.v20190116.models.GetUserResponse;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -109,7 +110,7 @@ public class AccountController {
         QueryWrapper wrapper = new QueryWrapper();
         wrapper.eq("username",username);
 
-        return Result.success("登录成功",new GetUserResponse(userMapper.selectOne(wrapper), principal.getRole()));
+        return Result.success("登录成功",new UserLoginInfo(userMapper.selectOne(wrapper)));
     }
 
     @PostMapping("/logout")

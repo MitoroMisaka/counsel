@@ -242,14 +242,7 @@ public class AccountServiceImpl implements AccountService {
             // Check if the supervisor exists
             return supervisor != null;
         }
-    @Override
-    public Page<User> getUser(Integer page, Integer size, String order) {
-        List<User> userList = userMapper.getUserList();
 
-        PageHelper.startPage(page, size, order);
-
-        return new Page<>(new PageInfo<>(userList));
-    }
 
     }
 
