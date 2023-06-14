@@ -6,4 +6,5 @@ public interface WXService {
     boolean visitorExist(String openid);
     Visitor findByopenid(String openid);
     Long findIdByopenid(String openid);
+    boolean visitorState(String openid);
 }

@@ -56,6 +56,9 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("SELECT role FROM user WHERE id = #{id}")
     String findRoleById(@Param("id") Long id);
 
+    @Delete("DELETE FROM user WHERE id = #{id}")
+    void deleteUser(@Param("id") Long id);
+
 
 
 }
