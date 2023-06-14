@@ -121,8 +121,10 @@ public class AccountController {
     @RequiresRoles("admin")
     @GetMapping("/users")
     @ApiOperation("获取用户列表")
-    public Result getUsers() {
-        return Result.success("获取成功", userMapper.getUserList());
+    public Result getUsers(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                           @RequestParam(value = "size", defaultValue = "20") Integer size,
+                           @RequestParam(value = "order", defaultValue = "id_asc") String order) {
+        return Result.success("获取成功", accountService.getUser(page, size, order));
     }
 
 
@@ -678,6 +680,21 @@ public class AccountController {
         }
 
         return Result.success("Bind successfully!");
+    }
+
+    @RequiresRoles("admin")
+    @GetMapping("/delete")
+    public Result delUser(@Valid @RequestBody List<Long> userId)
+    {
+        if(userId.isEmpty())
+            return Result.fail("No user to delete.");
+        for(Long userid:userId){
+            if(!Objects.equals(userMapper.findRoleById(userid), "admin"))
+                continue;
+            userMapper.deleteById(userid);
+        }
+
+        return Result.success("Delete successfully!");
     }
 
 

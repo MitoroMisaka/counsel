@@ -55,6 +55,7 @@ public class WXController {
             return Result.fail("Token过期或非法");
         }
 
+
         // Check if the real name is valid
         if(!request.getRealName().matches("[\\u4e00-\\u9fa5a-zA-Z]{2,32}")) {
             return Result.fail("真实姓名格式不正确");
@@ -80,6 +81,10 @@ public class WXController {
         String openid = jwt.getClaim("openid").asString();
         if(!wxService.visitorExist(openid)) {
             return Result.fail("该微信账号不存在");
+        }
+        else if(!wxService.visitorState(openid))
+        {
+            return Result.fail("该账号已封禁！");
         }
         else{
             u = wxService.findByopenid(openid);
@@ -116,21 +121,23 @@ public class WXController {
         return Result.success("信息修改成功");
     }
     @PostMapping("/wx/delete")
-    public String deleteVisitor(@RequestParam("token") String token){
+    public Result deleteVisitor(@RequestParam("token") String token){
         if(!TokenUtil.token_check(token)){
             System.out.println("Token过期或非法");
-            return("Token过期或非法");
+            return Result.fail("Token过期或非法");
 
         }
         else{
             DecodedJWT jwt = JWT.decode(token);
             String openid = jwt.getClaim("openid").asString();
+            Long id = wxService.findIdByopenid(openid);
             if(!wxService.visitorExist(openid)){
-                return("用户不存在");
+                return Result.fail("用户不存在");
             }
             else{
                 visitorMapper.deleteVisitor(openid);
-                return("账号已删除！");
+                userMapper.deleteById(id);
+                return Result.success("账号已删除！");
             }
         }
     }

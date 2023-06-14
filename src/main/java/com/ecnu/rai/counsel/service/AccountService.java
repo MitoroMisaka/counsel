@@ -1,5 +1,6 @@
 package com.ecnu.rai.counsel.service;
 
+import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.entity.Admin;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
@@ -36,6 +37,8 @@ public interface AccountService {
     boolean isUsernameUsedByOtherCounselor(String username);
 
     boolean isUsernameUsedByOtherSupervisor(String username);
+
+    Page<User> getUser(Integer page, Integer size, String order);
 }
 
 

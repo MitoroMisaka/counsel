@@ -47,5 +47,14 @@ public class WXServiceImpl implements WXService {
     public Long findIdByopenid(String openid) {
         return visitorMapper.findIdbyopenid(openid);
     }
+
+    @Override
+    public boolean visitorState(String openid) {
+        Visitor visitor = visitorMapper.findByopenid(openid);
+        User user = userMapper.findById(visitor.getId());
+        if(user.getState() == null)return false;
+        if(user.getState() == 1)return true;
+        else return false;
+    }
 }
 
