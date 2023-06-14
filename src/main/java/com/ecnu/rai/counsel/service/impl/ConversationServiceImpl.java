@@ -85,25 +85,43 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    public Page<Conversation> findConversationByUser(Long user, Integer page, Integer size, String order) {
+    public Page<ConversationResponse> findConversationByUser(Long user, Integer page, Integer size, String order) {
         // 构造分页参数
         PageHelper.startPage(page, size, order);
 
         List<Conversation> conversationList = conversationMapper.findByUser(user);
 
+        for(Conversation conversation : conversationList){
+            conversation.setCounselor(userMapper.findNameById(conversation.getCounselor()));
+            conversation.setUser(userMapper.findNameById(conversation.getUser()));
+        }
+        List<ConversationResponse> conversationResponseList = new ArrayList<>();
+        for(Conversation conversation : conversationList){
+            ConversationResponse conversationResponse = new ConversationResponse(conversation);
+            conversationResponseList.add(conversationResponse);
+        }
+
         // 返回分页后的结果
-        return new Page<>(new PageInfo<>(conversationList));
+        return new Page<>(new PageInfo<>(conversationResponseList));
     }
 
     @Override
-    public Page<Conversation> findConversationByCounselor(Long counselor, Integer page, Integer size, String order) {
+    public Page<ConversationResponse> findConversationByCounselor(Long counselor, Integer page, Integer size, String order) {
         // 构造分页参数
         PageHelper.startPage(page, size, order);
 
         List<Conversation> conversationList = conversationMapper.findByCounselor(counselor);
-
+        for(Conversation conversation : conversationList){
+            conversation.setCounselor(userMapper.findNameById(conversation.getCounselor()));
+            conversation.setUser(userMapper.findNameById(conversation.getUser()));
+        }
+        List<ConversationResponse> conversationResponseList = new ArrayList<>();
+        for(Conversation conversation : conversationList){
+            ConversationResponse conversationResponse = new ConversationResponse(conversation);
+            conversationResponseList.add(conversationResponse);
+        }
         // 返回分页后的结果
-        return new Page<>(new PageInfo<>(conversationList));
+        return new Page<>(new PageInfo<>(conversationResponseList));
     }
 
     @Override

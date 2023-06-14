@@ -18,9 +18,9 @@ public interface ConversationService {
 
     Conversation updateConversation(Conversation conversation);
 
-    Page<Conversation> findConversationByUser(Long user, Integer page, Integer size, String order);
+    Page<ConversationResponse> findConversationByUser(Long user, Integer page, Integer size, String order);
 
-    Page<Conversation> findConversationByCounselor(Long counselor, Integer page, Integer size, String order);
+    Page<ConversationResponse> findConversationByCounselor(Long counselor, Integer page, Integer size, String order);
 
     Page<Conversation> findConversationByCounselorUserDate(Long counselor, Long user, Date date, Integer page, Integer size, String order);
 

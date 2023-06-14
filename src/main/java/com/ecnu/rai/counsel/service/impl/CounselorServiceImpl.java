@@ -80,7 +80,7 @@ public class CounselorServiceImpl implements CounselorService {
     }
 
     @Override
-    public Page<AvailableCounselor> getAvailableCounselor(Integer page, Integer size, String order) {
+    public Page<AvailableCounselor> getAvailableCounselor(Integer page, Integer size, String order, Long id ) {
         List<Long> availableCounselorIdList = arrangeMapper.findCounselorByCurrentTime();
         List<AvailableCounselor> counselorList = new ArrayList<>();
 
@@ -94,7 +94,7 @@ public class CounselorServiceImpl implements CounselorService {
             }else if(currentConsult < counselor.getMaxConsult()) {
                 availableCounselor.setBusy("繁忙");
             }
-            User user = (User) SecurityUtils.getSubject().getPrincipal();
+            User user = userMapper.findById(id);
             String counselor_id = String.valueOf(userMapper.findIdByName(counselor.getName()));
             String user_id = String.valueOf(userMapper.findIdByName(user.getName()));
             List<Conversation> conversations = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id);

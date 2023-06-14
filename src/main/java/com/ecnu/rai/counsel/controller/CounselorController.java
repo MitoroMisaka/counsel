@@ -160,9 +160,10 @@ public class CounselorController {
     @GetMapping("getAvailableCounselor")
     @ApiOperation("获取可用咨询师,可根据排班,是否繁忙查询(需要先登录)")
     public Result getAvailableCounselor(@RequestParam("page") Integer page,
-                                                 @RequestParam("size") Integer size,
-                                                 @RequestParam("order") String order) {
-        return Result.success("获取成功",counselorService.getAvailableCounselor(page, size, order));
+                                        @RequestParam("size") Integer size,
+                                        @RequestParam("order") String order,
+                                        @RequestParam("id") Long id) {
+        return Result.success("获取成功",counselorService.getAvailableCounselor(page, size, order, id));
     }
 
 }
