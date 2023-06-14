@@ -1,7 +1,9 @@
 package com.ecnu.rai.counsel.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.response.GetUserResponse;
@@ -93,6 +95,12 @@ public class AccountController {
         User principal = (User) SecurityUtils.getSubject().getPrincipal();
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         info.addRole(principal.getRole());
+
+        if(principal.getRole().equals("counselor"))
+        {
+            visitorMapper.setStatusOnline(username);
+        }
+
         if(principal.getState()==null)
             return Result.fail("用户处于未知状态");
         else if(principal.getState()==0)
@@ -107,6 +115,11 @@ public class AccountController {
     @PostMapping("/logout")
     @ApiOperation("登出")
     public Result logout() throws IOException {
+        //get principle
+        User user = (User) SecurityUtils.getSubject().getPrincipal();
+        if(user.getRole().equals("counselor")){
+            counselorMapper.setStatusOffline(user.getUsername());
+        }
         SecurityUtils.getSubject().logout();
         return Result.success(null);
     }
@@ -121,10 +134,15 @@ public class AccountController {
     @RequiresRoles("admin")
     @GetMapping("/users")
     @ApiOperation("获取用户列表")
-    public Result getUsers(@RequestParam(value = "page", defaultValue = "1") Integer page,
-                           @RequestParam(value = "size", defaultValue = "20") Integer size,
-                           @RequestParam(value = "order", defaultValue = "id_asc") String order) {
-        return Result.success("获取成功", accountService.getUser(page, size, order));
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
+    public Page<UserBasicInfo> getUserList(@RequestParam("page") Integer page,
+                                           @RequestParam("size") Integer size,
+                                           @RequestParam("order") String order) {
+        return accountService.findUserList(page, size, order);
     }
 
 
@@ -132,7 +150,7 @@ public class AccountController {
 
     //获取用户信息
     @GetMapping("/{id}")
-    public Result getUser(@PathVariable Long id) {
+    public Result getUserInfo(@PathVariable Long id) {
 
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
         if (!currentUser.getRole().equals("admin")) {

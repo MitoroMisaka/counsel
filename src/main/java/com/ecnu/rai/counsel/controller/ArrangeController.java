@@ -1,6 +1,8 @@
 package com.ecnu.rai.counsel.controller;
 
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.dao.CounselorBasicInfo;
+import com.ecnu.rai.counsel.dao.SupervisorBasicInfo;
 import com.ecnu.rai.counsel.entity.Arrange;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.response.DayNum;
@@ -90,20 +92,41 @@ public class ArrangeController {
     }
 
     @RequiresRoles("admin")
-    @GetMapping("/counselorYearMonthInfo")
+    @GetMapping("/CounselorInfobyMonth")
     @ApiOperation("获取某年某月中每一天的排班咨询师总数")
-    public Result getArrangeCounselorInfobyYearMonth(@RequestParam("year") Integer year,
+    public Result getCounselorInfobyMonth(@RequestParam("year") Integer year,
                                             @RequestParam("month") Integer month) {
-        List<DayNum> arranges = arrangeService.findArrangeCounselorInfoByYearMonthDay(year, month);
+        List<DayNum> arranges = arrangeService.findCounselorInfoByMonth(year, month);
         return Result.success("获取成功", arranges);
     }
 
     @RequiresRoles("admin")
-    @GetMapping("/supervisorYearMonthInfo")
-    @ApiOperation("获取某年某月有排班的咨询师总数")
-    public Result getArrangeSupervisorInfobyYearMonth(@RequestParam("year") Integer year,
+    @GetMapping("/SupervisorInfobyMonth")
+    @ApiOperation("获取某年某月中每一天的排班督导总数")
+    public Result getSupervisorInfobyMonth(@RequestParam("year") Integer year,
                                             @RequestParam("month") Integer month) {
-        List<DayNum> arranges = arrangeService.findArrangeSupervisorInfoByYearMonthDay(year, month);
+        List<DayNum> arranges = arrangeService.findSupervisorInfoByMonth(year, month);
         return Result.success("获取成功", arranges);
     }
+
+    @RequiresRoles("admin")
+    @GetMapping("/counselorListByDay")
+    @ApiOperation("获取某天有排班的咨询师的基本信息列表")
+    public Result getCounselorListByDay(@RequestParam("year") Integer year,
+                                        @RequestParam("month") Integer month,
+                                        @RequestParam("day") Integer day) {
+        List<CounselorBasicInfo> counselorListByDay = arrangeService.findCounselorListByDay(year, month, day);
+        return Result.success("获取成功", counselorListByDay);
+    }
+
+    @RequiresRoles("admin")
+    @GetMapping("/supervisorListByDay")
+    @ApiOperation("获取某天有排班的咨询师的基本信息列表")
+    public Result getSupervisorListByDay(@RequestParam("year") Integer year,
+                                        @RequestParam("month") Integer month,
+                                        @RequestParam("day") Integer day) {
+        List<SupervisorBasicInfo> supervisorListByDay = arrangeService.findSupervisorListByDay(year, month, day);
+        return Result.success("获取成功", supervisorListByDay);
+    }
+
 }

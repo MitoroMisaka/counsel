@@ -1,6 +1,8 @@
 package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
+import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
@@ -14,9 +16,28 @@ import java.util.List;
 
 @Repository
 public interface CounselorMapper extends BaseMapper<Counselor> {
+
+    //update counselor rating
+    @Update("UPDATE counselor SET rating = #{rating} WHERE name = #{name}")
+    void updateCounselorRating(@Param("name") String name, @Param("rating") Integer rating);
+
+    //set Status offline
+    @Update("UPDATE counselor SET status = 'OFFLINE' WHERE username = #{username}")
+    void setStatusOffline(@Param("username") String username);
+
     //find by id
     @Select("SELECT * FROM counselor WHERE id = #{id}")
     Counselor findById(@Param("id") Long id);
+
+    @Select("SELECT counselor AS counselorId, COUNT(id) AS finishedConsults " +
+            "FROM conversation WHERE `year` = YEAR(CURDATE()) AND `month` = MONTH(CURDATE()) AND `status` = \"FINISHED\" " +
+            "GROUP BY counselor ORDER BY finishedconsults DESC limit #{len}")
+    List<CounselorMonthlyWork> findCounselorRankingByWork(Integer len);
+
+    @Select("SELECT counselor AS counselorId, COUNT(id) AS favouriteCommentNum " +
+            "FROM conversation WHERE `year` = YEAR(CURDATE()) AND `month` = MONTH(CURDATE()) AND `evaluate` = 5 " +
+            "GROUP BY counselor ORDER BY favouriteCommentNum DESC limit #{len}")
+    List<CounselorMonthlyStar> findCounselorRankingByComments(Integer len);
 
     @Select("SELECT * FROM supervise WHERE counselor_id = #{id}")
     List<Supervise> findSupervisors(@Param("id") Long id);

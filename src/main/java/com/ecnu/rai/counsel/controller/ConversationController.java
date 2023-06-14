@@ -3,23 +3,35 @@ package com.ecnu.rai.counsel.controller;
 import com.alibaba.fastjson.JSON;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.dao.ConversationIdList;
 import com.ecnu.rai.counsel.dao.group.GetGroupMsgResponse;
 import com.ecnu.rai.counsel.dao.group.RspMsg;
 import com.ecnu.rai.counsel.dao.single.IMRequest;
 import com.ecnu.rai.counsel.dao.single.Message;
 import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.mapper.ConversationMapper;
+import com.ecnu.rai.counsel.mapper.CounselorMapper;
+import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.service.ConversationService;
+import com.ecnu.rai.counsel.util.PinyinUtil;
+import com.google.gson.Gson;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.ByteArrayOutputStream;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @RestController
 @RequestMapping("/conversation")
@@ -30,6 +42,12 @@ public class ConversationController {
 
     @Autowired
     private ConversationMapper conversationMapper;
+
+    @Autowired
+    private CounselorMapper counselorMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @GetMapping("/id")
     @ApiOperation("根据ID获取会话信息")
@@ -169,27 +187,126 @@ public class ConversationController {
             }
         }
         String history = JSON.toJSONString(messages);
+        System.out.println(history);
+
+        Long counselor_id = userMapper.findIdByName(getGroupMsgResponse.getCounselorname());
+        Long user_id = userMapper.findIdByName(getGroupMsgResponse.getUsername());
+
+        String counselor_id_str = String.valueOf(counselor_id);
+        String user_id_str = String.valueOf(user_id);
+
         Conversation conversation = Conversation.builder()
-                .id(null)
+                .id(getGroupMsgResponse.getId())
                 .createTime(LocalDateTime.now())
-                .creator(getGroupMsgResponse.getCounselorname())
+                .creator(counselor_id_str)
                 .lastUpdateTime(LocalDateTime.now())
-                .lastUpdater(getGroupMsgResponse.getCounselorname())
+                .lastUpdater(counselor_id_str)
                 .year(getGroupMsgResponse.getStartTime().toLocalDateTime().getYear())
                 .month(getGroupMsgResponse.getStartTime().toLocalDateTime().getMonth())
                 .day(getGroupMsgResponse.getStartTime().toLocalDateTime().getDayOfMonth())
                 .startTime(getGroupMsgResponse.getStartTime())
                 .endTime(getGroupMsgResponse.getEndTime())
-                .user(getGroupMsgResponse.getUsername())
-                .counselor(getGroupMsgResponse.getCounselorname())
+                .user(user_id_str)
+                .counselor(counselor_id_str)
                 .status("FINISHED")
                 .visitorName(getGroupMsgResponse.getUsername())
-                .evaluate(0)
-                .conversationType("C2C")
+                .evaluate(getGroupMsgResponse.getRating())
+                .conversationType("评价:"+getGroupMsgResponse.getComment())
                 .message(history)
                 .build();
         conversationMapper.updateConversation(conversation);
+        String counselorid = String.valueOf(userMapper.findIdByName(getGroupMsgResponse.getCounselorname()));
+        List<Conversation> conversations1 = conversationMapper.findGroupMsgByCounselor(counselorid);
+        Double sum = 0.0;
+        for(Conversation conversation1 : conversations1){
+            sum += conversation1.getEvaluate();
+        }
+        //average 四舍五入
+        Integer average = (int) Math.round(sum/conversations1.size());
+        String name = getGroupMsgResponse.getCounselorname();
+        counselorMapper.updateCounselorRating(name , average);
+
         return Result.success("save and insert conversation ");
     }
 
+    @GetMapping("/get_group_msg")
+    @ApiOperation(value = "获取群聊信息", notes = "get the conversation ")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "counselor_name", value = "咨询师姓名", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "user_name", value = "咨询人姓名", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
+    public Result getGroupMsg(@RequestParam("counselor_name") String counselor_name,
+                              @RequestParam("user_name") String user_name,
+                              @RequestParam("page") Integer page,
+                              @RequestParam("size") Integer size,
+                              @RequestParam("order") String order) {
+        return Result.success("获取成功", conversationService.findGroupMsgByCounselorUser(counselor_name, user_name, page, size, order));
+    }
+
+    @GetMapping("/export/history")
+    @ApiOperation(value = "导出历史记录(JSON)", notes = "export the history ")
+    @ApiImplicitParam(name = "conversation_id", value = "会话id", required = true, dataType = "Long")
+    public ResponseEntity<ByteArrayResource> getJsonFile(@RequestParam("conversation_id") Long conversation_id) throws Exception {
+        Conversation conversation = conversationMapper.getConversationById(conversation_id);
+
+        String text = conversation.getMessage();
+
+        Gson gson = new Gson();
+
+        List<RspMsg> message = gson.fromJson(text, List.class);
+        String response = "{ \"message\" :" + gson.toJson(message) + "}";
+        String counselor_name  = userMapper.findNameById(conversation.getCounselor());
+        //convert counselor_name to pinyin
+        counselor_name = PinyinUtil.convertToPinyin(counselor_name);
+        String visitor_name = PinyinUtil.convertToPinyin(conversation.getVisitorName());
+        String filename = counselor_name + "_" + visitor_name + "_" + conversation.getStartTime() + ".json";
+
+        ByteArrayResource resource = new ByteArrayResource(response.getBytes("GBK"));
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + filename)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(resource);
+    }
+
+    @GetMapping("/export/history/batch")
+    public ResponseEntity<ByteArrayResource> getBatchJsonFiles(@RequestBody ConversationIdList conversationIdList) throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+
+        for (Long conversationId : conversationIdList.getConversationIds()) {
+            Conversation conversation = conversationMapper.getConversationById(conversationId);
+            String text = conversation.getMessage();
+            Gson gson = new Gson();
+            List<RspMsg> message = gson.fromJson(text, List.class);
+            String response = "{ \"message\" :" + gson.toJson(message) + "}";
+            String counselorName = userMapper.findNameById(conversation.getCounselor());
+            counselorName = PinyinUtil.convertToPinyin(counselorName);
+            String visitorName = PinyinUtil.convertToPinyin(conversation.getVisitorName());
+            String filename = counselorName + "_" + visitorName + "_" + conversation.getStartTime() + ".json";
+
+            // 添加文件到压缩包
+            zipOutputStream.putNextEntry(new ZipEntry(filename));
+            zipOutputStream.write(response.getBytes("GBK"));
+            zipOutputStream.closeEntry();
+        }
+
+        zipOutputStream.close();
+
+        byte[] zipData = outputStream.toByteArray();
+        ByteArrayResource resource = new ByteArrayResource(zipData);
+
+        // 设置响应头，指定文件名为导出的压缩包
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=export_history.zip");
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(zipData.length)
+                .body(resource);
+    }
 }

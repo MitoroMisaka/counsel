@@ -1,8 +1,8 @@
 package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.entity.User;
-import com.ecnu.rai.counsel.entity.Visitor;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -15,8 +15,19 @@ import java.util.List;
 @Repository
 public interface UserMapper extends BaseMapper<User> {
 
+    //get id by name
+    @Select("SELECT id FROM user WHERE name = #{name}")
+    Long findIdByName(@Param("name") String name);
+
+    //get name by id
+    @Select("SELECT name FROM user WHERE id = #{id}")
+    String findNameById(@Param("id") String id);
+
     @Select("SELECT * FROM user WHERE id = #{id}")
     User findById(@Param("id") Long id);
+
+    @Select("SELECT * FROM user")
+    List<UserBasicInfo> findAllUsers();
 
     @Select("SELECT * FROM user WHERE name = #{name}")
     User findByName(@Param("name") String name);

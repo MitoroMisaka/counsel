@@ -12,6 +12,15 @@ import java.util.List;
 @Repository
 public interface ConversationMapper extends BaseMapper<Conversation> {
 
+    //get conversation by id
+    @Select("SELECT * FROM conversation WHERE id = #{conversation_id}")
+    Conversation getConversationById(@Param("conversation_id") Long conversation_id);
+
+    @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND user = #{user} AND status = 'FINISHED' ORDER BY id DESC")
+    List<Conversation> findGroupMsgByCounselorUser(String counselor, String user);
+
+    @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND status = 'FINISHED' ORDER BY id DESC")
+    List<Conversation> findGroupMsgByCounselor(String counselor);
 
     @Select("SELECT max_consult FROM counselor WHERE name = #{counselor}")
     Integer getMaxConsult(@Param("counselor") String counselor);
@@ -54,7 +63,8 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
             "status = #{conversation.status}, " +
             "visitor_name = #{conversation.visitorName}, " +
             "evaluate = #{conversation.evaluate}, " +
-            "conversation_type = #{conversation.conversationType}" +
+            "conversation_type = #{conversation.conversationType}," +
+            "message = #{conversation.message}" +
             "WHERE id = #{conversation.id}")
     void updateConversation(@Param("conversation") Conversation conversation);
 
