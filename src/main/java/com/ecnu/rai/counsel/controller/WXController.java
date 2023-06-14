@@ -17,6 +17,7 @@ import com.ecnu.rai.counsel.service.WXService;
 import com.ecnu.rai.counsel.util.TokenUtil;
 import com.ecnu.rai.counsel.util.VerifyCodeGenUtil;
 import com.ecnu.rai.counsel.utils.CommonUtil;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -50,6 +51,7 @@ public class WXController {
 
 
     @PostMapping("/wx/edit")
+    @ApiOperation("编辑微信用户")
     public Result edit(@RequestBody EditRequest request) {
         if(!TokenUtil.token_check(request.getToken())){
             return Result.fail("Token过期或非法");
@@ -121,6 +123,7 @@ public class WXController {
         return Result.success("信息修改成功");
     }
     @PostMapping("/wx/delete")
+    @ApiOperation("删除用户")
     public Result deleteVisitor(@RequestParam("token") String token){
         if(!TokenUtil.token_check(token)){
             System.out.println("Token过期或非法");
@@ -142,7 +145,31 @@ public class WXController {
         }
     }
 
+
+    @PostMapping("/wx/info")
+    @ApiOperation("编辑用户")
+    public Result findVisitor(@RequestParam("token") String token){
+        if(!TokenUtil.token_check(token)){
+            System.out.println("Token过期或非法");
+            return Result.fail("Token过期或非法");
+
+        }
+        else{
+            DecodedJWT jwt = JWT.decode(token);
+            String openid = jwt.getClaim("openid").asString();
+            Long id = wxService.findIdByopenid(openid);
+            if(!wxService.visitorExist(openid)){
+                return Result.fail("用户不存在");
+            }
+            else{
+                Visitor v = visitorMapper.findByopenid(openid);
+                return Result.success("success！",v);
+            }
+        }
+    }
+
     @PostMapping("/wx/counselor")
+    @ApiOperation("获取可用咨询师，暂时弃用")
     public Object getCounselor(@RequestParam("token") String token){
         if(!TokenUtil.token_check(token)){
             System.out.println("Token过期或非法");
@@ -158,6 +185,7 @@ public class WXController {
     @ResponseBody
     @CrossOrigin
     @RequestMapping("/wx/login")
+    @ApiOperation("微信登录")
     public Result login(HttpServletRequest request) throws IOException {
 
         String code = request.getParameter("code");
