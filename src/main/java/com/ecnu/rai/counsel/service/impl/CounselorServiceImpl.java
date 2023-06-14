@@ -1,5 +1,7 @@
 package com.ecnu.rai.counsel.service.impl;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
@@ -35,6 +37,9 @@ public class CounselorServiceImpl implements CounselorService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private VisitorMapper visitorMapper;
 
     @Override
     public Counselor findCounselorByID(Long id) {
@@ -80,7 +85,7 @@ public class CounselorServiceImpl implements CounselorService {
     }
 
     @Override
-    public Page<AvailableCounselor> getAvailableCounselor(Integer page, Integer size, String order, Long id ) {
+    public Page<AvailableCounselor> getAvailableCounselor(Integer page, Integer size, String order, String token ) {
         List<Long> availableCounselorIdList = arrangeMapper.findCounselorByCurrentTime();
         List<AvailableCounselor> counselorList = new ArrayList<>();
 
@@ -94,7 +99,10 @@ public class CounselorServiceImpl implements CounselorService {
             }else if(currentConsult < counselor.getMaxConsult()) {
                 availableCounselor.setBusy("繁忙");
             }
-            User user = userMapper.findById(id);
+            DecodedJWT jwt = JWT.decode(token);
+            String openid = jwt.getClaim("openid").asString();
+            Visitor visitor = visitorMapper.findByopenid(openid);
+            User user = userMapper.findById(visitor.getId());
             String counselor_id = String.valueOf(userMapper.findIdByName(counselor.getName()));
             String user_id = String.valueOf(userMapper.findIdByName(user.getName()));
             List<Conversation> conversations = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id);

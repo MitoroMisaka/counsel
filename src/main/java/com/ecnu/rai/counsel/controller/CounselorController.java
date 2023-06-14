@@ -30,6 +30,7 @@ public class CounselorController {
 
     @Autowired
     private UserMapper userMapper;
+
   
     @Autowired
     private SuperviseMapper superviseMapper;
@@ -162,8 +163,8 @@ public class CounselorController {
     public Result getAvailableCounselor(@RequestParam("page") Integer page,
                                         @RequestParam("size") Integer size,
                                         @RequestParam("order") String order,
-                                        @RequestParam("id") Long id) {
-        return Result.success("获取成功",counselorService.getAvailableCounselor(page, size, order, id));
+                                        @RequestParam("token") String token) {
+        return Result.success("获取成功",counselorService.getAvailableCounselor(page, size, order, token));
     }
 
 }

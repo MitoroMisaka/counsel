@@ -21,6 +21,6 @@ public interface CounselorService {
 
     void updateCounselor(Counselor counselor);
 
-    Page<AvailableCounselor> getAvailableCounselor(Integer page, Integer size, String order,  Long id);
+    Page<AvailableCounselor> getAvailableCounselor(Integer page, Integer size, String order, String token);
 
 }
