@@ -132,7 +132,7 @@ public class AccountController {
 //    }
 
 
-    @RequiresRoles("admin")
+//    @RequiresRoles("admin")
     @GetMapping("/users")
     @ApiOperation("获取用户列表")
     @ApiImplicitParams({
@@ -153,12 +153,12 @@ public class AccountController {
     @GetMapping("/{id}")
     public Result getUserInfo(@PathVariable Long id) {
 
-        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
-            if (currentUser.getId() != id) {
-                return Result.fail("无权访问");
-            }
-        }
+//        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
+//        if (!currentUser.getRole().equals("admin")) {
+//            if (currentUser.getId() != id) {
+//                return Result.fail("无权访问");
+//            }
+//        }
 
         User user = accountService.findUserByID(id);
         String role = user.getRole();
@@ -651,7 +651,7 @@ public class AccountController {
                                            @Valid @RequestBody List<Long> counselorsId)
     {
         if(!Objects.equals(userMapper.findRoleById(id), "supervisor"))
-        return Result.fail("Unauthorized.");
+            return Result.fail("Unauthorized.");
         if(counselorsId.isEmpty())
             return Result.fail("No counselors to bind.");
         for(Long counselorid:counselorsId){

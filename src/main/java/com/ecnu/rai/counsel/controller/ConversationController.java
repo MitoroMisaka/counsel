@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.dao.ConversationIdList;
+import com.ecnu.rai.counsel.dao.ConversationResponse;
 import com.ecnu.rai.counsel.dao.group.GetGroupMsgResponse;
 import com.ecnu.rai.counsel.dao.group.RspMsg;
 import com.ecnu.rai.counsel.dao.single.IMRequest;
@@ -69,7 +70,7 @@ public class ConversationController {
     }
 
     @PostMapping("/update")
-    @ApiOperation("更新会话信息")
+    @ApiOperation("(弃用接口)更新会话信息")
     public Result updateConversation(@RequestParam("conversation") Conversation conversation) {
         Conversation new_arrange = conversationService.updateConversation(conversation);
         return Result.success("获取成功", new_arrange);
@@ -83,7 +84,7 @@ public class ConversationController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<Conversation> getConversationbyUser(@RequestParam("user") Long user,
+    public Page<ConversationResponse> getConversationbyUser(@RequestParam("user") Long user,
                                                @RequestParam("page") Integer page,
                                                @RequestParam("size") Integer size,
                                                @RequestParam("order") String order) {
@@ -98,10 +99,10 @@ public class ConversationController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<Conversation> getConversationbyCounselor(@RequestParam("counselor") Long counselor,
-                                                       @RequestParam("page") Integer page,
-                                                       @RequestParam("size") Integer size,
-                                                       @RequestParam("order") String order) {
+    public Page<ConversationResponse> getConversationbyCounselor(@RequestParam("counselor") Long counselor,
+                                                                 @RequestParam("page") Integer page,
+                                                                 @RequestParam("size") Integer size,
+                                                                 @RequestParam("order") String order) {
         return conversationService.findConversationByCounselor(counselor, page, size, order);
     }
 
