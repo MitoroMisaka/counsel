@@ -4,19 +4,23 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.dao.UserBasicInfo;
+import com.ecnu.rai.counsel.dao.UserLoginInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
-import com.ecnu.rai.counsel.dao.UserLoginInfo;
 import com.ecnu.rai.counsel.service.AccountService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
+import com.tencentcloudapi.cam.v20190116.models.GetUserResponse;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +30,8 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -139,6 +145,8 @@ public class AccountController {
                                            @RequestParam("order") String order) {
         return accountService.findUserList(page, size, order);
     }
+
+
 
 
     //获取用户信息
@@ -691,6 +699,21 @@ public class AccountController {
         }
 
         return Result.success("Bind successfully!");
+    }
+
+    @RequiresRoles("admin")
+    @GetMapping("/delete")
+    public Result delUser(@Valid @RequestBody List<Long> userId)
+    {
+        if(userId.isEmpty())
+            return Result.fail("No user to delete.");
+        for(Long userid:userId){
+            if(!Objects.equals(userMapper.findRoleById(userid), "admin"))
+                continue;
+            userMapper.deleteById(userid);
+        }
+
+        return Result.success("Delete successfully!");
     }
 
 
