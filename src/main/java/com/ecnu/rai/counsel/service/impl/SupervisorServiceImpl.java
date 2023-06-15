@@ -1,13 +1,13 @@
 package com.ecnu.rai.counsel.service.impl;
 
 import com.ecnu.rai.counsel.common.Page;
+import com.ecnu.rai.counsel.dao.AvailableSupervisor;
+import com.ecnu.rai.counsel.dao.UserSig;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
-import com.ecnu.rai.counsel.mapper.ArrangeMapper;
-import com.ecnu.rai.counsel.mapper.CounselorMapper;
-import com.ecnu.rai.counsel.mapper.SuperviseMapper;
-import com.ecnu.rai.counsel.mapper.SupervisorMapper;
+import com.ecnu.rai.counsel.entity.Usersig;
+import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.SupervisorService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -32,20 +32,36 @@ public class SupervisorServiceImpl implements SupervisorService {
     @Autowired
     private SuperviseMapper superviseMapper;
 
+    @Autowired
+    private UserSigMapper userSigMapper;
+
     @Override
     public void addCounselors(Long id, Long counselorIds) {
         superviseMapper.makeSupervise(id, counselorIds);
     }
 
     @Override
-    public Page<Supervisor> getAvailableSupervisorList(Integer page, Integer size, String order){
+    public Page<AvailableSupervisor> getAvailableSupervisorList(Long counselor_id, Integer page, Integer size, String order){
         List<Long> availableSupervisorIdList = supervisorMapper.findSupervisorByCurrentTime();
-        List<Supervisor> supervisorList = new ArrayList<>();
-
+        List<AvailableSupervisor> supervisorList = new ArrayList<>();
+        List<Long> bindedSupervisorIdList = superviseMapper.findSupervisorByCounselorId(counselor_id);
         PageHelper.startPage(page, size, order);
         for (Long availableSupervisorId : availableSupervisorIdList) {
-            supervisorList.add(supervisorMapper.findById(availableSupervisorId));
+            if(bindedSupervisorIdList.contains(availableSupervisorId)){
+                Supervisor supervisor= supervisorMapper.findById(availableSupervisorId);
+                AvailableSupervisor availableSupervisor = new AvailableSupervisor(supervisor);
+                if(userSigMapper.getUserSigByName(supervisor.getName())!=null){
+                    Usersig userSig = userSigMapper.getUserSigByName(supervisor.getName());
+                    availableSupervisor.setUserSig(userSig.getUsersig());
+                    availableSupervisor.setImid(userSig.getImid());
+                }
+                else {
+                    continue;
+                }
+                supervisorList.add(availableSupervisor);
+            }
         }
+
         return new Page<>(new PageInfo<>(supervisorList));
     }
 

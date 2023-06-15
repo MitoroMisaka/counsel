@@ -247,6 +247,7 @@ public class ConversationController {
         return Result.success("获取成功", conversationService.findGroupMsgByCounselorUser(counselor_name, user_name, page, size, order));
     }
 
+
     @GetMapping("/export/history")
     @ApiOperation(value = "导出历史记录(JSON)", notes = "export the history ")
     @ApiImplicitParam(name = "conversation_id", value = "会话id", required = true, dataType = "Long")
