@@ -11,6 +11,10 @@ import java.util.List;
 
 @Repository
 public interface SuperviseMapper {
+    //get all supervisorid by counselorid
+    @Select("SELECT supervisor_id FROM supervise WHERE counselor_id = #{counselor_id}")
+    List<Long> findSupervisorByCounselorId(@Param("counselor_id") Long counselor_id);
+
     @Insert("INSERT INTO supervise values (#{counselorid},#{supervisorid})")
     void makeSupervise(@Param("counselorid")Long counselorid, @Param("supervisorid")Long supervisorid);
 
