@@ -27,16 +27,22 @@ public class UserSigController {
     UserSigMapper userSigMapper;
 
     @GetMapping("/userSig")
-    public Object getUserSig(@RequestParam("userid") String userid, @RequestParam("name") String name) {
-        String userSig = userSigService.generateUserSig(userid);
+    public Object getUserSig(@RequestParam("imid") String imid, @RequestParam("name") String name) {
+        if(userSigMapper.getUserSigByName(name) != null){
+            return userSigMapper.getUserSigByName(name);
+        }
+        String userSig = userSigService.generateUserSig(imid);
         User user = userMapper.findByName(name);
-        Usersig usersig1 = new Usersig(userid, userSig, name, user.getRole());
+        System.out.println(user);
+        Usersig usersig1 = new Usersig(imid, userSig, name, user.getRole());
+        System.out.println(usersig1);
         userSigMapper.insertUserSig(usersig1);
         //User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
         //if (!currentUser.getRole().equals("admin")) {
         //        return Result.fail("You have no permission to generate userSig");
         //}
-        //返回一个Object，里面第一条是userid，第二条是token
-        return new UserSig(userid, userSig);
+
+        UserSig fresult = new UserSig(imid, userSig, name, user.getRole());
+        return fresult;
     }
 }

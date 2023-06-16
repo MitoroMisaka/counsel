@@ -2,6 +2,7 @@ package com.ecnu.rai.counsel.controller;
 
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.dao.AvailableSupervisor;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervisor;
 import com.ecnu.rai.counsel.entity.User;
@@ -94,12 +95,13 @@ public class SupervisorController {
 
     @GetMapping("/available")
     @ApiOperation("获取可用督导列表")
-    public Page<Supervisor> getAvailableSupervisorList(
+    public Page<AvailableSupervisor> getAvailableSupervisorList(
+            @RequestParam(value = "counselorId") Long counselorId,
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
             @RequestParam(value = "order", defaultValue = "id_asc") String order
     ) {
-        return supervisorService.getAvailableSupervisorList(page, size, order);
+        return supervisorService.getAvailableSupervisorList(counselorId, page, size, order);
     }
 
     @PostMapping("/update")

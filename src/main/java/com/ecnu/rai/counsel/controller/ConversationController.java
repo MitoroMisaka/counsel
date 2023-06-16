@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.dao.ConversationIdList;
+import com.ecnu.rai.counsel.dao.ConversationResponse;
 import com.ecnu.rai.counsel.dao.group.GetGroupMsgResponse;
 import com.ecnu.rai.counsel.dao.group.RspMsg;
 import com.ecnu.rai.counsel.dao.single.IMRequest;
@@ -12,6 +13,7 @@ import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.mapper.ConversationMapper;
 import com.ecnu.rai.counsel.mapper.CounselorMapper;
 import com.ecnu.rai.counsel.mapper.UserMapper;
+import com.ecnu.rai.counsel.mapper.UserSigMapper;
 import com.ecnu.rai.counsel.service.ConversationService;
 import com.ecnu.rai.counsel.util.PinyinUtil;
 import com.google.gson.Gson;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +39,9 @@ import java.util.zip.ZipOutputStream;
 @RestController
 @RequestMapping("/conversation")
 public class ConversationController {
+
+    @Autowired
+    private IMController imController;
 
     @Autowired
     private ConversationService conversationService;
@@ -49,6 +55,9 @@ public class ConversationController {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private UserSigMapper userSigMapper;
+
     @GetMapping("/id")
     @ApiOperation("根据ID获取会话信息")
     public Result getConversationbyID(@RequestParam("id") Long id) {
@@ -58,18 +67,23 @@ public class ConversationController {
 
     @PostMapping("/start")
     @ApiOperation("开始会话(就是建个表,给出咨询师和用户的姓名就行)")
-    public Result insertConversation(@Valid @RequestBody Conversation conversation) {
+    public Result insertConversation(@Valid @RequestBody Conversation conversation) throws IOException {
         Integer maxConsult = conversationMapper.getMaxConsult(conversation.getCounselor());
         if(maxConsult.equals(conversationMapper.getConsultNum(conversation.getCounselor()))){
             Result.fail("咨询师咨询次数已达上限");
         }
         conversation.setStatus("STARTED");
         Conversation new_conversation = conversationService.insertConversationByID(conversation);
-        return Result.success("获取成功", new_conversation);
+        String counselor_name = userMapper.findNameById(conversation.getCounselor());
+        String counselor_imid = userSigMapper.getImidByName(counselor_name);
+        String user_name = userMapper.findNameById(conversation.getUser());
+
+        Object result = imController.createGroup(counselor_name , user_name, counselor_imid);
+        return Result.success("获取成功", result);
     }
 
     @PostMapping("/update")
-    @ApiOperation("更新会话信息")
+    @ApiOperation("(弃用接口)更新会话信息")
     public Result updateConversation(@RequestParam("conversation") Conversation conversation) {
         Conversation new_arrange = conversationService.updateConversation(conversation);
         return Result.success("获取成功", new_arrange);
@@ -83,7 +97,7 @@ public class ConversationController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<Conversation> getConversationbyUser(@RequestParam("user") Long user,
+    public Page<ConversationResponse> getConversationbyUser(@RequestParam("user") Long user,
                                                @RequestParam("page") Integer page,
                                                @RequestParam("size") Integer size,
                                                @RequestParam("order") String order) {
@@ -98,10 +112,10 @@ public class ConversationController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<Conversation> getConversationbyCounselor(@RequestParam("counselor") Long counselor,
-                                                       @RequestParam("page") Integer page,
-                                                       @RequestParam("size") Integer size,
-                                                       @RequestParam("order") String order) {
+    public Page<ConversationResponse> getConversationbyCounselor(@RequestParam("counselor") Long counselor,
+                                                                 @RequestParam("page") Integer page,
+                                                                 @RequestParam("size") Integer size,
+                                                                 @RequestParam("order") String order) {
         return conversationService.findConversationByCounselor(counselor, page, size, order);
     }
 
@@ -245,6 +259,7 @@ public class ConversationController {
                               @RequestParam("order") String order) {
         return Result.success("获取成功", conversationService.findGroupMsgByCounselorUser(counselor_name, user_name, page, size, order));
     }
+
 
     @GetMapping("/export/history")
     @ApiOperation(value = "导出历史记录(JSON)", notes = "export the history ")
