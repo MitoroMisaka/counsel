@@ -13,6 +13,7 @@ import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.mapper.ConversationMapper;
 import com.ecnu.rai.counsel.mapper.CounselorMapper;
 import com.ecnu.rai.counsel.mapper.UserMapper;
+import com.ecnu.rai.counsel.mapper.UserSigMapper;
 import com.ecnu.rai.counsel.service.ConversationService;
 import com.ecnu.rai.counsel.util.PinyinUtil;
 import com.google.gson.Gson;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +39,9 @@ import java.util.zip.ZipOutputStream;
 @RestController
 @RequestMapping("/conversation")
 public class ConversationController {
+
+    @Autowired
+    private IMController imController;
 
     @Autowired
     private ConversationService conversationService;
@@ -50,6 +55,9 @@ public class ConversationController {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private UserSigMapper userSigMapper;
+
     @GetMapping("/id")
     @ApiOperation("根据ID获取会话信息")
     public Result getConversationbyID(@RequestParam("id") Long id) {
@@ -59,14 +67,19 @@ public class ConversationController {
 
     @PostMapping("/start")
     @ApiOperation("开始会话(就是建个表,给出咨询师和用户的姓名就行)")
-    public Result insertConversation(@Valid @RequestBody Conversation conversation) {
+    public Result insertConversation(@Valid @RequestBody Conversation conversation) throws IOException {
         Integer maxConsult = conversationMapper.getMaxConsult(conversation.getCounselor());
         if(maxConsult.equals(conversationMapper.getConsultNum(conversation.getCounselor()))){
             Result.fail("咨询师咨询次数已达上限");
         }
         conversation.setStatus("STARTED");
         Conversation new_conversation = conversationService.insertConversationByID(conversation);
-        return Result.success("获取成功", new_conversation);
+        String counselor_name = userMapper.findNameById(conversation.getCounselor());
+        String counselor_imid = userSigMapper.getImidByName(counselor_name);
+        String user_name = userMapper.findNameById(conversation.getUser());
+
+        Object result = imController.createGroup(counselor_name , user_name, counselor_imid);
+        return Result.success("获取成功", result);
     }
 
     @PostMapping("/update")
