@@ -9,11 +9,16 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserSigMapper extends BaseMapper<Usersig> {
-    @Insert("INSERT INTO usersig (userid, usersig, name, role) " +
-        "VALUES (#{usersig1.userid}, #{usersig1.usersig}, #{usersig1.name}, #{usersig1.role})")
+    @Insert("INSERT INTO usersig (imid, usersig, name, role) " +
+        "VALUES (#{usersig1.imid}, #{usersig1.usersig}, #{usersig1.name}, #{usersig1.role})")
     void insertUserSig(@Param("usersig1") Usersig usersig1);
 
     //get UserSig by name
     @Select("SELECT * FROM usersig WHERE name = #{name}")
     Usersig getUserSigByName(@Param("name") String name);
+
+    //get imid by name
+    @Select("SELECT imid FROM usersig WHERE name = #{name}")
+    String getImidByName(@Param("name") String name);
+
 }

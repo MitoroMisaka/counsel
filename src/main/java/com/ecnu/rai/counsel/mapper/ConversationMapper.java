@@ -22,7 +22,7 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND status = 'FINISHED' ORDER BY id DESC")
     List<Conversation> findGroupMsgByCounselor(String counselor);
 
-    @Select("SELECT max_consult FROM counselor WHERE name = #{counselor}")
+    @Select("SELECT max_consult FROM counselor WHERE id = #{counselor}")
     Integer getMaxConsult(@Param("counselor") String counselor);
 
     @Select("SELECT count(*) FROM conversation WHERE counselor = #{counselor} AND status = 'STARTED'")
