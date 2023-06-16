@@ -4,8 +4,10 @@ import lombok.Data;
 
 @Data
 public class GroupMsgBody {
-    private GroupMsgContent msgContent;
-    private String msgType;
+//    private GroupMsgContent msgContent;
+//    private String msgType;
 
+    private GroupMsgContent MsgContent;
+    private String MsgType;
     // getters and setters
 }
