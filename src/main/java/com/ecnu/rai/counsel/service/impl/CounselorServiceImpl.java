@@ -5,12 +5,15 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
+import com.ecnu.rai.counsel.dao.CounselorSMInfo;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
 import com.ecnu.rai.counsel.dao.AvailableCounselor;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
+import com.ecnu.rai.counsel.response.ConsultInfo;
+import com.ecnu.rai.counsel.service.ConversationService;
 import com.ecnu.rai.counsel.service.CounselorService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -18,8 +21,8 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class CounselorServiceImpl implements CounselorService {
@@ -119,6 +122,99 @@ public class CounselorServiceImpl implements CounselorService {
         return new Page<>(new PageInfo<>(counselorList));
     }
 
+    @Override
+    public List<CounselorSMInfo> getAllCounselor() {
+        List<Counselor> counselors = counselorMapper.findAllCounselors();
+        List<CounselorSMInfo> counselorSMInfos = new ArrayList<>();
+        for(Counselor counselor:counselors)
+        {
+            CounselorSMInfo counselorSMInfo = new CounselorSMInfo(counselor);
+            counselorSMInfo.SetTotalNum(conversationMapper.findTotalNumCounselor(counselor.getId()));
+            counselorSMInfo.SetTotalTime(conversationMapper.findTotalByCounselor(counselor.getId()));
+            counselorSMInfos.add(counselorSMInfo);
+            List<Integer> Days = arrangeMapper.findDayArrange(counselor.getId());
+            for(Integer day:Days)
+            {
+                counselorSMInfo.setTotalDay(day);
+            }
+        }
+
+
+        return counselorSMInfos;
+    }
+
+    @Override
+    public Page<HashMap<String, String>> getAvailableCounselorByBusy(Integer page, Integer size, String order) {
+        List<Counselor> counselors = counselorMapper.findAllCounselorsOnline();
+        List<HashMap<String, String>> CounselorBusy= new ArrayList<>();
+        for(Counselor counselor:counselors)
+        {
+            Integer currentConsult = conversationMapper.getConsultNum(counselor.getName());
+            if(currentConsult <= 5){
+                HashMap<String, String> h = new HashMap<>();
+                h.put("counselor",counselor.getName());
+                h.put("status","空闲");
+                CounselorBusy.add(h);
+            }else if(currentConsult < counselor.getMaxConsult()) {
+                HashMap<String, String> h = new HashMap<>();
+                h.put("counselor",counselor.getName());
+                h.put("status","繁忙");
+                CounselorBusy.add(h);
+            }
+        }
+        PageHelper.startPage(page, size, order);
+        return new Page<>(new PageInfo<>(CounselorBusy));
+    }
+
+    @Override
+    public HashMap<String, Integer> getBasicStatInfo() {
+        Integer totalNum = conversationMapper.findTodayNum();
+        Integer totalTime = conversationMapper.findTodayTotal();
+        Integer curNum = conversationMapper.findCurrentNum();
+        totalNum = totalNum + curNum;
+        HashMap<String, Integer> h = new HashMap<>();
+        h.put("totalNum",totalNum);
+        h.put("totalTime",totalTime);
+        h.put("curNum",curNum);
+        return h;
+
+    }
+
+    @Override
+    public TreeMap<String, Integer> getNumByWeek() {
+        TreeMap<String, Integer> h = new TreeMap<>();
+        LocalDate today = LocalDate.now();
+        for(int i = 0;i<7;i++)
+        {
+            LocalDate previousDate = today.minusDays(6-i );
+            Integer month = previousDate.getMonthValue();
+            Integer day = previousDate.getDayOfMonth();
+            Integer sum = conversationMapper.findNumDaysAgo(6-i );
+            String date = month + "/" + day;
+            h.put(date,sum);
+        }
+        return h;
+
+    }
+
+    @Override
+    public TreeMap<Integer, Integer> getNumByHours() {
+        TreeMap<Integer, Integer> h = new TreeMap<>();
+        for(int i = 0;i <= 12; i++)
+        {
+            Integer sum = 0;
+            if(i==0)
+            {
+                 sum = conversationMapper.findNumByHours(22,1);
+            }
+            else{
+                 sum = conversationMapper.findNumByHours(i*2,0);
+            }
+
+            h.put(i*2,sum);
+        }
+        return h;
+    }
 
 
 }

@@ -121,7 +121,7 @@ public class ArrangeController {
 
     @RequiresRoles("admin")
     @GetMapping("/supervisorListByDay")
-    @ApiOperation("获取某天有排班的咨询师的基本信息列表")
+    @ApiOperation("获取某天有排班的督导的基本信息列表")
     public Result getSupervisorListByDay(@RequestParam("year") Integer year,
                                         @RequestParam("month") Integer month,
                                         @RequestParam("day") Integer day) {

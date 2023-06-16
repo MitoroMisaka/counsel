@@ -25,4 +25,6 @@ public interface SupervisorService {
 
     Page<Supervisor> getAvailableSupervisor(Integer page, Integer size, String order);
 
+//    Page<Supervisor> getAvailableSupervisorByBusy(Integer page, Integer size, String order);
+
 }
