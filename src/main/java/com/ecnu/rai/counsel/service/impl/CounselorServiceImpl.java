@@ -41,6 +41,9 @@ public class CounselorServiceImpl implements CounselorService {
     @Autowired
     private VisitorMapper visitorMapper;
 
+    @Autowired
+    private UserSigMapper userSigMapper;
+
     @Override
     public Counselor findCounselorByID(Long id) {
         Counselor counselor = counselorMapper.findById(id);
@@ -112,6 +115,8 @@ public class CounselorServiceImpl implements CounselorService {
                 availableCounselor.setConsulted("未咨询");
             }
 
+            String imid = userSigMapper.getImidByName(counselor.getName());
+            availableCounselor.setImid(imid);
             if(!currentConsult.equals(counselor.getMaxConsult())){
                 counselorList.add(availableCounselor);
             }

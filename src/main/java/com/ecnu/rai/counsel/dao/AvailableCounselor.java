@@ -107,6 +107,9 @@ public class AvailableCounselor {
     @ApiModelProperty(value = "繁忙程度", example = "10")
     private String busy;
 
+    @ApiModelProperty(value = "imid", example = "guapi")
+    private String imid;
+
     public AvailableCounselor(Counselor counselor){
         //AvailableCounselor的所有属性赋值为Counselor里面的值
         this.id = counselor.getId();
