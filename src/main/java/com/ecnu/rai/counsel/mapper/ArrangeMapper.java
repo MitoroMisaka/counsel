@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Repository
@@ -89,5 +90,8 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
 
     @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='supervisor' AND state <> 0")
     List<Long> findSupervisorByCurrentTime();
+
+    @Select("SELECT day FROM arrange WHERE user = #{user} and year = YEAR(CURRENT_DATE()) and month = MONTH(CURRENT_DATE())")
+    List<Integer> findDayArrange(@Param("user") Long user);
 
 }

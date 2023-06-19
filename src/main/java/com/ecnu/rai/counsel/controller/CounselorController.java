@@ -2,10 +2,14 @@ package com.ecnu.rai.counsel.controller;
 
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.dao.AvailableCounselor;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
+import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.User;
+import com.ecnu.rai.counsel.mapper.ConversationMapper;
+import com.ecnu.rai.counsel.mapper.CounselorMapper;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.mapper.SuperviseMapper;
 import com.ecnu.rai.counsel.service.CounselorService;
@@ -18,6 +22,7 @@ import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,6 +35,12 @@ public class CounselorController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private CounselorMapper counselorMapper;
+
+    @Autowired
+    private ConversationMapper conversationMapper;
 
   
     @Autowired
@@ -174,4 +185,41 @@ public class CounselorController {
         return Result.success("获取成功",counselorService.getAvailableCounselor(page, size, order, token));
     }
 
+    @GetMapping("getCounselorByBusy")
+    @ApiOperation("获取咨询师及其繁忙状态")
+    public Result getCounselorByBusy(@RequestParam("page") Integer page,
+                                        @RequestParam("size") Integer size,
+                                        @RequestParam("order") String order) {
+
+
+        return Result.success("获取成功",counselorService.getAvailableCounselorByBusy(page, size, order));
+    }
+
+    @GetMapping("getBasicStatInfo")
+    @ApiOperation("获取基本资询统计数据")
+    public Result getBasicStatInfo(@RequestParam("page") Integer page,
+                                     @RequestParam("size") Integer size,
+                                     @RequestParam("order") String order) {
+
+
+        return Result.success("获取成功",counselorService.getBasicStatInfo());
+    }
+
+    @GetMapping("getNumByWeek")
+    @ApiOperation("获取周咨询统计数据（最近一周）")
+    public Result getNumByWeek(@RequestParam("page") Integer page,
+                                   @RequestParam("size") Integer size,
+                                   @RequestParam("order") String order) {
+
+
+        return Result.success("获取成功",counselorService.getNumByWeek());
+    }
+
+    @GetMapping("getNumByHours")
+    @ApiOperation("获取今日时辰统计数据")
+    public Result getNumByHours() {
+
+
+        return Result.success("获取成功",counselorService.getNumByHours());
+    }
 }

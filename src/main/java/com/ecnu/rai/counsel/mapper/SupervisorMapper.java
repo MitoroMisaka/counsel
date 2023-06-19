@@ -18,6 +18,12 @@ public interface SupervisorMapper extends BaseMapper<Supervisor> {
     @Select("SELECT * FROM supervisor WHERE id = #{id}")
     Supervisor findById(Long id);
 
+    @Update("UPDATE supervisor SET status = 'ONLINE' WHERE username = #{username}")
+    void setStatusOnline(@Param("username") String username);
+
+    @Update("UPDATE supervisor SET status = 'OFFLINE' WHERE username = #{username}")
+    void setStatusOffline(@Param("username") String username);
+
     @Select("SELECT * FROM supervisor")
     List<Supervisor> getAll();
 
@@ -39,6 +45,8 @@ public interface SupervisorMapper extends BaseMapper<Supervisor> {
             "title = #{supervisor.title}, " +
             "qualification = #{supervisor.qualification}, " +
             "qualification_code = #{supervisor.qualificationCode} " +
+            "max_consult = #{counselor.maxConsult}, " +
+            "status = #{counselor.status} " +
             "WHERE id = #{supervisor.id}")
     void updateSupervisor(@Param("supervisor") Supervisor supervisor);
 

@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Repository
@@ -89,9 +90,30 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
 
     @Select("SELECT COUNT(*) " +
             "FROM conversation " +
-            "WHERE counselor= #{counselor} AND " +
-            "DATE(start_time) = DATE(SYSDATE())")
+            "WHERE counselor= #{counselor}")
+    Integer findTotalNumCounselor(@Param("counselor") Long counselor);
+
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
+            "WHERE counselor= #{counselor} AND  +" +
+            "DATE(start_time) = DATE(SYSDATE()) ")
     Integer findTodayNumByCounselor(@Param("counselor") Long counselor);
+
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
+            "WHERE  DATE(start_time) = DATE(SYSDATE())")
+    Integer findTodayNum();
+
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
+            "WHERE  DATE(start_time) = DATE_SUB(DATE(SYSDATE()), INTERVAL #{days} DAY)")
+    Integer findNumDaysAgo(@Param("days") Integer days);
+
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
+            "WHERE  DATE(start_time) =  DATE_SUB(DATE(SYSDATE()), INTERVAL #{days} DAY) AND HOUR(start_time) < #{hours} " +
+            "AND HOUR(start_time) >= #{hours}-2")
+    Integer findNumByHours(@Param("hours") Integer hours ,@Param("days") Integer days);
 
     @Select("SELECT SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) " +
             "FROM conversation " +
@@ -99,10 +121,22 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
             "DATE(start_time) = DATE(SYSDATE())")
     Integer findTodayTotalByCounselor(@Param("counselor") Long counselor);
 
+    @Select("SELECT SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) " +
+            "FROM conversation " +
+            "WHERE DATE(start_time) = DATE(SYSDATE())")
+    Integer findTodayTotal();
+
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
+            "WHERE  status = 'STARTED' ")
+    Integer findCurrentNum();
+
     @Select("SELECT COUNT(*) " +
             "FROM conversation " +
             "WHERE counselor= #{counselor} AND " +
             "status = 'active'")
     Integer findCurrentNumByCounselor(@Param("counselor") Long counselor);
+
+
 
 }

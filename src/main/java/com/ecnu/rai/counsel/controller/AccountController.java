@@ -3,6 +3,7 @@ package com.ecnu.rai.counsel.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.dao.CounselorSMInfo;
 import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.dao.UserLoginInfo;
 import com.ecnu.rai.counsel.entity.*;
@@ -99,7 +100,11 @@ public class AccountController {
 
         if(principal.getRole().equals("counselor"))
         {
-            visitorMapper.setStatusOnline(username);
+            counselorMapper.setStatusOnline(username);
+        }
+        else if(principal.getRole().equals("supervisor"))
+        {
+            supervisorMapper.setStatusOnline(username);
         }
 
         if(principal.getState()==null)
@@ -120,6 +125,10 @@ public class AccountController {
         User user = (User) SecurityUtils.getSubject().getPrincipal();
         if(user.getRole().equals("counselor")){
             counselorMapper.setStatusOffline(user.getUsername());
+        }
+        else if(user.getRole().equals("supervisor"))
+        {
+            supervisorMapper.setStatusOffline(user.getUsername());
         }
         SecurityUtils.getSubject().logout();
         return Result.success(null);
@@ -144,6 +153,19 @@ public class AccountController {
                                            @RequestParam("size") Integer size,
                                            @RequestParam("order") String order) {
         return accountService.findUserList(page, size, order);
+    }
+
+    @GetMapping("/counselors")
+    @ApiOperation("获取咨询师列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
+    public Page<CounselorSMInfo> getCounselorList(@RequestParam("page") Integer page,
+                                                  @RequestParam("size") Integer size,
+                                                  @RequestParam("order") String order) {
+        return accountService.findCounselorList(page, size, order);
     }
 
 
@@ -543,6 +565,8 @@ public class AccountController {
 
           User insertedUser = userMapper.findByUsername(user.getUsername());
           supervisor.setId(insertedUser.getId());
+          supervisor.setStatus("OFFLINE");
+          supervisor.setMaxConsult(10);
 
         // Insert the counselor
         if(accountService.isUsernameUsedByOtherCounselor(user.getUsername())) {

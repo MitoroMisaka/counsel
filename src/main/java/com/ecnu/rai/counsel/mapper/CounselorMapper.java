@@ -12,10 +12,14 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Repository
 public interface CounselorMapper extends BaseMapper<Counselor> {
+
+    @Update("UPDATE counselor SET status = 'ONLINE' WHERE username = #{username}")
+    void setStatusOnline(@Param("username") String username);
 
     //update counselor rating
     @Update("UPDATE counselor SET rating = #{rating} WHERE name = #{name}")
@@ -44,6 +48,12 @@ public interface CounselorMapper extends BaseMapper<Counselor> {
 
     @Select("SELECT * FROM supervise WHERE supervisor_id = #{id}")
     List<Supervise> findCounselors(@Param("id") Long id);
+
+    @Select("SELECT * FROM counselor")
+    List<Counselor> findAllCounselors();
+
+    @Select("SELECT * FROM counselor where status ='ONLINE' ")
+    List<Counselor> findAllCounselorsOnline();
 
     //generate SQL statement to update counselor info
     @Update("UPDATE counselor SET " +

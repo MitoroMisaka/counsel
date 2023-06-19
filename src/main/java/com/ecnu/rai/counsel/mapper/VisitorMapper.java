@@ -12,9 +12,6 @@ import java.util.List;
 @Repository
 public interface VisitorMapper extends BaseMapper<Visitor> {
 
-    @Update("UPDATE counselor SET status = 'ONLINE' WHERE username = #{username}")
-    void setStatusOnline(@Param("username") String username);
-
     @Select("SELECT * FROM visitor WHERE id = #{id}")
     Visitor findById(@Param("id") Long id);
 

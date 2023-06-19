@@ -61,6 +61,14 @@ public class Supervisor {
     @ApiModelProperty(value = "职称")
     private String qualificationCode;
 
+    //status
+    @ApiModelProperty(value = "状态", example = "ONLINE")
+    private String status;
+
+    //maxConsult
+    @ApiModelProperty(value = "最大咨询量", example = "10")
+    private Integer maxConsult;
+
     // 省略其他方法...
 }
 
