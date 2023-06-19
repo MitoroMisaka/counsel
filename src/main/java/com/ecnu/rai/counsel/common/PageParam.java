@@ -1,4 +1,5 @@
 package com.ecnu.rai.counsel.common;
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PageParam {
+public class PageParam  {
     @ApiModelProperty("每页显示数量 (不小于0)")
     private Integer pageSize = 10;
 

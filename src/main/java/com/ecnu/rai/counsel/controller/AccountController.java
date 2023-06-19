@@ -132,7 +132,7 @@ public class AccountController {
 //    }
 
 
-//    @RequiresRoles("admin")
+    @RequiresRoles("admin")
     @GetMapping("/users")
     @ApiOperation("获取用户列表")
     @ApiImplicitParams({
@@ -347,9 +347,9 @@ public class AccountController {
             return Result.fail("Email is used by another counselor");
         }
         // Check if bind to supervisor
-        if(counselor.getSupervisors().isEmpty()) {
-            return Result.fail("Should bind at least one supervisor.");
-        }
+//        if(counselor.getSupervisors().isEmpty()) {
+//            return Result.fail("Should bind at least one supervisor.");
+//        }
         // Build the user object
         User user = User.builder()
                 .name(counselor.getName())
@@ -384,10 +384,10 @@ public class AccountController {
         }
         // Return the inserted counselor
         //Bind counselor and supervisors
-        for(Supervisor supervisor: counselor.getSupervisors())
-        {
-            superviseMapper.makeSupervise(counselor.getId(), supervisor.getId());
-        }
+//        for(Supervisor supervisor: counselor.getSupervisors())
+//        {
+//            superviseMapper.makeSupervise(counselor.getId(), supervisor.getId());
+//        }
         return Result.success("Insert counselor successfully", counselor);
     }
 
@@ -490,10 +490,34 @@ public class AccountController {
         if(supervisor.getPassword().length() < 6) {
             return Result.fail("Invalid password");
         }
+        //role must be supervisor
+        if(!supervisor.getRole().equals("supervisor")) {
+            return Result.fail("Invalid role");
+        }
+
         supervisor.setPassword(PasswordUtil.convert(supervisor.getPassword()));
         // Check if the phone number is valid
         if(!supervisor.getPhone().matches("^1(3|4|5|6|7|8|9)\\d{9}$")) {
             return Result.fail("Invalid phone number");
+        }
+        //gender must be "男" or "女
+        if(!supervisor.getGender().equals("男") && !supervisor.getGender().equals("女") )
+        {
+            return Result.fail("invalid gender (must be 男 or 女)");
+        }
+
+        //qualification must be '一级' '二级' or '三级'
+        if(!supervisor.getQualification().equals("一级") && !supervisor.getQualification().equals("二级") && !supervisor.getQualification().equals("三级")) {
+            return Result.fail("Invalid qualification");
+        }
+        //if qualification number is null return fail
+        if(supervisor.getQualificationCode() == null || supervisor.getQualificationCode().equals("")) {
+            return Result.fail("Invalid qualification code");
+        }
+
+        //department cannot be null or ""
+        if(supervisor.getDepartment() == null || supervisor.getDepartment().equals("")) {
+            return Result.fail("Invalid department");
         }
 
         // Build the user object
@@ -561,6 +585,11 @@ public class AccountController {
         if(!supervisor.getUsername().matches("^[A-Za-z0-9_]+$")) {
             return Result.fail("Invalid username.");
         }
+        //role must be supervisor
+        if(!supervisor.getRole().equals("supervisor")) {
+            return Result.fail("Invalid role.");
+        }
+
         // Check if the password is valid
         if(supervisor.getPassword().length() < 6) {
             return Result.fail("Password must be at least 6 characters long.");
