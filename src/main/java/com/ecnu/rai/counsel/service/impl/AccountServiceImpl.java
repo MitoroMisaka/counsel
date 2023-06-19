@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import com.ecnu.rai.counsel.common.Page;
 
+import com.ecnu.rai.counsel.dao.CounselorSMInfo;
 import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.MyMapper;
@@ -14,6 +15,7 @@ import com.ecnu.rai.counsel.mapper.CounselorMapper;
 import com.ecnu.rai.counsel.mapper.SupervisorMapper;
 import com.ecnu.rai.counsel.mapper.VisitorMapper;
 import com.ecnu.rai.counsel.service.AccountService;
+import com.ecnu.rai.counsel.service.CounselorService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -43,6 +45,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private SupervisorMapper supervisorMapper;
 
+    @Autowired
+    private CounselorService counselorService;
+
     @Override
     public User findUserByID(Long id) {
         return userMapper.selectById(id);
@@ -53,6 +58,13 @@ public class AccountServiceImpl implements AccountService {
         PageHelper.startPage(page, size, order);
         List<UserBasicInfo> userList = userMapper.findAllUsers();
         return new Page<>(new PageInfo<>(userList));
+    }
+
+    @Override
+    public Page<CounselorSMInfo> findCounselorList(Integer page, Integer size, String order) {
+        PageHelper.startPage(page, size, order);
+        List<CounselorSMInfo> counselorList = counselorService.getAllCounselor();
+        return new Page<>(new PageInfo<>(counselorList));
     }
 
     public User findUserByUsername(String username) {

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -25,6 +26,9 @@ public class SupervisorServiceImpl implements SupervisorService {
 
     @Autowired
     private CounselorMapper counselorMapper;
+
+    @Autowired
+    private ConversationMapper conversationMapper;
 
     @Autowired
     private ArrangeMapper arrangeMapper;
@@ -110,5 +114,28 @@ public class SupervisorServiceImpl implements SupervisorService {
         }
         return new Page<>(new PageInfo<>(supervisorList));
     }
+
+//    @Override
+//    public Page<Supervisor> getAvailableSupervisorByBusy(Integer page, Integer size, String order) {
+//        List<Supervisor> supervisors = supervisorMapper.getAll();
+//        List<HashMap<String, String>> supervisorBusy= new ArrayList<>();
+//        for(Supervisor supervisor:supervisors)
+//        {
+//            Integer currentConsult = conversationMapper.getConsultNum(supervisor.getName());
+//            if(currentConsult <= 5){
+//                HashMap<String, String> h = new HashMap<>();
+//                h.put("supervisor",supervisor.getName());
+//                h.put("status","空闲");
+//                supervisorBusy.add(h);
+//            }else if(currentConsult < supervisor.getMaxConsult()) {
+//                HashMap<String, String> h = new HashMap<>();
+//                h.put("supervisor",supervisor.getName());
+//                h.put("status","繁忙");
+//                supervisorBusy.add(h);
+//            }
+//        }
+//        PageHelper.startPage(page, size, order);
+//        return new Page<>(new PageInfo<>(supervisorBusy));
+//    }
 
 }
