@@ -81,4 +81,8 @@ public interface CounselorMapper extends BaseMapper<Counselor> {
         "#{counselor.enabled}, #{counselor.deleted}, #{counselor.status},#{counselor.rating}, #{counselor.maxConsult})")
     void insertCounselor(@Param("counselor") Counselor counselor);
 
+    //find all
+    @Select("SELECT * FROM counselor")
+    List<Counselor> findAll();
+
 }

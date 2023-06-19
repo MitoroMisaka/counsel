@@ -1,10 +1,15 @@
 package com.ecnu.rai.counsel.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ecnu.rai.counsel.config.UserSigConfig;
 import com.ecnu.rai.counsel.dao.group.GroupMsg;
+import com.ecnu.rai.counsel.dao.group.RspMsg;
+import com.ecnu.rai.counsel.dao.single.Message;
 import com.ecnu.rai.counsel.service.IMService;
+import com.ecnu.rai.counsel.util.LowerCaseUtil;
 import com.ecnu.rai.counsel.util.PinyinUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.tencentcloudapi.as.v20180419.models.Instance;
 import io.github.doocs.im.ImClient;
@@ -136,7 +141,7 @@ public class IMController {
 
     @GetMapping("/post/test")
     @ApiOperation("测试")
-    public Object test(@RequestParam("group_name") String group_name) throws IOException {
+    public Object test(@RequestParam("group_name") String group_name) throws Exception {
         group_name = "@TGS#2Y2M4MYM6";
 
         RestTemplate restTemplate = new RestTemplate();
@@ -157,14 +162,21 @@ public class IMController {
                 "random=47712345&contenttype=json";
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
         System.out.println(response);
-        //convert response.getBody() to JSON Object
-        Gson gson = new Gson();
-        JSONObject groupMsg = gson.fromJson(response.getBody(), JSONObject.class);
-        Object msg = groupMsg.get("RspMsgList");
 
-        // 获取响应结果
-        return msg;
+        ObjectMapper objectMapper = new ObjectMapper();
+        GroupMsg groupMsg = objectMapper.readValue(response.getBody(), GroupMsg.class);
+
+        // 对From_Account进行修改
+        for (RspMsg rspMsg : groupMsg.getRspMsgList()) {
+            if (rspMsg.getFromAccount().equals("144115197276518801")) {
+                rspMsg.setFromAccount("Anon");
+            }
+        }
+
+        return groupMsg;
     }
+
+
 
     @GetMapping("/send/text/single")
     @ApiOperation("发送单聊文本消息")

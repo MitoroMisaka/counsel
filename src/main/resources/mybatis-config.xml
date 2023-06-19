@@ -20,3 +20,4 @@
         <mapper class="com.example.demo.mapper.UserMapper"/>
     </mappers>
 </configuration>
+

@@ -15,6 +15,8 @@ import java.util.TreeMap;
 
 public interface CounselorService {
 
+    Page<Counselor> getCounselorList(Integer page, Integer size, String order);
+
     Counselor findCounselorByID(Long id);
 
     List<CounselorMonthlyWork> getCounselorRankingByWork(Integer len);
