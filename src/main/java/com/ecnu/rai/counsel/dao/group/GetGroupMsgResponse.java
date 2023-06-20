@@ -10,10 +10,10 @@ import java.util.List;
 public class GetGroupMsgResponse {
     @ApiModelProperty(value = "会话id")
     private Long id;
-    @ApiModelProperty(value = "腾讯IM用户id")
-    private String userid;
-    @ApiModelProperty(value = "腾讯IM咨询师id")
-    private String counselorid;
+//    @ApiModelProperty(value = "腾讯IM用户id")
+//    private String userid;
+//    @ApiModelProperty(value = "腾讯IM咨询师id")
+//    private String counselorid;
     @ApiModelProperty(value = "用户真实姓名")
     private String username;
     @ApiModelProperty(value = "咨询师真实姓名")
@@ -26,12 +26,14 @@ public class GetGroupMsgResponse {
     private Integer rating;
     @ApiModelProperty(value = "评价")
     private String comment;
-    private String actionStatus;
-    private String errorInfo;
-    private int errorCode;
-    private String groupId;
-    private int isFinished;
-    private List<RspMsg> rspMsgList;
+//    private String actionStatus;
+//    private String errorInfo;
+//    private int errorCode;
+//    private String groupId;
+//    private int isFinished;
+//    private List<RspMsg> rspMsgList;
+    @ApiModelProperty(value = "群组id")
+    private String groupid;
 
     // getters and setters
 }

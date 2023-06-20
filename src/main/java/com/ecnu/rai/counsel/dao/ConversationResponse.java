@@ -2,6 +2,7 @@ package com.ecnu.rai.counsel.dao;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.ecnu.rai.counsel.dao.group.GroupMsg;
 import com.ecnu.rai.counsel.dao.group.RspMsg;
 import com.ecnu.rai.counsel.entity.Conversation;
 import com.google.gson.Gson;
@@ -31,13 +32,13 @@ public class ConversationResponse {
     private Long id;
 
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createTime;
+    private Timestamp createTime;
 
     @ApiModelProperty(value = "创建者")
     private String creator;
 
     @ApiModelProperty(value = "最后更新时间")
-    private LocalDateTime lastUpdateTime;
+    private Timestamp lastUpdateTime;
 
     @ApiModelProperty(value = "最后更新者")
     private String lastUpdater;
@@ -76,7 +77,7 @@ public class ConversationResponse {
     private String conversationType;
 
     @ApiModelProperty(value = "会话内容")
-    private List<RspMsg> message;
+    private Object message;
 
     //从Conversation来的构造函数, 用于将Conversation转换为ConversationResponse,
     //其他属性直接使用,Conversation中的message(String)转换为ConversationResponse里面的message(List<RspMsg>)
@@ -84,9 +85,9 @@ public class ConversationResponse {
         Gson gson = new Gson();
 
         this.id = conversation.getId();
-        this.createTime = conversation.getCreateTime();
+        this.createTime = Timestamp.valueOf(conversation.getCreateTime());
         this.creator = conversation.getCreator();
-        this.lastUpdateTime = conversation.getLastUpdateTime();
+        this.lastUpdateTime = Timestamp.valueOf(conversation.getLastUpdateTime());
         this.lastUpdater = conversation.getLastUpdater();
         this.year = conversation.getYear();
         this.month = conversation.getMonth();
@@ -99,6 +100,6 @@ public class ConversationResponse {
         this.visitorName = conversation.getVisitorName();
         this.evaluate = conversation.getEvaluate();
         this.conversationType = conversation.getConversationType();
-        this.message = gson.fromJson(conversation.getMessage(), List.class);
+        this.message = gson.fromJson(conversation.getMessage(),Object.class);
     }
 }

@@ -6,6 +6,7 @@ import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.dao.ConversationIdList;
 import com.ecnu.rai.counsel.dao.ConversationResponse;
 import com.ecnu.rai.counsel.dao.group.GetGroupMsgResponse;
+import com.ecnu.rai.counsel.dao.group.GroupMsg;
 import com.ecnu.rai.counsel.dao.group.RspMsg;
 import com.ecnu.rai.counsel.dao.single.IMRequest;
 import com.ecnu.rai.counsel.dao.single.Message;
@@ -189,20 +190,11 @@ public class ConversationController {
     @PostMapping("/save_group_msg")
     @ApiOperation(value = "存储群聊信息/结束会话", notes = "save the conversation ")
     @ResponseBody
-    public Result saveGroupMsg(@Valid @RequestBody GetGroupMsgResponse getGroupMsgResponse){
+    public Result saveGroupMsg(@Valid @RequestBody GetGroupMsgResponse getGroupMsgResponse) throws Exception {
         System.out.println(getGroupMsgResponse);
-        List<RspMsg> messages = getGroupMsgResponse.getRspMsgList();
-        for(RspMsg message : messages){
-            if(message.getFromAccount().equals(getGroupMsgResponse.getUserid())){
-                message.setFromAccount("用户："+ getGroupMsgResponse.getUsername());
-            }
-            if(message.getFromAccount().equals(getGroupMsgResponse.getCounselorid())){
-                message.setFromAccount("咨询师："+ getGroupMsgResponse.getCounselorname());
-            }
-        }
-        String history = JSON.toJSONString(messages);
-        System.out.println(history);
 
+        GroupMsg groupMsg = imController.getGroupHistory(getGroupMsgResponse.getGroupid());
+        String history = JSON.toJSONString(groupMsg);
         Long counselor_id = userMapper.findIdByName(getGroupMsgResponse.getCounselorname());
         Long user_id = userMapper.findIdByName(getGroupMsgResponse.getUsername());
 

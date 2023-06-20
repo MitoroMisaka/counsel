@@ -11,6 +11,7 @@ import com.ecnu.rai.counsel.entity.Supervisor;
 import com.ecnu.rai.counsel.entity.Usersig;
 import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.SupervisorService;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,8 @@ public class SupervisorServiceImpl implements SupervisorService {
     public Page<Supervisor> getSupervisorList(Integer page, Integer size, String order) {
         PageHelper.startPage(page, size, order);
         List<Supervisor> supervisorList = supervisorMapper.getAll();
+        PageInfo<Supervisor> pageInfo = new PageInfo<>(supervisorList);
+        System.out.println(pageInfo.getPageNum() +" "+ pageInfo.getPageSize() + " "+ pageInfo.getSize());
         return new Page<>(new PageInfo<>(supervisorList));
     }
 

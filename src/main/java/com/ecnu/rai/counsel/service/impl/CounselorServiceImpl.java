@@ -51,6 +51,14 @@ public class CounselorServiceImpl implements CounselorService {
     private DialogueMapper dialogueMapper;
 
     @Override
+    public Page<Counselor> getCounselorList(Integer page, Integer size, String order){
+        PageHelper.startPage(page, size, order);
+        List<Counselor> list = counselorMapper.findAll();
+        PageInfo<Counselor> pageInfo = new PageInfo<>(list);
+        return new Page<>(pageInfo);
+    }
+
+    @Override
     public Counselor findCounselorByID(Long id) {
         Counselor counselor = counselorMapper.findById(id);
 
