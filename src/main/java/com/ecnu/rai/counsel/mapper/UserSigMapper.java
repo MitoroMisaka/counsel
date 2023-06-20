@@ -13,6 +13,10 @@ public interface UserSigMapper extends BaseMapper<Usersig> {
         "VALUES (#{usersig1.imid}, #{usersig1.usersig}, #{usersig1.name}, #{usersig1.role})")
     void insertUserSig(@Param("usersig1") Usersig usersig1);
 
+    //get name by imid
+    @Select("SELECT name FROM usersig WHERE imid = #{imid}")
+    String getNameByImid(@Param("imid") String imid);
+
     //get UserSig by name
     @Select("SELECT * FROM usersig WHERE name = #{name}")
     Usersig getUserSigByName(@Param("name") String name);

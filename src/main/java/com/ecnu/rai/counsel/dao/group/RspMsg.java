@@ -15,7 +15,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RspMsg {
 
-//    @JsonProperty("From_Account")
+    @JsonProperty("From_Account")
     private String fromAccount;
 
     @JsonProperty("IsPlaceMsg")
