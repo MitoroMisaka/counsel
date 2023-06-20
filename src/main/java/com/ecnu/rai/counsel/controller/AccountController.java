@@ -123,6 +123,9 @@ public class AccountController {
     public Result logout() throws IOException {
         //get principle
         User user = (User) SecurityUtils.getSubject().getPrincipal();
+        //if user is null return fail
+        if(user==null)
+            return Result.fail("用户未登录");
         if(user.getRole().equals("counselor")){
             counselorMapper.setStatusOffline(user.getUsername());
         }

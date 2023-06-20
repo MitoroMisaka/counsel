@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ecnu.rai.counsel.config.UserSigConfig;
 import com.ecnu.rai.counsel.dao.group.GroupMsg;
+import com.ecnu.rai.counsel.dao.group.GroupMsgBody;
 import com.ecnu.rai.counsel.dao.group.RspMsg;
 import com.ecnu.rai.counsel.dao.single.Message;
+import com.ecnu.rai.counsel.dao.single.MsgBody;
+import com.ecnu.rai.counsel.mapper.UserSigMapper;
 import com.ecnu.rai.counsel.service.IMService;
 import com.ecnu.rai.counsel.util.LowerCaseUtil;
 import com.ecnu.rai.counsel.util.PinyinUtil;
@@ -36,6 +39,7 @@ import java.io.IOException;
 
 import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -48,6 +52,9 @@ public class IMController {
 
     @Autowired
     UserSigConfig userSigConfig;
+
+    @Autowired
+    UserSigMapper userSigMapper;
 
     @GetMapping("/import")
     @ApiOperation("导入单个用户")
@@ -139,10 +146,10 @@ public class IMController {
         return result;
     }
 
-    @GetMapping("/post/test")
+    @GetMapping("/history")
     @ApiOperation("测试")
-    public Object test(@RequestParam("group_name") String group_name) throws Exception {
-        group_name = "@TGS#2Y2M4MYM6";
+    public GroupMsg getGroupHistory(@RequestParam("group_id") String group_id) throws Exception {
+//        group_id = "@TGS#2Y2M4MYM6";
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -151,7 +158,7 @@ public class IMController {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // 设置请求体
-        String requestBody = "{\"GroupId\": \"" + group_name +   "\", \"ReqMsgNumber\"" + ": 20}";
+        String requestBody = "{\"GroupId\": \"" + group_id +   "\", \"ReqMsgNumber\"" + ": 20}";
         System.out.println(requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
@@ -167,12 +174,22 @@ public class IMController {
         GroupMsg groupMsg = objectMapper.readValue(response.getBody(), GroupMsg.class);
 
         // 对From_Account进行修改
-        for (RspMsg rspMsg : groupMsg.getRspMsgList()) {
-            if (rspMsg.getFromAccount().equals("144115197276518801")) {
-                rspMsg.setFromAccount("Anon");
+        Iterator<RspMsg> iterator = groupMsg.getRspMsgList().iterator();
+        while (iterator.hasNext()) {
+            RspMsg rspMsg = iterator.next();
+            List<GroupMsgBody> msgBody = rspMsg.getMsgBody();
+            for (GroupMsgBody body : msgBody) {
+                if (body.getMsgType().equals("TIMTextElem")) {
+                    String text = body.getMsgContent().getText();
+                    System.out.println(text);
+                } else if (body.getMsgType().equals("TIMRelayElem")) {
+                    iterator.remove(); // Use iterator to remove the element
+                }
             }
+            String fromAccount = rspMsg.getFromAccount();
+            String name = userSigMapper.getNameByImid(fromAccount);
+            rspMsg.setFromAccount(name);
         }
-
         return groupMsg;
     }
 
