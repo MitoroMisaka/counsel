@@ -33,6 +33,9 @@ public interface SuperviseMapper {
     @Select("SELECT count(*) FROM supervise WHERE supervisor_id = #{supervisorid} and counselor_id = #{counselorid} limit 1")
     int findSupervise(@Param("counselorid") Long counselorid,@Param("supervisorid") Long supervisorid);
 
-    @Delete("DELETE FROM supervise WHERE counselor_id = #{counselorid} and supervisor_id = #{supervisorid}")
-    void deleteSupervise(@Param("counselorid")Long counselorid, @Param("supervisorid")Long supervisorid);
+    @Delete("DELETE FROM supervise WHERE counselor_id = #{counselorid}")
+    void deleteCounselorSupervise(@Param("counselorid")Long counselorid);
+
+    @Delete("DELETE FROM supervise WHERE  supervisor_id = #{supervisorid}")
+    void deleteSupervisorSupervise(@Param("supervisorid")Long supervisorid);
 }

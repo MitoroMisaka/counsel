@@ -8,11 +8,9 @@ import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
 import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.User;
-import com.ecnu.rai.counsel.mapper.ConversationMapper;
-import com.ecnu.rai.counsel.mapper.CounselorMapper;
-import com.ecnu.rai.counsel.mapper.UserMapper;
-import com.ecnu.rai.counsel.mapper.SuperviseMapper;
+import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.CounselorService;
+import com.ecnu.rai.counsel.service.SupervisorService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -42,9 +40,8 @@ public class CounselorController {
     @Autowired
     private ConversationMapper conversationMapper;
 
-  
     @Autowired
-    private SuperviseMapper superviseMapper;
+    private SupervisorService supervisorService;
 
     @PostMapping("/add")
     @ApiOperation("添加咨询师(弃用，参考AccountController里面接口)")
@@ -197,9 +194,7 @@ public class CounselorController {
 
     @GetMapping("getBasicStatInfo")
     @ApiOperation("获取基本资询统计数据")
-    public Result getBasicStatInfo(@RequestParam("page") Integer page,
-                                     @RequestParam("size") Integer size,
-                                     @RequestParam("order") String order) {
+    public Result getBasicStatInfo() {
 
 
         return Result.success("获取成功",counselorService.getBasicStatInfo());
@@ -207,9 +202,7 @@ public class CounselorController {
 
     @GetMapping("getNumByWeek")
     @ApiOperation("获取周咨询统计数据（最近一周）")
-    public Result getNumByWeek(@RequestParam("page") Integer page,
-                                   @RequestParam("size") Integer size,
-                                   @RequestParam("order") String order) {
+    public Result getNumByWeek() {
 
 
         return Result.success("获取成功",counselorService.getNumByWeek());
@@ -221,5 +214,15 @@ public class CounselorController {
 
 
         return Result.success("获取成功",counselorService.getNumByHours());
+    }
+
+    @GetMapping("getSupervisorByBusy")
+    @ApiOperation("获取督导及其繁忙状态")
+    public Result getSupervisorByBusy(@RequestParam("page") Integer page,
+                                      @RequestParam("size") Integer size,
+                                      @RequestParam("order") String order) {
+
+
+        return Result.success("获取成功",supervisorService.getAvailableSupervisorByBusy(page, size, order));
     }
 }
