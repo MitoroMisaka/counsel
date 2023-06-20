@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.dao.CounselorSMInfo;
+import com.ecnu.rai.counsel.dao.SupervisorSMInfo;
 import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.dao.UserLoginInfo;
 import com.ecnu.rai.counsel.entity.*;
@@ -166,6 +167,19 @@ public class AccountController {
                                                   @RequestParam("size") Integer size,
                                                   @RequestParam("order") String order) {
         return accountService.findCounselorList(page, size, order);
+    }
+
+    @GetMapping("/supervisors")
+    @ApiOperation("获取督导列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
+    public Page<SupervisorSMInfo> getSupervisorList(@RequestParam("page") Integer page,
+                                                    @RequestParam("size") Integer size,
+                                                    @RequestParam("order") String order) {
+        return accountService.findSupervisorList(page, size, order);
     }
 
 
@@ -650,6 +664,7 @@ public class AccountController {
 
     //咨询师页面绑定
     @RequiresRoles("admin")
+    @ApiOperation("咨询师视角绑定")
     @GetMapping("/counselor/binding/{id}")
     public Result makeSuperviseByCounselor(@PathVariable Long id,
                                           @Valid @RequestBody List<Long> supervisorsId)
@@ -658,6 +673,7 @@ public class AccountController {
             return Result.fail("Unauthorized.");
         if(supervisorsId.isEmpty())
             return Result.fail("No supervisors to bind.");
+        superviseMapper.deleteCounselorSupervise(id);
         for(Long supervisorid:supervisorsId)
         {
             if(superviseMapper.findSupervise(id,supervisorid)==1||!Objects.equals(userMapper.findRoleById(supervisorid), "supervisor"))
@@ -670,6 +686,7 @@ public class AccountController {
 
     //督导页面绑定
     @RequiresRoles("admin")
+    @ApiOperation("督导视角绑定")
     @GetMapping("/supervisor/binding/{id}")
     public Result makeSuperviseBySupervisor(@PathVariable Long id,
                                            @Valid @RequestBody List<Long> counselorsId)
@@ -678,48 +695,11 @@ public class AccountController {
             return Result.fail("Unauthorized.");
         if(counselorsId.isEmpty())
             return Result.fail("No counselors to bind.");
+        superviseMapper.deleteSupervisorSupervise(id);
         for(Long counselorid:counselorsId){
             if(superviseMapper.findSupervise(counselorid,id)==1|| !Objects.equals(userMapper.findRoleById(counselorid), "counselor"))
                 continue;
             superviseMapper.makeSupervise(counselorid,id);
-        }
-
-        return Result.success("Bind successfully!");
-    }
-
-    //咨询师页面解绑
-    @RequiresRoles("admin")
-    @GetMapping("/counselor/unbinding/{id}")
-    public Result delSuperviseByCounselor(@PathVariable Long id,
-                               @Valid @RequestBody List<Long> supervisorsId)
-    {
-        if(!Objects.equals(userMapper.findRoleById(id), "counselor"))
-            return Result.fail("Unauthorized.");
-        if(supervisorsId.isEmpty())
-            return Result.fail("No supervisors to unbind.");
-        for(Long supervisorid:supervisorsId){
-            if(superviseMapper.findSupervise(id,supervisorid)==0|| !Objects.equals(userMapper.findRoleById(supervisorid), "supervisor"))
-                continue;
-            superviseMapper.deleteSupervise(id,supervisorid);
-        }
-
-        return Result.success("Unbinding successfully!");
-    }
-
-    //督导页面解绑
-    @RequiresRoles("admin")
-    @GetMapping("/supervisor/unbinding/{id}")
-    public Result delSuperviseBySupervisor(@PathVariable Long id,
-                               @Valid @RequestBody List<Long> counselorsId)
-    {
-        if(!Objects.equals(userMapper.findRoleById(id), "supervisor"))
-            return Result.fail("Unauthorized.");
-        if(counselorsId.isEmpty())
-            return Result.fail("No counselors to unbind.");
-        for(Long counselorid:counselorsId){
-            if(superviseMapper.findSupervise(counselorid,id)==0|| !Objects.equals(userMapper.findRoleById(counselorid), "counselor"))
-                continue;
-            superviseMapper.deleteSupervise(counselorid,id);
         }
 
         return Result.success("Bind successfully!");

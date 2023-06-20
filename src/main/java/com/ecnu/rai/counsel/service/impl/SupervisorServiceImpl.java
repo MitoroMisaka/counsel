@@ -2,6 +2,8 @@ package com.ecnu.rai.counsel.service.impl;
 
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.dao.AvailableSupervisor;
+import com.ecnu.rai.counsel.dao.CounselorSMInfo;
+import com.ecnu.rai.counsel.dao.SupervisorSMInfo;
 import com.ecnu.rai.counsel.dao.UserSig;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
@@ -29,6 +31,9 @@ public class SupervisorServiceImpl implements SupervisorService {
 
     @Autowired
     private ConversationMapper conversationMapper;
+
+    @Autowired
+    private DialogueMapper dialogueMapper;
 
     @Autowired
     private ArrangeMapper arrangeMapper;
@@ -77,6 +82,34 @@ public class SupervisorServiceImpl implements SupervisorService {
     }
 
     @Override
+    public List<SupervisorSMInfo> getAllSupervisor() {
+        List<Supervisor> supervisors = supervisorMapper.getAll();
+        List<SupervisorSMInfo> supervisorSMInfos = new ArrayList<>();
+        for(Supervisor supervisor:supervisors)
+        {
+            SupervisorSMInfo supervisorSMInfo = new SupervisorSMInfo(supervisor);
+            supervisorSMInfo.SetTotalNum(dialogueMapper.findTotalNumSupervisor(supervisor.getId()));
+            supervisorSMInfo.SetTotalTime(dialogueMapper.findTotalBySupervisor(supervisor.getId()));
+            List<Integer> Days = arrangeMapper.findDayArrange(supervisor.getId());
+            for(Integer day:Days)
+            {
+                supervisorSMInfo.setTotalDay(day);
+            }
+            List<String> counselors = new ArrayList<>();
+            List<Supervise> supervises = supervisorMapper.findCounselors(supervisor.getId());
+            for(Supervise supervise:supervises)
+            {
+                counselors.add(counselorMapper.findById(supervise.getCounselorId()).getName());
+            }
+            supervisorSMInfo.SetCounselors(counselors);
+            supervisorSMInfos.add(supervisorSMInfo);
+        }
+
+
+        return supervisorSMInfos;
+    }
+    
+    @Override
     public void addSupervisor(Supervisor supervisor) {
         supervisorMapper.insertSupervisor(supervisor);
     }
@@ -102,6 +135,8 @@ public class SupervisorServiceImpl implements SupervisorService {
         return new Page<>(new PageInfo<>(availableCounselorList));
 
     }
+    
+    
 
     @Override
     public Page<Supervisor> getAvailableSupervisor(Integer page, Integer size, String order) {
@@ -115,27 +150,27 @@ public class SupervisorServiceImpl implements SupervisorService {
         return new Page<>(new PageInfo<>(supervisorList));
     }
 
-//    @Override
-//    public Page<Supervisor> getAvailableSupervisorByBusy(Integer page, Integer size, String order) {
-//        List<Supervisor> supervisors = supervisorMapper.getAll();
-//        List<HashMap<String, String>> supervisorBusy= new ArrayList<>();
-//        for(Supervisor supervisor:supervisors)
-//        {
-//            Integer currentConsult = conversationMapper.getConsultNum(supervisor.getName());
-//            if(currentConsult <= 5){
-//                HashMap<String, String> h = new HashMap<>();
-//                h.put("supervisor",supervisor.getName());
-//                h.put("status","空闲");
-//                supervisorBusy.add(h);
-//            }else if(currentConsult < supervisor.getMaxConsult()) {
-//                HashMap<String, String> h = new HashMap<>();
-//                h.put("supervisor",supervisor.getName());
-//                h.put("status","繁忙");
-//                supervisorBusy.add(h);
-//            }
-//        }
-//        PageHelper.startPage(page, size, order);
-//        return new Page<>(new PageInfo<>(supervisorBusy));
-//    }
+    @Override
+    public Page<HashMap<String, String>> getAvailableSupervisorByBusy(Integer page, Integer size, String order) {
+        List<Supervisor> supervisors = supervisorMapper.getAll();
+        List<HashMap<String, String>> supervisorBusy= new ArrayList<>();
+        for(Supervisor supervisor:supervisors)
+        {
+            Integer currentConsult = conversationMapper.getConsultNum(supervisor.getName());
+            if(currentConsult <= 5){
+                HashMap<String, String> h = new HashMap<>();
+                h.put("supervisor",supervisor.getName());
+                h.put("status","空闲");
+                supervisorBusy.add(h);
+            }else if(currentConsult < supervisor.getMaxConsult()) {
+                HashMap<String, String> h = new HashMap<>();
+                h.put("supervisor",supervisor.getName());
+                h.put("status","繁忙");
+                supervisorBusy.add(h);
+            }
+        }
+        PageHelper.startPage(page, size, order);
+        return new Page<>(new PageInfo<>(supervisorBusy));
+    }
 
 }

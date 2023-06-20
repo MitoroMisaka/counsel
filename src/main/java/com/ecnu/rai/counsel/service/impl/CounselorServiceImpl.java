@@ -47,6 +47,9 @@ public class CounselorServiceImpl implements CounselorService {
     @Autowired
     private UserSigMapper userSigMapper;
 
+    @Autowired
+    private DialogueMapper dialogueMapper;
+
     @Override
     public Counselor findCounselorByID(Long id) {
         Counselor counselor = counselorMapper.findById(id);
@@ -136,17 +139,19 @@ public class CounselorServiceImpl implements CounselorService {
             CounselorSMInfo counselorSMInfo = new CounselorSMInfo(counselor);
             counselorSMInfo.SetTotalNum(conversationMapper.findTotalNumCounselor(counselor.getId()));
             counselorSMInfo.SetTotalTime(conversationMapper.findTotalByCounselor(counselor.getId()));
-            counselorSMInfos.add(counselorSMInfo);
             List<Integer> Days = arrangeMapper.findDayArrange(counselor.getId());
             for(Integer day:Days)
             {
                 counselorSMInfo.setTotalDay(day);
             }
+            counselorSMInfos.add(counselorSMInfo);
         }
 
 
         return counselorSMInfos;
     }
+
+
 
     @Override
     public Page<HashMap<String, String>> getAvailableCounselorByBusy(Integer page, Integer size, String order) {
@@ -173,14 +178,16 @@ public class CounselorServiceImpl implements CounselorService {
 
     @Override
     public HashMap<String, Integer> getBasicStatInfo() {
-        Integer totalNum = conversationMapper.findTodayNum();
+        Integer totalNumCounselor = conversationMapper.findTodayNum();
         Integer totalTime = conversationMapper.findTodayTotal();
         Integer curNum = conversationMapper.findCurrentNum();
-        totalNum = totalNum + curNum;
+        Integer totalNumSupervisor = dialogueMapper.findTodayNum();
+        totalNumCounselor = totalNumCounselor + curNum;
         HashMap<String, Integer> h = new HashMap<>();
-        h.put("totalNum",totalNum);
+        h.put("totalNumCounselor",totalNumCounselor);
         h.put("totalTime",totalTime);
         h.put("curNum",curNum);
+        h.put("totalNumSupervisor",totalNumSupervisor);
         return h;
 
     }

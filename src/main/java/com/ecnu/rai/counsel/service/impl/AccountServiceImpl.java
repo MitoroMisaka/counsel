@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Page;
 
 import com.ecnu.rai.counsel.dao.CounselorSMInfo;
+import com.ecnu.rai.counsel.dao.SupervisorSMInfo;
 import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.MyMapper;
@@ -16,6 +17,7 @@ import com.ecnu.rai.counsel.mapper.SupervisorMapper;
 import com.ecnu.rai.counsel.mapper.VisitorMapper;
 import com.ecnu.rai.counsel.service.AccountService;
 import com.ecnu.rai.counsel.service.CounselorService;
+import com.ecnu.rai.counsel.service.SupervisorService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -48,6 +50,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private CounselorService counselorService;
 
+    @Autowired
+    private SupervisorService supervisorService;
+
     @Override
     public User findUserByID(Long id) {
         return userMapper.selectById(id);
@@ -65,6 +70,13 @@ public class AccountServiceImpl implements AccountService {
         PageHelper.startPage(page, size, order);
         List<CounselorSMInfo> counselorList = counselorService.getAllCounselor();
         return new Page<>(new PageInfo<>(counselorList));
+    }
+
+    @Override
+    public Page<SupervisorSMInfo> findSupervisorList(Integer page, Integer size, String order) {
+        PageHelper.startPage(page, size, order);
+        List<SupervisorSMInfo> supervisorList = supervisorService.getAllSupervisor();
+        return new Page<>(new PageInfo<>(supervisorList));
     }
 
     public User findUserByUsername(String username) {
