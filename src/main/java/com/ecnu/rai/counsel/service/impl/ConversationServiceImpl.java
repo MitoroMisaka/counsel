@@ -28,13 +28,17 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public Page<ConversationResponse> findGroupMsgByCounselorUser(String counselor, String user, Integer page, Integer size, String order){
-        PageHelper.startPage(page, size, order);
         String counselor_id = String.valueOf(userMapper.findIdByName(counselor));
         String user_id = String.valueOf(userMapper.findIdByName(user));
+        PageHelper.startPage(page, size, order);
         List<Conversation> conversationList = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id);
         List<ConversationResponse> conversationResponseList = new ArrayList<>();
         for(Conversation conversation : conversationList){
             ConversationResponse conversationResponse = new ConversationResponse(conversation);
+            conversationResponse.setCounselor(userMapper.findNameById(conversation.getCounselor()));
+            conversationResponse.setUser(userMapper.findNameById(conversation.getUser()));
+            conversationResponse.setCreator(userMapper.findNameById(conversation.getCreator()));
+            conversationResponse.setLastUpdater(userMapper.findNameById(conversation.getLastUpdater()));
             conversationResponseList.add(conversationResponse);
         }
         PageInfo<ConversationResponse> pageInfo = new PageInfo<>(conversationResponseList);
