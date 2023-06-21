@@ -231,7 +231,23 @@ public class IMController {
         return result;
     }
 
+    @GetMapping("/group/info")
+    @ApiOperation("获取群组详细资料")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "group_id", value = "群组ID", required = true, dataType = "String")
+    })
+    public Object getGroupInfo(@RequestParam("group_id") String group_id) throws IOException {
+        Long sdkAppId = userSigConfig.getSdkAppId();
+        String secretKey = userSigConfig.getSecretKey();
+        String userId = "administrator";
+        ImClient client = new ImClient(sdkAppId, userId, secretKey);
 
+        List<String> groupIdList = Collections.singletonList(group_id);
+        GetGroupInfoRequest request = new GetGroupInfoRequest(groupIdList);
+
+        GetGroupInfoResult result = client.group.getGroupInfo(request);
+        return result;
+    }
 
 
 
