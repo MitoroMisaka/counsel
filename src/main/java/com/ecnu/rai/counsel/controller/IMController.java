@@ -18,6 +18,7 @@ import com.tencentcloudapi.as.v20180419.models.Instance;
 import io.github.doocs.im.ImClient;
 import io.github.doocs.im.constant.ApplyJoinOption;
 import io.github.doocs.im.constant.GroupType;
+import io.github.doocs.im.constant.OnlineOnlyFlag;
 import io.github.doocs.im.constant.SyncOtherMachine;
 import io.github.doocs.im.model.message.TIMMsgElement;
 import io.github.doocs.im.model.message.TIMTextMsgElement;
@@ -249,7 +250,31 @@ public class IMController {
         return result;
     }
 
+    @GetMapping("/group/text/single")
+    @ApiOperation("发送群聊文本消息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "group_id", value = "群组ID", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "text", value = "文本内容", required = true, dataType = "String")
+    })
+    public Object sendGroupTextMsg(@RequestParam("group_id") String group_id, @RequestParam("text") String text) throws IOException {
+        Long sdkAppId = userSigConfig.getSdkAppId();
+        String secretKey = userSigConfig.getSecretKey();
+        String userId = "administrator";
+        ImClient client = new ImClient(sdkAppId, userId, secretKey);
 
+        TIMTextMsgElement msg = new TIMTextMsgElement(text);
+        List<TIMMsgElement> msgBody = Collections.singletonList(msg);
+        SendGroupMsgRequest request = SendGroupMsgRequest.builder()
+                .groupId(group_id)
+                .random(1314L)
+                .msgBody(msgBody)
+                .onlineOnlyFlag(OnlineOnlyFlag.YES)
+                .build();
+
+        SendGroupMsgResult result = client.group.sendGroupMsg(request);
+
+        return result;
+    }
 
 
 }
