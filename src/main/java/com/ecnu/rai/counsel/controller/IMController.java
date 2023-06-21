@@ -256,10 +256,10 @@ public class IMController {
             @ApiImplicitParam(name = "group_id", value = "群组ID", required = true, dataType = "String"),
             @ApiImplicitParam(name = "text", value = "文本内容", required = true, dataType = "String")
     })
-    public Object sendGroupTextMsg(@RequestParam("group_id") String group_id, @RequestParam("text") String text) throws IOException {
+    public Object sendGroupTextMsg( @RequestParam("group_id") String group_id, @RequestParam("text") String text) throws IOException {
         Long sdkAppId = userSigConfig.getSdkAppId();
         String secretKey = userSigConfig.getSecretKey();
-        String userId = "administrator";
+        String userId = "Administrator";
         ImClient client = new ImClient(sdkAppId, userId, secretKey);
 
         TIMTextMsgElement msg = new TIMTextMsgElement(text);
