@@ -1,17 +1,12 @@
 package com.ecnu.rai.counsel.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
-import com.ecnu.rai.counsel.dao.CounselorSMInfo;
-import com.ecnu.rai.counsel.dao.SupervisorSMInfo;
-import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.dao.UserLoginInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.AccountService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
-import com.tencentcloudapi.cam.v20190116.models.GetUserResponse;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -20,9 +15,7 @@ import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -153,10 +146,10 @@ public class AccountController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<UserBasicInfo> getUserList(@RequestParam("page") Integer page,
+    public Result getUserList(@RequestParam("page") Integer page,
                                            @RequestParam("size") Integer size,
                                            @RequestParam("order") String order) {
-        return accountService.findUserList(page, size, order);
+        return Result.success("获取用户列表成功", accountService.findUserList(page, size, order));
     }
 
     @GetMapping("/counselors")
@@ -166,10 +159,10 @@ public class AccountController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<CounselorSMInfo> getCounselorList(@RequestParam("page") Integer page,
+    public Result getCounselorList(@RequestParam("page") Integer page,
                                                   @RequestParam("size") Integer size,
                                                   @RequestParam("order") String order) {
-        return accountService.findCounselorList(page, size, order);
+        return Result.success("获取咨询师列表成功", accountService.findCounselorList(page, size, order));
     }
 
     @GetMapping("/supervisors")
@@ -179,10 +172,10 @@ public class AccountController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<SupervisorSMInfo> getSupervisorList(@RequestParam("page") Integer page,
+    public Result getSupervisorList(@RequestParam("page") Integer page,
                                                     @RequestParam("size") Integer size,
                                                     @RequestParam("order") String order) {
-        return accountService.findSupervisorList(page, size, order);
+        return Result.success("获取督导列表成功", accountService.findSupervisorList(page, size, order));
     }
 
 

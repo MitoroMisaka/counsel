@@ -6,7 +6,6 @@ import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.response.ConsultInfo;
 
 import java.sql.Date;
-import java.util.List;
 
 public interface ConversationService {
 

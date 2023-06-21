@@ -31,7 +31,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -95,14 +96,14 @@ public class ConversationController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "user", value = "用户id", required = true, dataType = "Long"),
             @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "page", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<ConversationResponse> getConversationbyUser(@RequestParam("user") Long user,
-                                               @RequestParam("page") Integer page,
-                                               @RequestParam("size") Integer size,
-                                               @RequestParam("order") String order) {
-        return conversationService.findConversationByUser(user, page, size, order);
+    public Result getConversationbyUser(@RequestParam(value = "user") Long user,
+                                                            @RequestParam(value = "page") Integer page,
+                                                            @RequestParam(value = "page") Integer size,
+                                                            @RequestParam(value = "order") String order) {
+        return Result.success("获取会话信息成功", conversationService.findConversationByUser(user, page, size, order));
     }
 
     @GetMapping("/counselor")
@@ -113,11 +114,11 @@ public class ConversationController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<ConversationResponse> getConversationbyCounselor(@RequestParam("counselor") Long counselor,
+    public Result getConversationbyCounselor(@RequestParam("counselor") Long counselor,
                                                                  @RequestParam("page") Integer page,
                                                                  @RequestParam("size") Integer size,
                                                                  @RequestParam("order") String order) {
-        return conversationService.findConversationByCounselor(counselor, page, size, order);
+        return Result.success("获取会话信息成功", conversationService.findConversationByCounselor(counselor, page, size, order));
     }
 
     @GetMapping("/counselorUserDate")
@@ -130,13 +131,18 @@ public class ConversationController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<Conversation> getConversationbyCounselorUserDate(@RequestParam("counselor") Long counselor,
+    public Result getConversationbyCounselorUserDate(@RequestParam("counselor") Long counselor,
                                                                  @RequestParam("user") Long user,
-                                                                 @RequestParam("date") Date date,
+                                                                 @RequestParam("date") String date,
                                                                  @RequestParam("page") Integer page,
                                                                  @RequestParam("size") Integer size,
-                                                                 @RequestParam("order") String order) {
-        return conversationService.findConversationByCounselorUserDate(counselor, user, date, page, size, order);
+                                                                 @RequestParam("order") String order) throws ParseException {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        java.util.Date util_date = simpleDateFormat.parse(date);
+        java.sql.Date sql_date = new java.sql.Date(util_date.getTime());
+
+        return Result.success("获取会话信息成功", conversationService.findConversationByCounselorUserDate(counselor, user, sql_date, page, size, order));
     }
 
     @GetMapping("/counselorConsultInfo")

@@ -1,11 +1,8 @@
 package com.ecnu.rai.counsel.controller;
 
-import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
-import com.ecnu.rai.counsel.dao.AvailableCounselor;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
-import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.mapper.*;
@@ -14,14 +11,11 @@ import com.ecnu.rai.counsel.service.SupervisorService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Param;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController

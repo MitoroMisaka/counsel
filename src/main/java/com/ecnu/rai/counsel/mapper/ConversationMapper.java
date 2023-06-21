@@ -1,13 +1,11 @@
 package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ecnu.rai.counsel.entity.Arrange;
 import com.ecnu.rai.counsel.entity.Conversation;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
-import java.util.HashMap;
 import java.util.List;
 
 @Repository
