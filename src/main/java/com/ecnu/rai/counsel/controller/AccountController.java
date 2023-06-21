@@ -745,6 +745,12 @@ public class AccountController {
         return Result.success("Delete successfully!");
     }
 
+    @GetMapping("getBasicStatInfo")
+    @ApiOperation("获取基本咨询统计数据")
+    public Result getBasicStatInfo() {
+
+        return Result.success("获取成功", accountService.getBasicStatInfo());
+    }
 
 }
 

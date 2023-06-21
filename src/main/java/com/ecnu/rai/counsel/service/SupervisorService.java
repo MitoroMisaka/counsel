@@ -32,4 +32,6 @@ public interface SupervisorService {
 
     Page<HashMap<String, String>> getAvailableSupervisorByBusy(Integer page, Integer size, String order);
 
+    HashMap<String, Integer> getBasicStatInfoBySupervisor(Long supervisorId);
+
 }

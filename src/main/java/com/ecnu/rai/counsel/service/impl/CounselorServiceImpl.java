@@ -76,6 +76,7 @@ public class CounselorServiceImpl implements CounselorService {
         List<CounselorMonthlyWork> list = counselorMapper.findCounselorRankingByWork(len);
         for (CounselorMonthlyWork item : list) {
             item.setName(counselorMapper.findById(item.getCounselorId()).getName());
+            item.setAvatar(counselorMapper.findById(item.getCounselorId()).getAvatar());
             item.setUsername(counselorMapper.findById(item.getCounselorId()).getUsername());
         }
         return list;
@@ -163,8 +164,9 @@ public class CounselorServiceImpl implements CounselorService {
 
     @Override
     public Page<HashMap<String, String>> getAvailableCounselorByBusy(Integer page, Integer size, String order) {
-        List<Counselor> counselors = counselorMapper.findAllCounselorsOnline();
         List<HashMap<String, String>> CounselorBusy= new ArrayList<>();
+        PageHelper.startPage(page, size, order);
+        List<Counselor> counselors = counselorMapper.findAllCounselorsOnline();
         for(Counselor counselor:counselors)
         {
             Integer currentConsult = conversationMapper.getConsultNum(counselor.getName());
@@ -180,16 +182,15 @@ public class CounselorServiceImpl implements CounselorService {
                 CounselorBusy.add(h);
             }
         }
-        PageHelper.startPage(page, size, order);
         return new Page<>(new PageInfo<>(CounselorBusy));
     }
 
     @Override
-    public HashMap<String, Integer> getBasicStatInfo() {
-        Integer totalNumCounselor = conversationMapper.findTodayNum();
-        Integer totalTime = conversationMapper.findTodayTotal();
-        Integer curNum = conversationMapper.findCurrentNum();
-        Integer totalNumSupervisor = dialogueMapper.findTodayNum();
+    public HashMap<String, Integer> getBasicStatInfoByCounselor(Long counselorId) {
+        Integer totalNumCounselor = conversationMapper.findTodayNumByCounselor(counselorId);
+        Integer totalTime = conversationMapper.findTodayTotalByCounselor(counselorId);
+        Integer curNum = conversationMapper.findCurrentNumByCounselor(counselorId);
+        Integer totalNumSupervisor = dialogueMapper.findTodayNumByCounselor(counselorId);
         totalNumCounselor = totalNumCounselor + curNum;
         HashMap<String, Integer> h = new HashMap<>();
         h.put("totalNumCounselor",totalNumCounselor);
