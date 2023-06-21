@@ -76,12 +76,12 @@ public class ConversationController {
         }
         conversation.setStatus("STARTED");
         Conversation new_conversation = conversationService.insertConversationByID(conversation);
-        String counselor_name = userMapper.findNameById(conversation.getCounselor());
-        String counselor_imid = userSigMapper.getImidByName(counselor_name);
-        String user_name = userMapper.findNameById(conversation.getUser());
-
-        Object result = imController.createGroup(counselor_name , user_name, counselor_imid);
-        return Result.success("获取成功", result);
+//        String counselor_name = userMapper.findNameById(conversation.getCounselor());
+//        String counselor_imid = userSigMapper.getImidByName(counselor_name);
+//        String user_name = userMapper.findNameById(conversation.getUser());
+//
+//        Object result = imController.createGroup(counselor_name , user_name, counselor_imid);
+        return Result.success("获取成功", new_conversation);
     }
 
     @PostMapping("/update")

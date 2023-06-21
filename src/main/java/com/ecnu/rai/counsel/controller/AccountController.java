@@ -54,6 +54,9 @@ public class AccountController {
     @Autowired
     private SuperviseMapper superviseMapper;
 
+    @Autowired
+    private UserSigMapper userSigMapper;
+
 
     @PostMapping("/login")
     @ApiOperation("登录")
@@ -108,8 +111,11 @@ public class AccountController {
         System.out.println(principal);
         QueryWrapper wrapper = new QueryWrapper();
         wrapper.eq("username",username);
+        User user = userMapper.selectOne(wrapper);
 
-        return Result.success("登录成功",new UserLoginInfo(userMapper.selectOne(wrapper)));
+        String imid = userSigMapper.getImidByName(user.getName());
+
+        return Result.success("登录成功",new UserLoginInfo(user, imid));
     }
 
     @PostMapping("/logout")
