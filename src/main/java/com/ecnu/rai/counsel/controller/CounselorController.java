@@ -203,16 +203,12 @@ public class CounselorController {
     @GetMapping("getNumByWeek")
     @ApiOperation("获取周咨询统计数据（最近一周）")
     public Result getNumByWeek() {
-
-
         return Result.success("获取成功",counselorService.getNumByWeek());
     }
 
     @GetMapping("getNumByHours")
     @ApiOperation("获取今日时辰统计数据")
     public Result getNumByHours() {
-
-
         return Result.success("获取成功",counselorService.getNumByHours());
     }
 

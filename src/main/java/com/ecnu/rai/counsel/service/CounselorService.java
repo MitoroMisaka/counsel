@@ -35,7 +35,7 @@ public interface CounselorService {
 
     HashMap<String, Integer> getBasicStatInfo();
 
-    TreeMap<String, Integer> getNumByWeek();
+    List<TreeMap<String, Integer>> getNumByWeek();
 
-    TreeMap<Integer, Integer> getNumByHours();
+    List<TreeMap<String, Integer>> getNumByHours();
 }
