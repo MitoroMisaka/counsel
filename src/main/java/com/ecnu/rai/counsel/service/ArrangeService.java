@@ -28,4 +28,7 @@ public interface ArrangeService {
 
     List<SupervisorBasicInfo> findSupervisorListByDay(Integer year, Integer month, Integer day);
 
+    List<SupervisorBasicInfo> findSupervisorFreeListByDay(Integer year, Integer month, Integer day);
+
+    List<CounselorBasicInfo> findCounselorFreeListByDay(Integer year, Integer month, Integer day);
 }

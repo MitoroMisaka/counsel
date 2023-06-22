@@ -83,7 +83,7 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
                                                @Param("user") Long user,
                                                @Param("date") Date date);
 
-    @Select("SELECT SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) " +
+    @Select("SELECT IFNULL(SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) ,0)" +
             "FROM conversation " +
             "WHERE counselor= #{counselor}")
     Integer findTotalByCounselor(@Param("counselor") Long counselor);
@@ -115,13 +115,13 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
             "AND HOUR(start_time) >= #{hours}-2")
     Integer findNumByHours(@Param("hours") Integer hours ,@Param("days") Integer days);
 
-    @Select("SELECT SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) " +
+    @Select("SELECT IFNULL(SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ),0) " +
             "FROM conversation " +
             "WHERE counselor= #{counselor} AND " +
             "DATE(start_time) = DATE(SYSDATE())")
     Integer findTodayTotalByCounselor(@Param("counselor") Long counselor);
 
-    @Select("SELECT SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) " +
+    @Select("SELECT IFNULL(SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ),0) " +
             "FROM conversation " +
             "WHERE DATE(start_time) = DATE(SYSDATE())")
     Integer findTodayTotal();

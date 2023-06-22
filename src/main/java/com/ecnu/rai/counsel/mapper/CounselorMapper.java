@@ -33,6 +33,9 @@ public interface CounselorMapper extends BaseMapper<Counselor> {
     @Select("SELECT * FROM counselor WHERE id = #{id}")
     Counselor findById(@Param("id") Long id);
 
+    @Select("SELECT id FROM counselor")
+    List<Long> findId();
+
     @Select("SELECT counselor AS counselorId, COUNT(id) AS finishedConsults " +
             "FROM conversation WHERE `year` = YEAR(CURDATE()) AND `month` = MONTH(CURDATE()) AND `status` = \"FINISHED\" " +
             "GROUP BY counselor ORDER BY finishedconsults DESC limit #{len}")

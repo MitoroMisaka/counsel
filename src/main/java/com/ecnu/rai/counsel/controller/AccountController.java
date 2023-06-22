@@ -32,10 +32,7 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/account")
@@ -660,8 +657,9 @@ public class AccountController {
 //禁用用户
     @RequiresRoles("admin")
     @PostMapping("/banUser")
-    public Result banUser(@Valid @RequestBody List<Long> ids)
+    public Result banUser(@Valid @RequestBody Map<String,List<Long>> idsList)
     {
+        List<Long> ids = idsList.get("idsList");
         if (ids == null)
             return Result.fail("No valid user.");
 
@@ -680,8 +678,9 @@ public class AccountController {
     //启用用户
     @RequiresRoles("admin")
     @PostMapping("/enableUser")
-    public Result enableUser(@Valid @RequestBody List<Long> ids)
+    public Result enableUser(@Valid @RequestBody Map<String,List<Long>> idsList)
     {
+        List<Long> ids = idsList.get("idsList");
         if (ids == null)
             return Result.fail("No valid user.");
         for (Long id:ids) {
@@ -695,12 +694,13 @@ public class AccountController {
     }
 
     //咨询师页面绑定
-    @RequiresRoles("admin")
+//    @RequiresRoles("admin")
     @ApiOperation("咨询师视角绑定")
     @GetMapping("/counselor/binding/{id}")
     public Result makeSuperviseByCounselor(@PathVariable Long id,
-                                          @Valid @RequestBody List<Long> supervisorsId)
+                                          @Valid @RequestBody Map<String,List<Long>> supervisorsIdList)
     {
+        List<Long> supervisorsId = supervisorsIdList.get("supervisorsIdList");
         if(!Objects.equals(userMapper.findRoleById(id), "counselor"))
             return Result.fail("Unauthorized.");
         if(supervisorsId.isEmpty())
@@ -721,8 +721,9 @@ public class AccountController {
     @ApiOperation("督导视角绑定")
     @GetMapping("/supervisor/binding/{id}")
     public Result makeSuperviseBySupervisor(@PathVariable Long id,
-                                           @Valid @RequestBody List<Long> counselorsId)
+                                           @Valid @RequestBody Map<String,List<Long>> counselorsIdList)
     {
+        List<Long> counselorsId = counselorsIdList.get("counselorsIdList");
         if(!Objects.equals(userMapper.findRoleById(id), "supervisor"))
             return Result.fail("Unauthorized.");
         if(counselorsId.isEmpty())
@@ -739,8 +740,9 @@ public class AccountController {
 
     @RequiresRoles("admin")
     @GetMapping("/delete")
-    public Result delUser(@Valid @RequestBody List<Long> userId)
+    public Result delUser(@Valid @RequestBody Map<String,List<Long>> userIdList)
     {
+        List<Long> userId = userIdList.get("userIdList");
         if(userId.isEmpty())
             return Result.fail("No user to delete.");
         for(Long userid:userId){

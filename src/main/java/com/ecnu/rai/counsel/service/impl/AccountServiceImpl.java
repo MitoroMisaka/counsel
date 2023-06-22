@@ -69,7 +69,8 @@ public class AccountServiceImpl implements AccountService {
     public Page<CounselorSMInfo> findCounselorList(Integer page, Integer size, String order) {
         PageHelper.startPage(page, size, order);
         List<CounselorSMInfo> counselorList = counselorService.getAllCounselor();
-        return new Page<>(new PageInfo<>(counselorList));
+        PageInfo<CounselorSMInfo> pageInfo = new PageInfo<>(counselorList);
+        return new Page<>(pageInfo);
     }
 
     @Override
