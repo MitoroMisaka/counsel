@@ -21,6 +21,7 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -148,6 +149,11 @@ public class CounselorServiceImpl implements CounselorService {
             counselorSMInfo.SetTotalNum(conversationMapper.findTotalNumCounselor(counselor.getId()));
             counselorSMInfo.SetTotalTime(conversationMapper.findTotalByCounselor(counselor.getId()));
             List<Integer> Days = arrangeMapper.findDayArrange(counselor.getId());
+            LocalDate today = LocalDate.now();
+            LocalDate monday = today;
+            if (today.getDayOfWeek() != DayOfWeek.MONDAY) {
+                monday = today.with(DayOfWeek.MONDAY);
+            }
             for(Integer day:Days)
             {
                 counselorSMInfo.setTotalDay(day);
@@ -201,8 +207,8 @@ public class CounselorServiceImpl implements CounselorService {
     }
 
     @Override
-    public TreeMap<String, Integer> getNumByWeek() {
-        TreeMap<String, Integer> h = new TreeMap<>();
+    public List<TreeMap<String, Integer>> getNumByWeek() {
+        List<TreeMap<String, Integer>> NumByWeek = new ArrayList<>();
         LocalDate today = LocalDate.now();
         for(int i = 0;i<7;i++)
         {
@@ -210,16 +216,19 @@ public class CounselorServiceImpl implements CounselorService {
             Integer month = previousDate.getMonthValue();
             Integer day = previousDate.getDayOfMonth();
             Integer sum = conversationMapper.findNumDaysAgo(6-i );
-            String date = month + "/" + day;
-            h.put(date,sum);
+            TreeMap<String, Integer> h = new TreeMap<>();
+            h.put("month",month);
+            h.put("day",day);
+            h.put("sum",sum);
+            NumByWeek.add(h);
         }
-        return h;
+        return NumByWeek;
 
     }
 
     @Override
-    public TreeMap<Integer, Integer> getNumByHours() {
-        TreeMap<Integer, Integer> h = new TreeMap<>();
+    public List<TreeMap<String, Integer>> getNumByHours() {
+        List<TreeMap<String, Integer>> NumByHour = new ArrayList<>();
         for(int i = 0;i <= 12; i++)
         {
             Integer sum = 0;
@@ -230,10 +239,12 @@ public class CounselorServiceImpl implements CounselorService {
             else{
                  sum = conversationMapper.findNumByHours(i*2,0);
             }
-
-            h.put(i*2,sum);
+            TreeMap<String, Integer> h = new TreeMap<>();
+            h.put("hour",i*2);
+            h.put("sum",sum);
+            NumByHour.add(h);
         }
-        return h;
+        return NumByHour;
     }
 
 
