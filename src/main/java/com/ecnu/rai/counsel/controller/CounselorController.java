@@ -105,8 +105,8 @@ public class CounselorController {
     @GetMapping("/getCounselorRankingByWork")
     @ApiOperation("获取咨询师月咨询数量排名")
     @ApiImplicitParam(name = "listSize", value = "排名列表长度", required = true, dataType = "Integer")
-    public Result getCounselorRankingByWork(@RequestParam Integer len) {
-        List<CounselorMonthlyWork> counselorRanking = counselorService.getCounselorRankingByWork(len);
+    public Result getCounselorRankingByWork(@RequestParam Integer listSize) {
+        List<CounselorMonthlyWork> counselorRanking = counselorService.getCounselorRankingByWork(listSize);
         return Result.success("获取成功", counselorRanking);
     }
 
@@ -114,8 +114,8 @@ public class CounselorController {
     @GetMapping("/getCounselorRankingByStar")
     @ApiOperation("获取咨询师月好评数量排名")
     @ApiImplicitParam(name = "listSize", value = "排名列表长度", required = true, dataType = "Integer")
-    public Result getCounselorRankingByStar(@RequestParam Integer len) {
-        List<CounselorMonthlyStar> counselorRanking = counselorService.getCounselorRankingByStar(len);
+    public Result getCounselorRankingByStar(@RequestParam Integer listSize) {
+        List<CounselorMonthlyStar> counselorRanking = counselorService.getCounselorRankingByStar(listSize);
         return Result.success("获取成功", counselorRanking);
     }
 
@@ -186,12 +186,11 @@ public class CounselorController {
         return Result.success("获取成功",counselorService.getAvailableCounselorByBusy(page, size, order));
     }
 
-    @GetMapping("getBasicStatInfo")
-    @ApiOperation("获取基本资询统计数据")
-    public Result getBasicStatInfo() {
+    @GetMapping("getBasicStatInfoByCounselor")
+    @ApiOperation("获取咨询师基本资询统计数据")
+    public Result getBasicStatInfoByCounselor(@RequestParam("counselorId") Long counselorId) {
 
-
-        return Result.success("获取成功",counselorService.getBasicStatInfo());
+        return Result.success("获取成功",counselorService.getBasicStatInfoByCounselor(counselorId));
     }
 
     @GetMapping("getNumByWeek")

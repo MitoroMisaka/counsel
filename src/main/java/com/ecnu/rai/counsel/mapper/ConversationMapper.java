@@ -99,6 +99,12 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
 
     @Select("SELECT COUNT(*) " +
             "FROM conversation " +
+            "WHERE counselor= #{supervisor} AND  +" +
+            "DATE(start_time) = DATE(SYSDATE()) ")
+    Integer findTodayNumBySupervisor(@Param("supervisor") Long supervisor);
+
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
             "WHERE  DATE(start_time) = DATE(SYSDATE())")
     Integer findTodayNum();
 
@@ -121,6 +127,12 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
 
     @Select("SELECT SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) " +
             "FROM conversation " +
+            "WHERE counselor= #{supervisor} AND " +
+            "DATE(start_time) = DATE(SYSDATE())")
+    Integer findTodayTotalBySupervisor(@Param("supervisor") Long supervisor);
+
+    @Select("SELECT SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) " +
+            "FROM conversation " +
             "WHERE DATE(start_time) = DATE(SYSDATE())")
     Integer findTodayTotal();
 
@@ -132,9 +144,14 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     @Select("SELECT COUNT(*) " +
             "FROM conversation " +
             "WHERE counselor= #{counselor} AND " +
-            "status = 'active'")
+            "status = 'STARTED'")
     Integer findCurrentNumByCounselor(@Param("counselor") Long counselor);
 
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
+            "WHERE counselor= #{supervisor} AND " +
+            "status = 'STARTED'")
+    Integer findCurrentNumBySupervisor(@Param("supervisor") Long supervisor);
 
 
 }

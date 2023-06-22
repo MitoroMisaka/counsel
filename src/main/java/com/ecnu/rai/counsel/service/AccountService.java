@@ -10,6 +10,8 @@ import com.ecnu.rai.counsel.entity.Visitor;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervisor;
 
+import java.util.HashMap;
+
 public interface AccountService {
 
     User findUserByID(Long id);
@@ -46,6 +48,9 @@ public interface AccountService {
     boolean isUsernameUsedByOtherCounselor(String username);
 
     boolean isUsernameUsedByOtherSupervisor(String username);
+
+    HashMap<String, Integer> getBasicStatInfo();
+
 }
 
 

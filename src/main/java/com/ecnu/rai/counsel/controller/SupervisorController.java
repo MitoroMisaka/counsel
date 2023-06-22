@@ -27,8 +27,6 @@ public class SupervisorController {
     @Autowired
     private SupervisorService supervisorService;
 
-
-
     @PostMapping("/add")
     @ApiOperation("添加督导")
     public Result addSupervisor(@RequestBody Supervisor supervisor) {
@@ -184,6 +182,13 @@ public class SupervisorController {
                                                   @RequestParam("size") Integer size,
                                                   @RequestParam("order") String order) {
         return supervisorService.getAvailableSupervisor(page, size, order);
+    }
+
+    @GetMapping("getBasicStatInfoBySupervisor")
+    @ApiOperation("获取督导基本咨询统计数据")
+    public Result getBasicStatInfoBySupervisor(@RequestParam("supervisorId") Long supervisorId) {
+
+        return Result.success("获取成功",supervisorService.getBasicStatInfoBySupervisor(supervisorId));
     }
 
 }
