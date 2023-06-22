@@ -2,7 +2,6 @@ package com.ecnu.rai.counsel.service;
 
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.dao.AvailableSupervisor;
-import com.ecnu.rai.counsel.dao.CounselorSMInfo;
 import com.ecnu.rai.counsel.dao.SupervisorSMInfo;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervisor;
@@ -28,7 +27,7 @@ public interface SupervisorService {
 
     Page<Supervisor> getAvailableSupervisor(Integer page, Integer size, String order);
 
-    List<SupervisorSMInfo> getAllSupervisor();
+    Page<SupervisorSMInfo> getAllSupervisor(Integer page, Integer size, String order);
 
     Page<HashMap<String, String>> getAvailableSupervisorByBusy(Integer page, Integer size, String order);
 

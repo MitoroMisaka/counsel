@@ -84,34 +84,34 @@ public class DialogueController {
         return Result.success("获取成功", new_arrange);
     }
 
-    @GetMapping("/user")
+    @GetMapping("/supervisor")
     @ApiOperation("根据督导ID获取会话信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "user", value = "用户id", required = true, dataType = "Long"),
+            @ApiImplicitParam(name = "supervisorId", value = "督导id", required = true, dataType = "Long"),
             @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<Dialogue> getdialoguebyUser(@RequestParam("user") Long user,
+    public Page<Dialogue> getdialoguebySupervisor(@RequestParam("supervisorId") Long supervisorId,
                                                             @RequestParam("page") Integer page,
                                                             @RequestParam("size") Integer size,
                                                             @RequestParam("order") String order) {
-        return dialogueService.findDialogueBySupervisor(user, page, size, order);
+        return dialogueService.findDialogueBySupervisor(supervisorId, page, size, order);
     }
 
     @GetMapping("/counselor")
     @ApiOperation("根据咨询师ID获取会话信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "counselor", value = "咨询师id", required = true, dataType = "Long"),
+            @ApiImplicitParam(name = "counselorId", value = "咨询师id", required = true, dataType = "Long"),
             @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<Dialogue> getdialoguebyCounselor(@RequestParam("counselor") Long counselor,
+    public Page<Dialogue> getdialoguebyCounselor(@RequestParam("counselorId") Long counselorId,
                                                                  @RequestParam("page") Integer page,
                                                                  @RequestParam("size") Integer size,
                                                                  @RequestParam("order") String order) {
-        return dialogueService.findDialogueByCounselor(counselor, page, size, order);
+        return dialogueService.findDialogueByCounselor(counselorId, page, size, order);
     }
 
     @GetMapping("/BothDate")

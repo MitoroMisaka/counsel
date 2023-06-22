@@ -1,10 +1,7 @@
 package com.ecnu.rai.counsel.service.impl;
 
 import com.ecnu.rai.counsel.common.Page;
-import com.ecnu.rai.counsel.dao.AvailableSupervisor;
-import com.ecnu.rai.counsel.dao.CounselorSMInfo;
-import com.ecnu.rai.counsel.dao.SupervisorSMInfo;
-import com.ecnu.rai.counsel.dao.UserSig;
+import com.ecnu.rai.counsel.dao.*;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
@@ -52,10 +49,9 @@ public class SupervisorServiceImpl implements SupervisorService {
 
     @Override
     public Page<AvailableSupervisor> getAvailableSupervisorList(Long counselor_id, Integer page, Integer size, String order){
-        List<Long> availableSupervisorIdList = supervisorMapper.findSupervisorByCurrentTime();
+        List<Long> availableSupervisorIdList = supervisorMapper.findSupervisorByCurrentTime(order);
         List<AvailableSupervisor> supervisorList = new ArrayList<>();
         List<Long> bindedSupervisorIdList = superviseMapper.findSupervisorByCounselorId(counselor_id);
-        PageHelper.startPage(page, size, order);
         for (Long availableSupervisorId : availableSupervisorIdList) {
             if(bindedSupervisorIdList.contains(availableSupervisorId)){
                 Supervisor supervisor= supervisorMapper.findById(availableSupervisorId);
@@ -72,44 +68,40 @@ public class SupervisorServiceImpl implements SupervisorService {
             }
         }
 
-        return new Page<>(new PageInfo<>(supervisorList));
+        return new Page(supervisorList, page, size);
     }
 
     @Override
     public Page<Supervisor> getSupervisorList(Integer page, Integer size, String order) {
         PageHelper.startPage(page, size, order);
-        List<Supervisor> supervisorList = supervisorMapper.getAll();
+        List<Supervisor> supervisorList = supervisorMapper.getAll(order);
         PageInfo<Supervisor> pageInfo = new PageInfo<>(supervisorList);
-        System.out.println(pageInfo.getPageNum() +" "+ pageInfo.getPageSize() + " "+ pageInfo.getSize());
         return new Page<>(new PageInfo<>(supervisorList));
     }
 
     @Override
-    public List<SupervisorSMInfo> getAllSupervisor() {
-        List<Supervisor> supervisors = supervisorMapper.getAll();
+    public Page<SupervisorSMInfo> getAllSupervisor(Integer page, Integer size, String order) {
+        List<Supervisor> supervisors = supervisorMapper.getAll(order);
         List<SupervisorSMInfo> supervisorSMInfos = new ArrayList<>();
-        for(Supervisor supervisor:supervisors)
-        {
-            SupervisorSMInfo supervisorSMInfo = new SupervisorSMInfo(supervisor);
+        SupervisorSMInfo supervisorSMInfo = null;
+        for (Supervisor supervisor : supervisors) {
+            supervisorSMInfo = new SupervisorSMInfo(supervisor);
             supervisorSMInfo.SetTotalNum(dialogueMapper.findTotalNumSupervisor(supervisor.getId()));
             supervisorSMInfo.SetTotalTime(dialogueMapper.findTotalBySupervisor(supervisor.getId()));
             List<Integer> Days = arrangeMapper.findDayArrange(supervisor.getId());
-            for(Integer day:Days)
-            {
+            for (Integer day : Days) {
                 supervisorSMInfo.setTotalDay(day);
             }
             List<String> counselors = new ArrayList<>();
             List<Supervise> supervises = supervisorMapper.findCounselors(supervisor.getId());
-            for(Supervise supervise:supervises)
-            {
+            for (Supervise supervise : supervises) {
                 counselors.add(counselorMapper.findById(supervise.getCounselorId()).getName());
             }
             supervisorSMInfo.SetCounselors(counselors);
             supervisorSMInfos.add(supervisorSMInfo);
         }
 
-
-        return supervisorSMInfos;
+        return new Page(supervisorSMInfos, page, size);
     }
     
     @Override
@@ -127,15 +119,14 @@ public class SupervisorServiceImpl implements SupervisorService {
         supervisorMapper.updateSupervisor(supervisor);
     }
 
-    public Page<Counselor> getAvailableCounselor(Long id, Integer page, Integer size, String order) {
+    public Page<Counselor> getAvailableCounselor(Long supervisorId, Integer page, Integer size, String order) {
 
-        PageHelper.startPage(page, size, order);
-        List<Supervise> superviselist = counselorMapper.findCounselors(id);
+        List<Supervise> superviselist = counselorMapper.findCounselors(supervisorId, order);
         List<Counselor> availableCounselorList = new ArrayList<>();
         for (Supervise supervise : superviselist) {
             availableCounselorList.add(counselorMapper.findById(supervise.getCounselorId()));
         }
-        return new Page<>(new PageInfo<>(availableCounselorList));
+        return new Page(availableCounselorList, page, size);
 
     }
     
@@ -143,20 +134,21 @@ public class SupervisorServiceImpl implements SupervisorService {
 
     @Override
     public Page<Supervisor> getAvailableSupervisor(Integer page, Integer size, String order) {
-        List<Long> availableSupervisorIdList = arrangeMapper.findSupervisorByCurrentTime();
+        List<Long> availableSupervisorIdList = arrangeMapper.findSupervisorByCurrentTime(order);
         List<Supervisor> supervisorList = new ArrayList<>();
 
         PageHelper.startPage(page, size, order);
         for (Long availableSupervisorId : availableSupervisorIdList) {
             supervisorList.add(supervisorMapper.findById(availableSupervisorId));
         }
-        return new Page<>(new PageInfo<>(supervisorList));
+        return new Page(supervisorList, page, size);
     }
+
 
     @Override
     public Page<HashMap<String, String>> getAvailableSupervisorByBusy(Integer page, Integer size, String order) {
-        List<Supervisor> supervisors = supervisorMapper.getAll();
         List<HashMap<String, String>> supervisorBusy= new ArrayList<>();
+        List<Supervisor> supervisors = supervisorMapper.findAllSupervisorsOnline(order);
         for(Supervisor supervisor:supervisors)
         {
             Integer currentConsult = conversationMapper.getConsultNum(supervisor.getName());
@@ -172,9 +164,9 @@ public class SupervisorServiceImpl implements SupervisorService {
                 supervisorBusy.add(h);
             }
         }
-        PageHelper.startPage(page, size, order);
-        return new Page<>(new PageInfo<>(supervisorBusy));
+        return new Page(supervisorBusy, page, size);
     }
+
 
     @Override
     public HashMap<String, Integer> getBasicStatInfoBySupervisor(Long supervisorId) {

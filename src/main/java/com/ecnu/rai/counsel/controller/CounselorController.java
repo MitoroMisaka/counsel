@@ -10,6 +10,7 @@ import com.ecnu.rai.counsel.service.CounselorService;
 import com.ecnu.rai.counsel.service.SupervisorService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
@@ -178,12 +179,16 @@ public class CounselorController {
 
     @GetMapping("getCounselorByBusy")
     @ApiOperation("获取咨询师及其繁忙状态")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
     public Result getCounselorByBusy(@RequestParam("page") Integer page,
                                         @RequestParam("size") Integer size,
                                         @RequestParam("order") String order) {
 
-
-        return Result.success("获取成功",counselorService.getAvailableCounselorByBusy(page, size, order));
+        return Result.success("获取成功", counselorService.getAvailableCounselorByBusy(page, size, order));
     }
 
     @GetMapping("getBasicStatInfoByCounselor")
@@ -205,13 +210,4 @@ public class CounselorController {
         return Result.success("获取成功",counselorService.getNumByHours());
     }
 
-    @GetMapping("getSupervisorByBusy")
-    @ApiOperation("获取督导及其繁忙状态")
-    public Result getSupervisorByBusy(@RequestParam("page") Integer page,
-                                      @RequestParam("size") Integer size,
-                                      @RequestParam("order") String order) {
-
-
-        return Result.success("获取成功",supervisorService.getAvailableSupervisorByBusy(page, size, order));
-    }
 }

@@ -5,14 +5,12 @@ import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
-import com.ecnu.rai.counsel.entity.Supervisor;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Repository
@@ -46,14 +44,15 @@ public interface CounselorMapper extends BaseMapper<Counselor> {
     @Select("SELECT * FROM supervise WHERE counselor_id = #{id}")
     List<Supervise> findSupervisors(@Param("id") Long id);
 
-    @Select("SELECT * FROM supervise WHERE supervisor_id = #{id}")
-    List<Supervise> findCounselors(@Param("id") Long id);
+    @Select("SELECT * FROM supervise WHERE supervisor_id = #{supervisorId} ORDER BY ${order}")
+    List<Supervise> findCounselors(@Param("supervisorId") Long supervisorId,
+                                   @Param("order") String order);
 
-    @Select("SELECT * FROM counselor")
-    List<Counselor> findAllCounselors();
+    @Select("SELECT * FROM counselor ORDER BY ${order}")
+    List<Counselor> findAllCounselors(@Param("order") String order);
 
-    @Select("SELECT * FROM counselor where status ='ONLINE' ")
-    List<Counselor> findAllCounselorsOnline();
+    @Select("SELECT * FROM counselor where status ='ONLINE' ORDER BY ${order}")
+    List<Counselor> findAllCounselorsOnline(@Param("order") String order);
 
     //generate SQL statement to update counselor info
     @Update("UPDATE counselor SET " +

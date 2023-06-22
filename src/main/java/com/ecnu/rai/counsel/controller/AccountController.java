@@ -6,6 +6,8 @@ import com.ecnu.rai.counsel.dao.UserLoginInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.AccountService;
+import com.ecnu.rai.counsel.service.CounselorService;
+import com.ecnu.rai.counsel.service.SupervisorService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -35,6 +37,12 @@ import java.util.Objects;
 public class AccountController {
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private CounselorService counselorService;
+
+    @Autowired
+    private SupervisorService supervisorService;
 
     @Autowired
     private UserMapper userMapper;
@@ -168,7 +176,7 @@ public class AccountController {
     public Result getCounselorList(@RequestParam("page") Integer page,
                                                   @RequestParam("size") Integer size,
                                                   @RequestParam("order") String order) {
-        return Result.success("获取咨询师列表成功", accountService.findCounselorList(page, size, order));
+        return Result.success("获取咨询师列表成功", counselorService.getAllCounselor(page, size, order));
     }
 
     @GetMapping("/supervisors")
@@ -181,7 +189,7 @@ public class AccountController {
     public Result getSupervisorList(@RequestParam("page") Integer page,
                                                     @RequestParam("size") Integer size,
                                                     @RequestParam("order") String order) {
-        return Result.success("获取督导列表成功", accountService.findSupervisorList(page, size, order));
+        return Result.success("获取督导列表成功", supervisorService.getAllSupervisor(page, size, order));
     }
 
 
@@ -191,12 +199,12 @@ public class AccountController {
     @GetMapping("/{id}")
     public Result getUserInfo(@PathVariable Long id) {
 
-//        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-//        if (!currentUser.getRole().equals("admin")) {
-//            if (currentUser.getId() != id) {
-//                return Result.fail("无权访问");
-//            }
-//        }
+        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
+        if (!currentUser.getRole().equals("admin")) {
+            if (currentUser.getId() != id) {
+                return Result.fail("无权访问");
+            }
+        }
 
         User user = accountService.findUserByID(id);
         String role = user.getRole();

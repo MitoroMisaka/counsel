@@ -30,8 +30,7 @@ public class ConversationServiceImpl implements ConversationService {
     public Page<ConversationResponse> findGroupMsgByCounselorUser(String counselor, String user, Integer page, Integer size, String order){
         String counselor_id = String.valueOf(userMapper.findIdByName(counselor));
         String user_id = String.valueOf(userMapper.findIdByName(user));
-        PageHelper.startPage(page, size, order);
-        List<Conversation> conversationList = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id);
+        List<Conversation> conversationList = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id, order);
         List<ConversationResponse> conversationResponseList = new ArrayList<>();
         for(Conversation conversation : conversationList){
             ConversationResponse conversationResponse = new ConversationResponse(conversation);
@@ -41,8 +40,7 @@ public class ConversationServiceImpl implements ConversationService {
             conversationResponse.setLastUpdater(userMapper.findNameById(conversation.getLastUpdater()));
             conversationResponseList.add(conversationResponse);
         }
-        PageInfo<ConversationResponse> pageInfo = new PageInfo<>(conversationResponseList);
-        return new Page<>(pageInfo);
+        return new Page(conversationResponseList, page, size);
     }
 
     @Override

@@ -29,7 +29,7 @@ public interface CounselorService {
 
     Page<AvailableCounselor> getAvailableCounselor(Integer page, Integer size, String order, String token);
 
-    List<CounselorSMInfo> getAllCounselor();
+    Page<CounselorSMInfo> getAllCounselor(Integer page, Integer size, String order);
 
     Page<HashMap<String,String>> getAvailableCounselorByBusy(Integer page, Integer size, String order);
 

@@ -93,13 +93,13 @@ public class SupervisorController {
 
     @GetMapping("/available")
     @ApiOperation("获取可用督导列表")
-    public Page<AvailableSupervisor> getAvailableSupervisorList(
+    public Result getAvailableSupervisorList(
             @RequestParam(value = "counselorId") Long counselorId,
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
             @RequestParam(value = "order", defaultValue = "id_asc") String order
     ) {
-        return supervisorService.getAvailableSupervisorList(counselorId, page, size, order);
+        return Result.success("获取可用督导列表成功", supervisorService.getAvailableSupervisorList(counselorId, page, size, order));
     }
 
     @PostMapping("/update")
@@ -148,19 +148,19 @@ public class SupervisorController {
         return Result.success("更新成功");
     }
 
-    @GetMapping("/getCounselors")
+    @GetMapping("/getSupervisedCounselors")
     @ApiOperation("获取督导所管理的咨询师")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "督导id", required = true, dataType = "Long"),
-            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+            @ApiImplicitParam(name = "supervisorId", value = "督导id", required = true, dataType = "Long", example = "2"),
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer", example = "1"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer", example = "2"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String", example = "supervisor_id asc")
     })
-    public Page<Counselor> getAvailableCounselor(@RequestParam("id") Long id,
+    public Page<Counselor> getSupervisedCounselors(@RequestParam("supervisorId") Long supervisorId,
                                                  @RequestParam("page") Integer page,
                                                  @RequestParam("size") Integer size,
                                                  @RequestParam("order") String order) {
-        return supervisorService.getAvailableCounselor(id, page, size, order);
+        return supervisorService.getAvailableCounselor(supervisorId, page, size, order);
     }
 
     @GetMapping("/addCounselor")
@@ -178,10 +178,10 @@ public class SupervisorController {
 
     @GetMapping("getAvailableSupervisor")
     @ApiOperation("获取可用咨询师,目前只能根据排班判断，无法根据繁忙程度判断")
-    public Page<Supervisor> getAvailableCounselor(@RequestParam("page") Integer page,
+    public Result getAvailableCounselor(@RequestParam("page") Integer page,
                                                   @RequestParam("size") Integer size,
                                                   @RequestParam("order") String order) {
-        return supervisorService.getAvailableSupervisor(page, size, order);
+        return Result.success("获取可用咨询师成功", supervisorService.getAvailableSupervisor(page, size, order));
     }
 
     @GetMapping("getBasicStatInfoBySupervisor")
@@ -189,6 +189,15 @@ public class SupervisorController {
     public Result getBasicStatInfoBySupervisor(@RequestParam("supervisorId") Long supervisorId) {
 
         return Result.success("获取成功",supervisorService.getBasicStatInfoBySupervisor(supervisorId));
+    }
+
+    @GetMapping("getSupervisorByBusy")
+    @ApiOperation("获取督导及其繁忙状态")
+    public Result getSupervisorByBusy(@RequestParam("page") Integer page,
+                                      @RequestParam("size") Integer size,
+                                      @RequestParam("order") String order) {
+
+        return Result.success("获取成功",supervisorService.getAvailableSupervisorByBusy(page, size, order));
     }
 
 }

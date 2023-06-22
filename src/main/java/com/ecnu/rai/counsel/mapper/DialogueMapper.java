@@ -70,11 +70,13 @@ public interface DialogueMapper extends BaseMapper<Dialogue>{
             "WHERE id = #{dialogue.id}")
     void updateDialogue(@Param("dialogue") Dialogue dialogue);
 
-    @Select("SELECT * FROM dialogue WHERE supervisor = #{supervisor}")
-    List<Dialogue> findBySupervisor(@Param("supervisor") Long supervisor);
+    @Select("SELECT * FROM dialogue WHERE supervisor = #{supervisor} ORDER BY ${order}")
+    List<Dialogue> findBySupervisor(@Param("supervisor") Long supervisor,
+                                    @Param("order") String order);
 
-    @Select("SELECT * FROM dialogue WHERE counselor = #{counselor}")
-    List<Dialogue> findByCounselor(@Param("counselor") Long counselor);
+    @Select("SELECT * FROM dialogue WHERE counselor = #{counselor} ORDER BY ${order}")
+    List<Dialogue> findByCounselor(@Param("counselor") Long counselor,
+                                   @Param("order") String order);
 
     @Select("SELECT * FROM dialogue WHERE " +
             "counselor = #{counselor} AND " +

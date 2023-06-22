@@ -18,10 +18,6 @@ public interface AccountService {
 
     Page<UserBasicInfo> findUserList(Integer page, Integer size, String order);
 
-    Page<CounselorSMInfo> findCounselorList(Integer page, Integer size, String order);
-
-    Page<SupervisorSMInfo> findSupervisorList(Integer page, Integer size, String order);
-
     boolean isPhoneUsedByOtherCounselor(Long id,String phone);
 
     boolean isPhoneUsedByOtherSupervisor(Long id, String phone);

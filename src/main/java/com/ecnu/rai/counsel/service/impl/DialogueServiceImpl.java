@@ -80,10 +80,8 @@ public class DialogueServiceImpl implements DialogueService {
 
     @Override
     public Page<Dialogue> findDialogueBySupervisor(Long supervisor, Integer page, Integer size, String order) {
-        // 构造分页参数
-        PageHelper.startPage(page, size, order);
 
-        List<Dialogue> dialogueList = dialogueMapper.findBySupervisor(supervisor);
+        List<Dialogue> dialogueList = dialogueMapper.findBySupervisor(supervisor, order);
 
         for(Dialogue dialogue : dialogueList){
             dialogue.setCounselor(userMapper.findNameById(dialogue.getCounselor()));
@@ -91,21 +89,19 @@ public class DialogueServiceImpl implements DialogueService {
         }
 
         // 返回分页后的结果
-        return new Page<>(new PageInfo<>(dialogueList));
+        return new Page(dialogueList, page, size);
     }
 
     @Override
     public Page<Dialogue> findDialogueByCounselor(Long counselor, Integer page, Integer size, String order) {
-        // 构造分页参数
-        PageHelper.startPage(page, size, order);
 
-        List<Dialogue> dialogueList = dialogueMapper.findByCounselor(counselor);
+        List<Dialogue> dialogueList = dialogueMapper.findByCounselor(counselor, order);
         for(Dialogue dialogue : dialogueList){
             dialogue.setCounselor(userMapper.findNameById(dialogue.getCounselor()));
             dialogue.setSupervisor(userMapper.findNameById(dialogue.getSupervisor()));
         }
         // 返回分页后的结果
-        return new Page<>(new PageInfo<>(dialogueList));
+        return new Page(dialogueList, page, size);
     }
 
     @Override
