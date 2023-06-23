@@ -94,4 +94,32 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     @Select("SELECT day FROM arrange WHERE user = #{user} and year = YEAR(CURRENT_DATE()) and month = MONTH(CURRENT_DATE())")
     List<Integer> findDayArrange(@Param("user") Long user);
 
+    @Select("SELECT DISTINCT `user` FROM arrange WHERE `role` = 'SUPERVISOR' AND `user` NOT IN " +
+            "(SELECT DISTINCT `user` FROM arrange " +
+            "WHERE `year` = YEAR(CURRENT_DATE()) " +
+            "AND `month` = MONTH(CURRENT_DATE()) " +
+            "AND `day` = DAY(CURRENT_DATE()))")
+    List<Long> findFreeSupervisor();
+
+    @Select("SELECT DISTINCT `user` FROM arrange " +
+            "WHERE `role` = 'SUPERVISOR' " +
+            "AND `year` = YEAR(CURRENT_DATE()) " +
+            "AND `month` = MONTH(CURRENT_DATE()) " +
+            "AND `day` = DAY(CURRENT_DATE())")
+    List<Long> findWorkingSupervisor();
+
+    @Select("SELECT DISTINCT `user` FROM arrange WHERE `role` = 'COUNSELOR' AND `user` NOT IN " +
+            "(SELECT DISTINCT `user` FROM arrange " +
+            "WHERE `year` = YEAR(CURRENT_DATE()) " +
+            "AND `month` = MONTH(CURRENT_DATE()) " +
+            "AND `day` = DAY(CURRENT_DATE()))")
+    List<Long> findFreeCounselor();
+
+    @Select("SELECT DISTINCT `user` FROM arrange " +
+            "WHERE `role` = 'COUNSELOR' " +
+            "AND `year` = YEAR(CURRENT_DATE()) " +
+            "AND `month` = MONTH(CURRENT_DATE()) " +
+            "AND `day` = DAY(CURRENT_DATE())")
+    List<Long> findWorkingCounselor();
+
 }

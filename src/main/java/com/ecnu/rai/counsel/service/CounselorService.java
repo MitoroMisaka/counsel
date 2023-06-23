@@ -1,10 +1,7 @@
 package com.ecnu.rai.counsel.service;
 
 import com.ecnu.rai.counsel.common.Page;
-import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
-import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
-import com.ecnu.rai.counsel.dao.AvailableCounselor;
-import com.ecnu.rai.counsel.dao.CounselorSMInfo;
+import com.ecnu.rai.counsel.dao.*;
 import com.ecnu.rai.counsel.entity.Counselor;
 import io.swagger.models.auth.In;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +15,10 @@ public interface CounselorService {
     Page<Counselor> getCounselorList(Integer page, Integer size, String order);
 
     Counselor findCounselorByID(Long id);
+
+    List<CounselorBasicInfo> getFreeCounselorList();
+
+    List<CounselorBasicInfo> getWorkingCounselorList();
 
     List<CounselorMonthlyWork> getCounselorRankingByWork(Integer len);
 

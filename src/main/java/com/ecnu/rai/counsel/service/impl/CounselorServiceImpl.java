@@ -3,13 +3,10 @@ package com.ecnu.rai.counsel.service.impl;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ecnu.rai.counsel.common.Page;
-import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
-import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
-import com.ecnu.rai.counsel.dao.CounselorSMInfo;
+import com.ecnu.rai.counsel.dao.*;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
-import com.ecnu.rai.counsel.dao.AvailableCounselor;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.CounselorService;
@@ -67,6 +64,30 @@ public class CounselorServiceImpl implements CounselorService {
         }
         counselor.setSupervisors(availablesupervisorList);
         return counselor;
+    }
+
+    @Override
+    public
+    List<CounselorBasicInfo> getFreeCounselorList() {
+        List<Long> freeCounselorIdList = arrangeMapper.findFreeCounselor();
+        List<CounselorBasicInfo> counselorList = new ArrayList<>();
+        for (Long freeCounselorId : freeCounselorIdList) {
+            CounselorBasicInfo counselor = new CounselorBasicInfo(counselorMapper.findById(freeCounselorId));
+            counselorList.add(counselor);
+        }
+        return counselorList;
+    }
+
+    @Override
+    public
+    List<CounselorBasicInfo> getWorkingCounselorList() {
+        List<Long> workingCounselorIdList = arrangeMapper.findWorkingCounselor();
+        List<CounselorBasicInfo> counselorList = new ArrayList<>();
+        for (Long freeCounselorId : workingCounselorIdList) {
+            CounselorBasicInfo counselor = new CounselorBasicInfo(counselorMapper.findById(freeCounselorId));
+            counselorList.add(counselor);
+        }
+        return counselorList;
     }
 
     @Override

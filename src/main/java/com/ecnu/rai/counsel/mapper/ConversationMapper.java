@@ -15,6 +15,9 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     @Select("SELECT * FROM conversation WHERE id = #{conversation_id}")
     Conversation getConversationById(@Param("conversation_id") Long conversation_id);
 
+    @Select("SELECT * FROM conversation ORDER BY ${order}")
+    List<Conversation> getAllConversation(@Param("order") String order);
+
     @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND user = #{user} AND status = 'FINISHED' ORDER BY ${order}")
     List<Conversation> findGroupMsgByCounselorUser(@Param("counselor") String counselor,
                                                    @Param("user") String user,
@@ -70,10 +73,12 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     void updateConversation(@Param("conversation") Conversation conversation);
 
     @Select("SELECT * FROM conversation WHERE user = #{user}")
-    List<Conversation> findByUser(@Param("user") Long user);
+    List<Conversation> findByUser(@Param("user") Long user,
+                                  @Param("order") String order);
 
-    @Select("SELECT * FROM conversation WHERE counselor = #{counselor}")
-    List<Conversation> findByCounselor(@Param("counselor") Long counselor);
+    @Select("SELECT * FROM conversation WHERE counselor = #{counselor} ORDER BY ${order}")
+    List<Conversation> findByCounselor(@Param("counselor") Long counselor,
+                                       @Param("order") String order);
 
     @Select("SELECT * FROM conversation WHERE " +
             "counselor = #{counselor} AND " +

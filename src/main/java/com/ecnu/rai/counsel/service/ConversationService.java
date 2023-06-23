@@ -6,12 +6,15 @@ import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.response.ConsultInfo;
 
 import java.sql.Date;
+import java.util.List;
 
 public interface ConversationService {
 
     Page<ConversationResponse> findGroupMsgByCounselorUser(String counselor, String user, Integer page, Integer size, String order);
 
     Conversation findConversationByID(Long id);
+
+    Page<ConversationResponse> findAllConversation(Integer page, Integer size, String order);
 
     Conversation insertConversationByID(Conversation conversation);
 

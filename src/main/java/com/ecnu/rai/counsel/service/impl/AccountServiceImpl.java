@@ -29,9 +29,6 @@ public class AccountServiceImpl implements AccountService {
     private UserMapper userMapper;
 
     @Autowired
-    private MyMapper myMapper;
-
-    @Autowired
     private VisitorMapper visitorMapper;
 
     @Autowired
@@ -42,12 +39,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private SupervisorMapper supervisorMapper;
-
-    @Autowired
-    private CounselorService counselorService;
-
-    @Autowired
-    private SupervisorService supervisorService;
 
     @Autowired
     private ConversationMapper conversationMapper;

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.ecnu.rai.counsel.dao.group.GroupMsg;
 import com.ecnu.rai.counsel.dao.group.RspMsg;
 import com.ecnu.rai.counsel.entity.Conversation;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.gson.Gson;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -31,12 +33,16 @@ public class ConversationResponse {
     @ApiModelProperty(value = "会话ID")
     private Long id;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @ApiModelProperty(value = "创建时间")
     private Timestamp createTime;
 
     @ApiModelProperty(value = "创建者")
     private String creator;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @ApiModelProperty(value = "最后更新时间")
     private Timestamp lastUpdateTime;
 
@@ -52,9 +58,13 @@ public class ConversationResponse {
     @ApiModelProperty(value = "日")
     private Integer day;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @ApiModelProperty(value = "开始时间")
     private Timestamp startTime;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @ApiModelProperty(value = "结束时间")
     private Timestamp endTime;
 

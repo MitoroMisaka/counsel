@@ -27,10 +27,7 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/account")
@@ -704,7 +701,7 @@ public class AccountController {
     //咨询师页面绑定
     @RequiresRoles("admin")
     @ApiOperation("咨询师视角绑定")
-    @GetMapping("/counselor/binding/{id}")
+    @PostMapping("/counselor/binding/{id}")
     public Result makeSuperviseByCounselor(@PathVariable Long id,
                                           @Valid @RequestBody List<Long> supervisorsId)
     {
@@ -713,7 +710,7 @@ public class AccountController {
         if(supervisorsId.isEmpty())
             return Result.fail("No supervisors to bind.");
         superviseMapper.deleteCounselorSupervise(id);
-        for(Long supervisorid:supervisorsId)
+        for(Long supervisorid : supervisorsId)
         {
             if(superviseMapper.findSupervise(id,supervisorid)==1||!Objects.equals(userMapper.findRoleById(supervisorid), "supervisor"))
                 continue;

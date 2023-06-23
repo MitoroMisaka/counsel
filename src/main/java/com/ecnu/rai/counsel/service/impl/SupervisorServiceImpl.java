@@ -72,6 +72,30 @@ public class SupervisorServiceImpl implements SupervisorService {
     }
 
     @Override
+    public
+    List<SupervisorBasicInfo> getFreeSupervisorList() {
+        List<Long> freeSupervisorIdList = arrangeMapper.findFreeSupervisor();
+        List<SupervisorBasicInfo> supervisorList = new ArrayList<>();
+        for (Long freeSupervisorId : freeSupervisorIdList) {
+            SupervisorBasicInfo supervisor = new SupervisorBasicInfo(supervisorMapper.findById(freeSupervisorId));
+            supervisorList.add(supervisor);
+        }
+        return supervisorList;
+    }
+
+    @Override
+    public
+    List<SupervisorBasicInfo> getWorkingSupervisorList() {
+        List<Long> workingSupervisorIdList = arrangeMapper.findWorkingSupervisor();
+        List<SupervisorBasicInfo> supervisorList = new ArrayList<>();
+        for (Long freeSupervisorId : workingSupervisorIdList) {
+            SupervisorBasicInfo supervisor = new SupervisorBasicInfo(supervisorMapper.findById(freeSupervisorId));
+            supervisorList.add(supervisor);
+        }
+        return supervisorList;
+    }
+
+    @Override
     public Page<Supervisor> getSupervisorList(Integer page, Integer size, String order) {
         PageHelper.startPage(page, size, order);
         List<Supervisor> supervisorList = supervisorMapper.getAll(order);

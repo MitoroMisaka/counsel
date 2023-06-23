@@ -91,17 +91,30 @@ public class ConversationController {
         return Result.success("获取成功", new_arrange);
     }
 
+    @GetMapping("/list")
+    @ApiOperation("获取所有会话信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "page", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
+    public Result getAllConversation(@RequestParam(value = "page") Integer page,
+                                        @RequestParam(value = "size") Integer size,
+                                        @RequestParam(value = "order") String order) {
+        return Result.success("获取会话信息成功", conversationService.findAllConversation(page, size, order));
+    }
+
     @GetMapping("/user")
     @ApiOperation("根据用户ID获取会话信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "user", value = "用户id", required = true, dataType = "Long"),
             @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "page", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
     public Result getConversationbyUser(@RequestParam(value = "user") Long user,
                                                             @RequestParam(value = "page") Integer page,
-                                                            @RequestParam(value = "page") Integer size,
+                                                            @RequestParam(value = "size") Integer size,
                                                             @RequestParam(value = "order") String order) {
         return Result.success("获取会话信息成功", conversationService.findConversationByUser(user, page, size, order));
     }

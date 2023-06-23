@@ -56,8 +56,8 @@ public class CounselorController {
         if(counselor.getUsername()!=null && !counselor.getUsername().matches("^[a-zA-Z0-9_]{2,32}$")){
             return Result.fail("用户名只能是大小写字母数字和下划线组成。 2-32 位");
         }
-        if(counselor.getRole()!=null && !counselor.getRole().equals("counselor")){
-            return Result.fail("角色必须是counselor");
+        if(counselor.getRole()!=null && !counselor.getRole().equals("COUNSELOR")){
+            return Result.fail("角色必须是COUNSELOR");
         }
         if(counselor.getPhone()!=null && !counselor.getPhone().matches("^[0-9]{11}$")){
             return Result.fail("电话号码必须是11位");
@@ -102,6 +102,18 @@ public class CounselorController {
         return Result.success("获取成功", counselor);
     }
 
+    @GetMapping("/getFreeCounselorList")
+    @ApiOperation("获取当天空闲督导列表")
+    public Result getFreeCounselorList() {
+        return Result.success("获取可用督导列表成功", counselorService.getFreeCounselorList());
+    }
+
+    @GetMapping("/getWorkingCounselorList")
+    @ApiOperation("获取当天有排版督导列表")
+    public Result getWorkingCounselorList() {
+        return Result.success("获取可用督导列表成功", counselorService.getWorkingCounselorList());
+    }
+
     @RequiresRoles("admin")
     @GetMapping("/getCounselorRankingByWork")
     @ApiOperation("获取咨询师月咨询数量排名")
@@ -139,7 +151,7 @@ public class CounselorController {
             return Result.fail("用户名只能是大小写字母数字和下划线组成。 2-32 位");
         }
         if(counselor.getRole()!=null && !counselor.getRole().equals("counselor")){
-            return Result.fail("角色必须是counselor");
+            return Result.fail("角色必须是COUNSELOR");
         }
         if(counselor.getPhone()!=null && !counselor.getPhone().matches("^1[0-9]{10}$")){
             return Result.fail("电话号码必须是11位");

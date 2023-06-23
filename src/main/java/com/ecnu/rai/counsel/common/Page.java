@@ -36,6 +36,7 @@ public class Page<T> {
 
     public Page(List<T> rawList, Integer pageNum, Integer pageSize) {
         this.total = (long) rawList.size();
+        pageSize = pageSize > this.total ? this.total.intValue() : pageSize;
         List<T> list  = rawList.subList((pageNum - 1) * pageSize, Math.min(pageNum * pageSize, rawList.size()));
         this.items = list;
         this.pageNum = pageNum;
