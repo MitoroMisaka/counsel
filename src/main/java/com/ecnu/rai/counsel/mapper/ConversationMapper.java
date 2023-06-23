@@ -18,6 +18,10 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND user = #{user} AND status = 'FINISHED' ORDER BY id DESC")
     List<Conversation> findGroupMsgByCounselorUser(String counselor, String user);
 
+    //find the last conversation id by counselor and user and status is STARTED
+    @Select("SELECT id FROM conversation WHERE counselor = #{counselor} AND user = #{user} AND status = 'STARTED' ORDER BY id DESC LIMIT 1")
+    Long findConversationByCounselorAndUser(@Param("counselor") String counselor, @Param("user") String user);
+
     @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND status = 'FINISHED' ORDER BY id DESC")
     List<Conversation> findGroupMsgByCounselor(String counselor);
 
@@ -66,6 +70,28 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
             "message = #{conversation.message}" +
             "WHERE id = #{conversation.id}")
     void updateConversation(@Param("conversation") Conversation conversation);
+
+    @Update("UPDATE conversation SET " +
+            "create_time = #{conversation.createTime}, " +
+            "creator = #{conversation.creator}, " +
+            "last_update_time = #{conversation.lastUpdateTime}, " +
+            "last_updater = #{conversation.lastUpdater}, " +
+            "user = #{conversation.user}, " +
+            "counselor = #{conversation.counselor}, " +
+            "visitor_name = #{conversation.visitorName}, " +
+            "evaluate = #{conversation.evaluate}, " +
+            "conversation_type = #{conversation.conversationType}," +
+            "message = #{conversation.message}" +
+            "WHERE id = #{conversation.id}")
+    void updateConversationUser(@Param("conversation") Conversation conversation);
+
+    @Update("UPDATE conversation SET " +
+            "last_update_time = #{conversation.lastUpdateTime}, " +
+            "last_updater = #{conversation.lastUpdater}, " +
+            "status = #{conversation.status}, " +
+            "comment = #{conversation.comment} " +
+            "WHERE id = #{conversation.id}")
+    void updateConversationCounselor(@Param("conversation") Conversation conversation);
 
     @Select("SELECT * FROM conversation WHERE user = #{user}")
     List<Conversation> findByUser(@Param("user") Long user);

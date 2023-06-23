@@ -28,10 +28,11 @@ public class UserSigController {
 
     @GetMapping("/userSig")
     public Object getUserSig(@RequestParam("imid") String imid, @RequestParam("name") String name) {
+        String userSig = userSigService.generateUserSig(imid);
+        System.out.println(userSig);
         if(userSigMapper.getUserSigByName(name) != null){
             return userSigMapper.getUserSigByName(name);
         }
-        String userSig = userSigService.generateUserSig(imid);
         User user = userMapper.findByName(name);
         System.out.println(user);
         Usersig usersig1 = new Usersig(imid, userSig, name, user.getRole());
