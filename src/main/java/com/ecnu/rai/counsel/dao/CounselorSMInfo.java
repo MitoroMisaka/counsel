@@ -27,7 +27,7 @@ public class CounselorSMInfo implements Serializable {
     private String role;
 
     @ApiModelProperty("绑定督导")
-    private List<Supervisor> supervisors;
+    private List<String> supervisors;
 
     @ApiModelProperty("平均评价")
     private Integer rating;
@@ -44,10 +44,12 @@ public class CounselorSMInfo implements Serializable {
     @ApiModelProperty("排版星期")
     private List<Integer> totalDay = new ArrayList<>();
 
+    @ApiModelProperty("禁用状态")
+    private Integer state;
+
     public CounselorSMInfo(Counselor counselor){
         this.id = counselor.getId();
         this.name = counselor.getName();
-        this.supervisors = counselor.getSupervisors();
         this.name = counselor.getName();
         this.role = counselor.getRole();
         this.avatar = counselor.getAvatar();
@@ -65,5 +67,13 @@ public class CounselorSMInfo implements Serializable {
     {
         if(!this.totalDay.contains(day))
         this.totalDay.add(day);
+    }
+    public void setState(Integer state)
+    {
+        this.state = state;
+    }
+    public void setSupervisors(List<String> supervisors)
+    {
+        this.supervisors = supervisors;
     }
 }

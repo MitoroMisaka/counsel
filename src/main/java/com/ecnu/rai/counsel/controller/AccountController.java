@@ -1,12 +1,15 @@
 package com.ecnu.rai.counsel.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.dao.UserLoginInfo;
+import com.ecnu.rai.counsel.dao.*;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.AccountService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
+import com.tencentcloudapi.cam.v20190116.models.GetUserResponse;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -15,7 +18,9 @@ import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresRoles;
+import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,10 +30,7 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/account")
@@ -182,6 +184,18 @@ public class AccountController {
                                                     @RequestParam("size") Integer size,
                                                     @RequestParam("order") String order) {
         return Result.success("获取督导列表成功", accountService.findSupervisorList(page, size, order));
+    }
+    @GetMapping("/visitors")
+    @ApiOperation("获取访客列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
+    public Result getVisitorList(@RequestParam("page") Integer page,
+                                              @RequestParam("size") Integer size,
+                                              @RequestParam("order") String order) {
+        return Result.success("获取访客列表",accountService.findVisitorList(page, size, order));
     }
 
 
@@ -696,7 +710,7 @@ public class AccountController {
     //咨询师页面绑定
     @RequiresRoles("admin")
     @ApiOperation("咨询师视角绑定")
-    @GetMapping("/counselor/binding/{id}")
+    @PostMapping("/counselor/binding/{id}")
     public Result makeSuperviseByCounselor(@PathVariable Long id,
                                           @Valid @RequestBody List<Long> supervisorsId)
     {
@@ -718,7 +732,7 @@ public class AccountController {
     //督导页面绑定
     @RequiresRoles("admin")
     @ApiOperation("督导视角绑定")
-    @GetMapping("/supervisor/binding/{id}")
+    @PostMapping("/supervisor/binding/{id}")
     public Result makeSuperviseBySupervisor(@PathVariable Long id,
                                            @Valid @RequestBody List<Long> counselorsId)
     {

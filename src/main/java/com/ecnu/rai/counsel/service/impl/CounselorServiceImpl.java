@@ -51,6 +51,9 @@ public class CounselorServiceImpl implements CounselorService {
     @Autowired
     private DialogueMapper dialogueMapper;
 
+    @Autowired
+    private SuperviseMapper superviseMapper;
+
     @Override
     public Page<Counselor> getCounselorList(Integer page, Integer size, String order){
         PageHelper.startPage(page, size, order);
@@ -149,6 +152,14 @@ public class CounselorServiceImpl implements CounselorService {
             CounselorSMInfo counselorSMInfo = new CounselorSMInfo(counselor);
             counselorSMInfo.SetTotalNum(conversationMapper.findTotalNumCounselor(counselor.getId()));
             counselorSMInfo.SetTotalTime(conversationMapper.findTotalByCounselor(counselor.getId()));
+            counselorSMInfo.setState(userMapper.findStateById(counselor.getId()));
+            List<Long> bindIds = superviseMapper.findSupervisorByCounselorId(counselor.getId());
+            List<String> bindNames = new ArrayList<>();
+            for(Long id:bindIds)
+            {
+                bindNames.add(supervisorMapper.findById(id).getName());
+            }
+            counselorSMInfo.setSupervisors(bindNames);
             List<Integer> Days = arrangeMapper.findDayArrange(counselor.getId());
             LocalDate today = LocalDate.now();
             LocalDate monday = today;
