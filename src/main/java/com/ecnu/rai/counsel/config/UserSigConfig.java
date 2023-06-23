@@ -15,5 +15,5 @@ public class UserSigConfig {
     @Getter
     private String secretKey;
     @Getter
-    private Long expire = (long) (60*60*24*7);
+    private Long expire = (long) (60*60*24*365);
 }
