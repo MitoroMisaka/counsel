@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -76,6 +77,11 @@ public class ConversationController {
             Result.fail("咨询师咨询次数已达上限");
         }
         conversation.setStatus("STARTED");
+        conversation.setYear(LocalDateTime.now().getYear());
+        conversation.setMonth(LocalDateTime.now().getMonth());
+        conversation.setDay(LocalDateTime.now().getDayOfMonth());
+        conversation.setStartTime(Timestamp.valueOf(LocalDateTime.now()));
+
         Conversation new_conversation = conversationService.insertConversationByID(conversation);
 //        String counselor_name = userMapper.findNameById(conversation.getCounselor());
 //        String counselor_imid = userSigMapper.getImidByName(counselor_name);
@@ -218,7 +224,7 @@ public class ConversationController {
 //                .month(getGroupMsgResponse.getStartTime().toLocalDateTime().getMonth())
 //                .day(getGroupMsgResponse.getStartTime().toLocalDateTime().getDayOfMonth())
 //                .startTime(getGroupMsgResponse.getStartTime())
-//                .endTime(getGroupMsgResponse.getEndTime())
+                .endTime(Timestamp.valueOf(LocalDateTime.now()))
                 .user(user_id_str)
                 .counselor(counselor_id_str)
 //                .status("FINISHED")
