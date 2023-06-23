@@ -3,10 +3,7 @@ package com.ecnu.rai.counsel.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
-import com.ecnu.rai.counsel.dao.CounselorSMInfo;
-import com.ecnu.rai.counsel.dao.SupervisorSMInfo;
-import com.ecnu.rai.counsel.dao.UserBasicInfo;
-import com.ecnu.rai.counsel.dao.UserLoginInfo;
+import com.ecnu.rai.counsel.dao.*;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.AccountService;
@@ -180,6 +177,18 @@ public class AccountController {
                                                     @RequestParam("size") Integer size,
                                                     @RequestParam("order") String order) {
         return accountService.findSupervisorList(page, size, order);
+    }
+    @GetMapping("/visitors")
+    @ApiOperation("获取访客列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
+    public Page<VisitorSMInfo> getVisitorList(@RequestParam("page") Integer page,
+                                              @RequestParam("size") Integer size,
+                                              @RequestParam("order") String order) {
+        return accountService.findVisitorList(page, size, order);
     }
 
 
@@ -655,11 +664,11 @@ public class AccountController {
         return Result.success("更新督导信息成功", updatedSupervisor);
     }
 //禁用用户
-    @RequiresRoles("admin")
+//    @RequiresRoles("admin")
     @PostMapping("/banUser")
-    public Result banUser(@Valid @RequestBody Map<String,List<Long>> idsList)
+    public Result banUser(@Valid @RequestBody List<Long> ids)
     {
-        List<Long> ids = idsList.get("idsList");
+
         if (ids == null)
             return Result.fail("No valid user.");
 
@@ -678,9 +687,8 @@ public class AccountController {
     //启用用户
     @RequiresRoles("admin")
     @PostMapping("/enableUser")
-    public Result enableUser(@Valid @RequestBody Map<String,List<Long>> idsList)
+    public Result enableUser(@Valid @RequestBody List<Long> ids)
     {
-        List<Long> ids = idsList.get("idsList");
         if (ids == null)
             return Result.fail("No valid user.");
         for (Long id:ids) {
@@ -698,9 +706,8 @@ public class AccountController {
     @ApiOperation("咨询师视角绑定")
     @GetMapping("/counselor/binding/{id}")
     public Result makeSuperviseByCounselor(@PathVariable Long id,
-                                          @Valid @RequestBody Map<String,List<Long>> supervisorsIdList)
+                                          @Valid @RequestBody List<Long> supervisorsId)
     {
-        List<Long> supervisorsId = supervisorsIdList.get("supervisorsIdList");
         if(!Objects.equals(userMapper.findRoleById(id), "counselor"))
             return Result.fail("Unauthorized.");
         if(supervisorsId.isEmpty())
@@ -721,9 +728,8 @@ public class AccountController {
     @ApiOperation("督导视角绑定")
     @GetMapping("/supervisor/binding/{id}")
     public Result makeSuperviseBySupervisor(@PathVariable Long id,
-                                           @Valid @RequestBody Map<String,List<Long>> counselorsIdList)
+                                           @Valid @RequestBody List<Long> counselorsId)
     {
-        List<Long> counselorsId = counselorsIdList.get("counselorsIdList");
         if(!Objects.equals(userMapper.findRoleById(id), "supervisor"))
             return Result.fail("Unauthorized.");
         if(counselorsId.isEmpty())
@@ -740,9 +746,8 @@ public class AccountController {
 
     @RequiresRoles("admin")
     @GetMapping("/delete")
-    public Result delUser(@Valid @RequestBody Map<String,List<Long>> userIdList)
+    public Result delUser(@Valid @RequestBody List<Long> userId)
     {
-        List<Long> userId = userIdList.get("userIdList");
         if(userId.isEmpty())
             return Result.fail("No user to delete.");
         for(Long userid:userId){

@@ -4,6 +4,7 @@ import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.dao.CounselorSMInfo;
 import com.ecnu.rai.counsel.dao.SupervisorSMInfo;
 import com.ecnu.rai.counsel.dao.UserBasicInfo;
+import com.ecnu.rai.counsel.dao.VisitorSMInfo;
 import com.ecnu.rai.counsel.entity.Admin;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
@@ -19,6 +20,8 @@ public interface AccountService {
     Page<CounselorSMInfo> findCounselorList(Integer page, Integer size, String order);
 
     Page<SupervisorSMInfo> findSupervisorList(Integer page, Integer size, String order);
+
+    Page<VisitorSMInfo> findVisitorList(Integer page, Integer size, String order);
 
     boolean isPhoneUsedByOtherCounselor(Long id,String phone);
 
