@@ -82,4 +82,7 @@ public class Conversation {
     @ApiModelProperty(value = "会话内容")
     private String message;
 
+    @ApiModelProperty(value = "咨询师评价")
+    private String comment;
+
 }

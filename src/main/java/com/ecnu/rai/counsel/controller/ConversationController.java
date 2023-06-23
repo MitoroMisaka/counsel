@@ -5,6 +5,7 @@ import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.dao.ConversationIdList;
 import com.ecnu.rai.counsel.dao.ConversationResponse;
+import com.ecnu.rai.counsel.dao.group.GetGroupMsgCounselor;
 import com.ecnu.rai.counsel.dao.group.GetGroupMsgResponse;
 import com.ecnu.rai.counsel.dao.group.GroupMsg;
 import com.ecnu.rai.counsel.dao.group.RspMsg;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -75,6 +77,11 @@ public class ConversationController {
             Result.fail("咨询师咨询次数已达上限");
         }
         conversation.setStatus("STARTED");
+        conversation.setYear(LocalDateTime.now().getYear());
+        conversation.setMonth(LocalDateTime.now().getMonth());
+        conversation.setDay(LocalDateTime.now().getDayOfMonth());
+        conversation.setStartTime(Timestamp.valueOf(LocalDateTime.now()));
+
         Conversation new_conversation = conversationService.insertConversationByID(conversation);
 //        String counselor_name = userMapper.findNameById(conversation.getCounselor());
 //        String counselor_imid = userSigMapper.getImidByName(counselor_name);
@@ -226,20 +233,20 @@ public class ConversationController {
                 .creator(counselor_id_str)
                 .lastUpdateTime(LocalDateTime.now())
                 .lastUpdater(counselor_id_str)
-                .year(getGroupMsgResponse.getStartTime().toLocalDateTime().getYear())
-                .month(getGroupMsgResponse.getStartTime().toLocalDateTime().getMonth())
-                .day(getGroupMsgResponse.getStartTime().toLocalDateTime().getDayOfMonth())
-                .startTime(getGroupMsgResponse.getStartTime())
-                .endTime(getGroupMsgResponse.getEndTime())
+//                .year(getGroupMsgResponse.getStartTime().toLocalDateTime().getYear())
+//                .month(getGroupMsgResponse.getStartTime().toLocalDateTime().getMonth())
+//                .day(getGroupMsgResponse.getStartTime().toLocalDateTime().getDayOfMonth())
+//                .startTime(getGroupMsgResponse.getStartTime())
+                .endTime(Timestamp.valueOf(LocalDateTime.now()))
                 .user(user_id_str)
                 .counselor(counselor_id_str)
-                .status("FINISHED")
+//                .status("FINISHED")
                 .visitorName(getGroupMsgResponse.getUsername())
                 .evaluate(getGroupMsgResponse.getRating())
                 .conversationType("评价:"+getGroupMsgResponse.getComment())
                 .message(history)
                 .build();
-        conversationMapper.updateConversation(conversation);
+        conversationMapper.updateConversationUser(conversation);
         String counselorid = String.valueOf(userMapper.findIdByName(getGroupMsgResponse.getCounselorname()));
         List<Conversation> conversations1 = conversationMapper.findGroupMsgByCounselor(counselorid);
         Double sum = 0.0;
@@ -252,6 +259,45 @@ public class ConversationController {
         counselorMapper.updateCounselorRating(name , average);
 
         return Result.success("save and insert conversation ");
+    }
+
+    @PostMapping("/save_group_msg/counselor")
+    @ApiOperation(value = "存储群聊信息/结束会话", notes = "save the conversation ")
+    @ResponseBody
+    public Result saveGroupMsgByCounselor(@Valid @RequestBody GetGroupMsgCounselor getGroupMsgResponse) throws Exception {
+
+        System.out.println(getGroupMsgResponse);
+
+        Long counselor_id = userMapper.findIdByName(getGroupMsgResponse.getCounselorname());
+        Long user_id = userMapper.findIdByName(getGroupMsgResponse.getUsername());
+
+        String counselor_id_str = String.valueOf(counselor_id);
+        String user_id_str = String.valueOf(user_id);
+
+        Long conversation_id = conversationMapper.findConversationByCounselorAndUser(counselor_id_str , user_id_str);
+
+        Conversation conversation = Conversation.builder()
+                .id(conversation_id)
+//                .createTime(LocalDateTime.now())
+//                .creator(counselor_id_str)
+                .lastUpdateTime(LocalDateTime.now())
+                .lastUpdater(counselor_id_str)
+//                .year(getGroupMsgResponse.getStartTime().toLocalDateTime().getYear())
+//                .month(getGroupMsgResponse.getStartTime().toLocalDateTime().getMonth())
+//                .day(getGroupMsgResponse.getStartTime().toLocalDateTime().getDayOfMonth())
+//                .startTime(getGroupMsgResponse.getStartTime())
+//                .endTime(getGroupMsgResponse.getEndTime())
+//                .user(user_id_str)
+//                .counselor(counselor_id_str)
+                .status("FINISHED")
+//                .visitorName(getGroupMsgResponse.getUsername())
+//                .evaluate(getGroupMsgResponse.getRating())
+                .comment("评价:"+getGroupMsgResponse.getComment())
+//                .message(history)
+                .build();
+        conversationMapper.updateConversationCounselor(conversation);
+
+        return Result.success("save and insert conversation by counselor success");
     }
 
     @GetMapping("/get_group_msg")

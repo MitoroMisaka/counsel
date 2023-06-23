@@ -36,6 +36,10 @@ public class SupervisorSMInfo {
     @ApiModelProperty("排版星期")
     private List<Integer> totalDay = new ArrayList<>();
 
+    @ApiModelProperty("禁用状态")
+    private Integer state;
+
+
     public SupervisorSMInfo(Supervisor supervisor){
         this.id = supervisor.getId();
         this.name = supervisor.getName();
@@ -59,5 +63,9 @@ public class SupervisorSMInfo {
     {
         if(!this.totalDay.contains(day))
             this.totalDay.add(day);
+    }
+    public void setState(Integer state)
+    {
+        this.state = state;
     }
 }

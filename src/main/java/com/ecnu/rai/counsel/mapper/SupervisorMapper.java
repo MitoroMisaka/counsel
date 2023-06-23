@@ -18,6 +18,10 @@ public interface SupervisorMapper extends BaseMapper<Supervisor> {
     @Select("SELECT * FROM supervisor WHERE id = #{id}")
     Supervisor findById(Long id);
 
+    @Select("SELECT id FROM supervisor")
+    List<Long> findId();
+
+
     @Update("UPDATE supervisor SET status = 'ONLINE' WHERE username = #{username}")
     void setStatusOnline(@Param("username") String username);
 

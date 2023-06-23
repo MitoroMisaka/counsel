@@ -8,11 +8,13 @@ import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.dao.CounselorSMInfo;
 import com.ecnu.rai.counsel.dao.SupervisorSMInfo;
 import com.ecnu.rai.counsel.dao.UserBasicInfo;
+import com.ecnu.rai.counsel.dao.VisitorSMInfo;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.AccountService;
 import com.ecnu.rai.counsel.service.CounselorService;
 import com.ecnu.rai.counsel.service.SupervisorService;
+import com.ecnu.rai.counsel.service.WXService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -46,6 +48,9 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private DialogueMapper dialogueMapper;
 
+    @Autowired
+    private WXService wxService;
+
     @Override
     public User findUserByID(Long id) {
         return userMapper.selectById(id);
@@ -58,18 +63,46 @@ public class AccountServiceImpl implements AccountService {
         return new Page<>(new PageInfo<>(userList));
     }
 
+    @Override
+    public Page<CounselorSMInfo> findCounselorList(Integer page, Integer size, String order) {
+        PageHelper.startPage(page, size, order);
+        List<CounselorSMInfo> counselorList = counselorService.getAllCounselor();
+        return new Page<>(new PageInfo<>(counselorList));
+    }
+
+    @Override
+    public Page<SupervisorSMInfo> findSupervisorList(Integer page, Integer size, String order) {
+        PageHelper.startPage(page, size, order);
+        List<SupervisorSMInfo> supervisorList = supervisorService.getAllSupervisor();
+        return new Page<>(new PageInfo<>(supervisorList));
+    }
+
+    @Override
+    public Page<VisitorSMInfo> findVisitorList(Integer page, Integer size, String order) {
+        PageHelper.startPage(page, size, order);
+        List<VisitorSMInfo> visitorList = wxService.getAllVisitor();
+        PageInfo<VisitorSMInfo> pageInfo = new PageInfo<>(visitorList);
+        return new Page<>(pageInfo);
+    }
+
     public User findUserByUsername(String username) {
         QueryWrapper wrapper = new QueryWrapper();
         wrapper.eq("username", username);
         return userMapper.selectOne(wrapper);
     }
 
-    @Override
-    public User updateUser(Long id, User user) {
-        User existingUser = userMapper.findById(id);
-        if (existingUser == null) {
-            throw new RuntimeException("User not found with ID: " + id);
+        public Page<User> findAllUsers (int page, int size){
+            PageHelper.startPage(page, size);
+            List<User> users = myMapper.findAllUser();
+            return new Page<>(new PageInfo<>(users));
         }
+
+        @Override
+        public User updateUser(Long id, User user) {
+            User existingUser = userMapper.findById(id);
+            if (existingUser == null) {
+                throw new RuntimeException("User not found with ID: " + id);
+            }
 
         // Update the user properties
         existingUser.setName(user.getName());
@@ -256,7 +289,7 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
-}
+    }
 
     
 

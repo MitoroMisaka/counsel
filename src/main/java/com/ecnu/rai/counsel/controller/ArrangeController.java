@@ -129,4 +129,24 @@ public class ArrangeController {
         return Result.success("获取成功", supervisorListByDay);
     }
 
+    @RequiresRoles("admin")
+    @GetMapping("/supervisorFreeListByDay")
+    @ApiOperation("获取某天没排班的督导的基本信息列表")
+    public Result getSupervisorFreeListByDay(@RequestParam("year") Integer year,
+                                         @RequestParam("month") Integer month,
+                                         @RequestParam("day") Integer day) {
+        List<SupervisorBasicInfo> supervisorListByDay = arrangeService.findSupervisorFreeListByDay(year, month, day);
+        return Result.success("获取成功", supervisorListByDay);
+    }
+
+    @RequiresRoles("admin")
+    @GetMapping("/counselorFreeListByDay")
+    @ApiOperation("获取某天没排班的咨询师的基本信息列表")
+    public Result getCounselorFreeListByDay(@RequestParam("year") Integer year,
+                                             @RequestParam("month") Integer month,
+                                             @RequestParam("day") Integer day) {
+        List<CounselorBasicInfo> counselorListByDay = arrangeService.findCounselorFreeListByDay(year, month, day);
+        return Result.success("获取成功", counselorListByDay);
+    }
+
 }
