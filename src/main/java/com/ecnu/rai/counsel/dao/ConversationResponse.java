@@ -79,6 +79,9 @@ public class ConversationResponse {
     @ApiModelProperty(value = "会话内容")
     private Object message;
 
+    @ApiModelProperty(value = "会话评价")
+    private String comment;
+
     //从Conversation来的构造函数, 用于将Conversation转换为ConversationResponse,
     //其他属性直接使用,Conversation中的message(String)转换为ConversationResponse里面的message(List<RspMsg>)
     public ConversationResponse(Conversation conversation){
@@ -101,5 +104,6 @@ public class ConversationResponse {
         this.evaluate = conversation.getEvaluate();
         this.conversationType = conversation.getConversationType();
         this.message = gson.fromJson(conversation.getMessage(),Object.class);
+        this.comment = conversation.getComment();
     }
 }

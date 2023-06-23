@@ -3,6 +3,7 @@ package com.ecnu.rai.counsel.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
+import com.ecnu.rai.counsel.dao.UserLoginInfo;
 import com.ecnu.rai.counsel.dao.*;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
@@ -54,6 +55,9 @@ public class AccountController {
 
     @Autowired
     private SuperviseMapper superviseMapper;
+
+    @Autowired
+    private UserSigMapper userSigMapper;
 
 
     @PostMapping("/login")
@@ -109,8 +113,11 @@ public class AccountController {
         System.out.println(principal);
         QueryWrapper wrapper = new QueryWrapper();
         wrapper.eq("username",username);
+        User user = userMapper.selectOne(wrapper);
 
-        return Result.success("登录成功",new UserLoginInfo(userMapper.selectOne(wrapper)));
+        String imid = userSigMapper.getImidByName(user.getName());
+
+        return Result.success("登录成功",new UserLoginInfo(user, imid));
     }
 
     @PostMapping("/logout")
@@ -147,10 +154,10 @@ public class AccountController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<UserBasicInfo> getUserList(@RequestParam("page") Integer page,
+    public Result getUserList(@RequestParam("page") Integer page,
                                            @RequestParam("size") Integer size,
                                            @RequestParam("order") String order) {
-        return accountService.findUserList(page, size, order);
+        return Result.success("获取用户列表成功", accountService.findUserList(page, size, order));
     }
 
     @GetMapping("/counselors")
@@ -160,10 +167,10 @@ public class AccountController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<CounselorSMInfo> getCounselorList(@RequestParam("page") Integer page,
+    public Result getCounselorList(@RequestParam("page") Integer page,
                                                   @RequestParam("size") Integer size,
                                                   @RequestParam("order") String order) {
-        return accountService.findCounselorList(page, size, order);
+        return Result.success("获取咨询师列表成功", accountService.findCounselorList(page, size, order));
     }
 
     @GetMapping("/supervisors")
@@ -173,10 +180,10 @@ public class AccountController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<SupervisorSMInfo> getSupervisorList(@RequestParam("page") Integer page,
+    public Result getSupervisorList(@RequestParam("page") Integer page,
                                                     @RequestParam("size") Integer size,
                                                     @RequestParam("order") String order) {
-        return accountService.findSupervisorList(page, size, order);
+        return Result.success("获取督导列表成功", accountService.findSupervisorList(page, size, order));
     }
     @GetMapping("/visitors")
     @ApiOperation("获取访客列表")
@@ -185,10 +192,10 @@ public class AccountController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<VisitorSMInfo> getVisitorList(@RequestParam("page") Integer page,
+    public Result getVisitorList(@RequestParam("page") Integer page,
                                               @RequestParam("size") Integer size,
                                               @RequestParam("order") String order) {
-        return accountService.findVisitorList(page, size, order);
+        return Result.success("获取访客列表",accountService.findVisitorList(page, size, order));
     }
 
 
@@ -664,11 +671,10 @@ public class AccountController {
         return Result.success("更新督导信息成功", updatedSupervisor);
     }
 //禁用用户
-//    @RequiresRoles("admin")
+    @RequiresRoles("admin")
     @PostMapping("/banUser")
     public Result banUser(@Valid @RequestBody List<Long> ids)
     {
-
         if (ids == null)
             return Result.fail("No valid user.");
 
@@ -702,7 +708,7 @@ public class AccountController {
     }
 
     //咨询师页面绑定
-//    @RequiresRoles("admin")
+    @RequiresRoles("admin")
     @ApiOperation("咨询师视角绑定")
     @GetMapping("/counselor/binding/{id}")
     public Result makeSuperviseByCounselor(@PathVariable Long id,
@@ -759,6 +765,12 @@ public class AccountController {
         return Result.success("Delete successfully!");
     }
 
+    @GetMapping("getBasicStatInfo")
+    @ApiOperation("获取基本咨询统计数据")
+    public Result getBasicStatInfo() {
+
+        return Result.success("获取成功", accountService.getBasicStatInfo());
+    }
 
 }
 

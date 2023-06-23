@@ -18,6 +18,7 @@ import com.tencentcloudapi.as.v20180419.models.Instance;
 import io.github.doocs.im.ImClient;
 import io.github.doocs.im.constant.ApplyJoinOption;
 import io.github.doocs.im.constant.GroupType;
+import io.github.doocs.im.constant.OnlineOnlyFlag;
 import io.github.doocs.im.constant.SyncOtherMachine;
 import io.github.doocs.im.model.message.TIMMsgElement;
 import io.github.doocs.im.model.message.TIMTextMsgElement;
@@ -165,31 +166,32 @@ public class IMController {
         // 发送请求
         String url = "https://console.tim.qq.com/v4/group_open_http_svc/group_msg_get_simple"+
                 "?sdkappid=1400810789&identifier=administrator&"+
-                "usersig=eJw1jkELgjAYhv-LroV8W3NOoUN5SfAQldTV2LIP0clcYxD990Tr*D4PD7xvcinPkQ4DWk0yAVwCrGfmtSUZYRGQZY*qrYcBFckoB5AUEpkuBpXuHT5wDmrVYY*js7Uz9p9iM5n27p95cfMxv6Y*3x*q4pS-duPqyFipkyYUaFjbBLGpzPYXOuymV1RIIZmEmH**2SU0PQ__&"+
+                "usersig=eJw1jkEOgjAURO-SrYb8ChZo4gZ1ocGF0URkR2zFr5Y2pUGM8e4i6HLm5WXmRfbpzpOtQSsJ9*nUZwAw7ttGWsLJxAMy5FrcCmNQEE4DgIhCGMUDQSErh2fshUIorLB2tnDa-lUsO1K2pyzBxXqV6fnxmVDVGCkfh7DMWb5M9fa*0XC9CH-E9OwnOlTdL8qiMIi-i*8PSFA1Uw__&"+
                 "random=47712345&contenttype=json";
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
         System.out.println(response);
 
+
         ObjectMapper objectMapper = new ObjectMapper();
         GroupMsg groupMsg = objectMapper.readValue(response.getBody(), GroupMsg.class);
-
-        // 对From_Account进行修改
-        Iterator<RspMsg> iterator = groupMsg.getRspMsgList().iterator();
-        while (iterator.hasNext()) {
-            RspMsg rspMsg = iterator.next();
-            List<GroupMsgBody> msgBody = rspMsg.getMsgBody();
-            for (GroupMsgBody body : msgBody) {
-                if (body.getMsgType().equals("TIMTextElem")) {
-                    String text = body.getMsgContent().getText();
-                    System.out.println(text);
-                } else if (body.getMsgType().equals("TIMRelayElem")) {
-                    iterator.remove(); // Use iterator to remove the element
-                }
-            }
-            String fromAccount = rspMsg.getFromAccount();
-            String name = userSigMapper.getNameByImid(fromAccount);
-            rspMsg.setFromAccount(name);
-        }
+//
+//        // 对From_Account进行修改
+//        Iterator<RspMsg> iterator = groupMsg.getRspMsgList().iterator();
+//        while (iterator.hasNext()) {
+//            RspMsg rspMsg = iterator.next();
+//            List<GroupMsgBody> msgBody = rspMsg.getMsgBody();
+//            for (GroupMsgBody body : msgBody) {
+//                if (body.getMsgType().equals("TIMTextElem")) {
+//                    String text = body.getMsgContent().getText();
+//                    System.out.println(text);
+//                } else if (body.getMsgType().equals("TIMRelayElem")) {
+//                    iterator.remove(); // Use iterator to remove the element
+//                }
+//            }
+//            String fromAccount = rspMsg.getFromAccount();
+//            String name = userSigMapper.getNameByImid(fromAccount);
+//            rspMsg.setFromAccount(name);
+//        }
         return groupMsg;
     }
 
@@ -231,9 +233,130 @@ public class IMController {
         return result;
     }
 
+    @GetMapping("/group/info")
+    @ApiOperation("获取群组详细资料")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "group_id", value = "群组ID", required = true, dataType = "String")
+    })
+    public Object getGroupInfo(@RequestParam("group_id") String group_id) throws IOException {
+        Long sdkAppId = userSigConfig.getSdkAppId();
+        String secretKey = userSigConfig.getSecretKey();
+        String userId = "administrator";
+        ImClient client = new ImClient(sdkAppId, userId, secretKey);
+
+        List<String> groupIdList = Collections.singletonList(group_id);
+        GetGroupInfoRequest request = new GetGroupInfoRequest(groupIdList);
+
+        GetGroupInfoResult result = client.group.getGroupInfo(request);
+        return result;
+    }
+
+    @GetMapping("/group/text/single")
+    @ApiOperation("发送群聊文本消息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "group_id", value = "群组ID", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "text", value = "文本内容", required = true, dataType = "String")
+    })
+    public Object sendGroupTextMsg( @RequestParam("group_id") String group_id, @RequestParam("text") String text) throws IOException {
+        Long sdkAppId = userSigConfig.getSdkAppId();
+        String secretKey = userSigConfig.getSecretKey();
+        String userId = "administrator";
+        ImClient client = new ImClient(sdkAppId, userId, secretKey);
+
+        TIMTextMsgElement msg = new TIMTextMsgElement(text);
+        List<TIMMsgElement> msgBody = Collections.singletonList(msg);
+        SendGroupMsgRequest request = SendGroupMsgRequest.builder()
+                .groupId(group_id)
+                .random(1314L)
+                .msgBody(msgBody)
+                .onlineOnlyFlag(OnlineOnlyFlag.YES)
+                .build();
+
+        SendGroupMsgResult result = client.group.sendGroupMsg(request);
+
+        return result;
+    }
+
+    @GetMapping("/group/text")
+    @ApiOperation("发送群聊文本消息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "group_id", value = "群组ID", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "imid", value = "imid", required = true, dataType = "String")
+    })
+    public Object sendGroupTextMsgByAPI( @RequestParam("group_id") String group_id, @RequestParam("imid") String imid) throws IOException {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 设置请求头
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // 设置请求体
+        String requestBody = "{\n" +
+                "  \"GroupId\": \"" + group_id +"\",\n" +
+                "  \"From_Account\": \""+ imid +"\", \n" +
+                "  \"Random\": 8912345, \n" +
+                "  \"MsgBody\": [ \n" +
+                "      {\n" +
+                "          \"MsgType\": \"TIMTextElem\",\n" +
+                "          \"MsgContent\": {\n" +
+                "              \"Text\": \"开始会话\"\n" +
+                "          }\n" +
+                "      }\n" +
+                "  ]\n" +
+                "}";
+        System.out.println(requestBody);
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        // 发送请求
+        String url = "https://console.tim.qq.com/v4/group_open_http_svc/send_group_msg?sdkappid=1400810789&"+
+                "identifier=administrator&"+
+                "usersig=eJw1jkEOgjAURO-SrYb8ChZo4gZ1ocGF0URkR2zFr5Y2pUGM8e4i6HLm5WXmRfbpzpOtQSsJ9*nUZwAw7ttGWsLJxAMy5FrcCmNQEE4DgIhCGMUDQSErh2fshUIorLB2tnDa-lUsO1K2pyzBxXqV6fnxmVDVGCkfh7DMWb5M9fa*0XC9CH-E9OwnOlTdL8qiMIi-i*8PSFA1Uw__"+
+                "random=234235566&contenttype=json";
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+        return response;
+    }
+
+    @GetMapping("/group/send/notify")
+    @ApiOperation("发送群聊通知消息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "group_id", value = "群组ID", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "text", value = "文本内容", required = true, dataType = "String")
+    })
+    public Object sendGroupNotifyMsg( @RequestParam("group_id") String group_id, @RequestParam("text") String text) throws IOException {
+        Long sdkAppId = userSigConfig.getSdkAppId();
+        String secretKey = userSigConfig.getSecretKey();
+        String userId = "administrator";
+        ImClient client = new ImClient(sdkAppId, userId, secretKey);
 
 
 
+        return null;
+    }
 
+    @GetMapping("/group/text/system")
+    @ApiOperation("发送群聊系统消息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "group_id", value = "群组ID", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "text", value = "文本内容", required = true, dataType = "String")
+    })
+    public Object sendGroupSystemMsg( @RequestParam("group_id") String group_id, @RequestParam("text") String text) throws IOException {
+        Long sdkAppId = userSigConfig.getSdkAppId();
+        String secretKey = userSigConfig.getSecretKey();
+        String userId = "administrator";
+        ImClient client = new ImClient(sdkAppId, userId, secretKey);
+
+        List<String> toMembersAccount = Collections.singletonList("wek");
+        SendGroupSystemNotificationRequest request = SendGroupSystemNotificationRequest.builder()
+                .groupId(group_id)
+                .content(text)
+                .toMembersAccount(toMembersAccount)
+                .build();
+
+        SendGroupSystemNotificationResult result = client.group.sendGroupSystemNotification(request);
+
+        return result;
+    }
 
 }

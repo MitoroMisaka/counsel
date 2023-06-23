@@ -176,4 +176,20 @@ public class SupervisorServiceImpl implements SupervisorService {
         return new Page<>(new PageInfo<>(supervisorBusy));
     }
 
+    @Override
+    public HashMap<String, Integer> getBasicStatInfoBySupervisor(Long supervisorId) {
+        Integer totalNumCounselor = conversationMapper.findTodayNumBySupervisor(supervisorId);
+        Integer totalTime = conversationMapper.findTodayTotalBySupervisor(supervisorId);
+        Integer curNum = conversationMapper.findCurrentNumBySupervisor(supervisorId);
+        Integer totalNumSupervisor = dialogueMapper.findTodayNumBySupervisor(supervisorId);
+        totalNumCounselor = totalNumCounselor + curNum;
+        HashMap<String, Integer> h = new HashMap<>();
+        h.put("totalNumCounselor",totalNumCounselor);
+        h.put("totalTime",totalTime);
+        h.put("curNum",curNum);
+        h.put("totalNumSupervisor",totalNumSupervisor);
+        return h;
+
+    }
+
 }

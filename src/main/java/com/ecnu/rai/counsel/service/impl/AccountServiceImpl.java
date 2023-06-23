@@ -10,12 +10,7 @@ import com.ecnu.rai.counsel.dao.SupervisorSMInfo;
 import com.ecnu.rai.counsel.dao.UserBasicInfo;
 import com.ecnu.rai.counsel.dao.VisitorSMInfo;
 import com.ecnu.rai.counsel.entity.*;
-import com.ecnu.rai.counsel.mapper.MyMapper;
-import com.ecnu.rai.counsel.mapper.UserMapper;
-import com.ecnu.rai.counsel.mapper.AdminMapper;
-import com.ecnu.rai.counsel.mapper.CounselorMapper;
-import com.ecnu.rai.counsel.mapper.SupervisorMapper;
-import com.ecnu.rai.counsel.mapper.VisitorMapper;
+import com.ecnu.rai.counsel.mapper.*;
 import com.ecnu.rai.counsel.service.AccountService;
 import com.ecnu.rai.counsel.service.CounselorService;
 import com.ecnu.rai.counsel.service.SupervisorService;
@@ -28,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -56,6 +52,12 @@ public class AccountServiceImpl implements AccountService {
     private SupervisorService supervisorService;
 
     @Autowired
+    private ConversationMapper conversationMapper;
+
+    @Autowired
+    private DialogueMapper dialogueMapper;
+
+    @Autowired
     private WXService wxService;
 
     @Override
@@ -74,8 +76,7 @@ public class AccountServiceImpl implements AccountService {
     public Page<CounselorSMInfo> findCounselorList(Integer page, Integer size, String order) {
         PageHelper.startPage(page, size, order);
         List<CounselorSMInfo> counselorList = counselorService.getAllCounselor();
-        PageInfo<CounselorSMInfo> pageInfo = new PageInfo<>(counselorList);
-        return new Page<>(pageInfo);
+        return new Page<>(new PageInfo<>(counselorList));
     }
 
     @Override
@@ -281,6 +282,21 @@ public class AccountServiceImpl implements AccountService {
             return supervisor != null;
         }
 
+    @Override
+    public HashMap<String, Integer> getBasicStatInfo() {
+        Integer totalNumCounselor = conversationMapper.findTodayNum();
+        Integer totalTime = conversationMapper.findTodayTotal();
+        Integer curNum = conversationMapper.findCurrentNum();
+        Integer totalNumSupervisor = dialogueMapper.findTodayNum();
+        totalNumCounselor = totalNumCounselor + curNum;
+        HashMap<String, Integer> h = new HashMap<>();
+        h.put("totalNumCounselor",totalNumCounselor);
+        h.put("totalTime",totalTime);
+        h.put("curNum",curNum);
+        h.put("totalNumSupervisor",totalNumSupervisor);
+        return h;
+
+    }
 
     }
 

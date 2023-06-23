@@ -1,13 +1,11 @@
 package com.ecnu.rai.counsel.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ecnu.rai.counsel.entity.Arrange;
 import com.ecnu.rai.counsel.entity.Conversation;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
-import java.util.HashMap;
 import java.util.List;
 
 @Repository
@@ -19,6 +17,10 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
 
     @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND user = #{user} AND status = 'FINISHED' ORDER BY id DESC")
     List<Conversation> findGroupMsgByCounselorUser(String counselor, String user);
+
+    //find the last conversation id by counselor and user and status is STARTED
+    @Select("SELECT id FROM conversation WHERE counselor = #{counselor} AND user = #{user} AND status = 'STARTED' ORDER BY id DESC LIMIT 1")
+    Long findConversationByCounselorAndUser(@Param("counselor") String counselor, @Param("user") String user);
 
     @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND status = 'FINISHED' ORDER BY id DESC")
     List<Conversation> findGroupMsgByCounselor(String counselor);
@@ -69,6 +71,28 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
             "WHERE id = #{conversation.id}")
     void updateConversation(@Param("conversation") Conversation conversation);
 
+    @Update("UPDATE conversation SET " +
+            "create_time = #{conversation.createTime}, " +
+            "creator = #{conversation.creator}, " +
+            "last_update_time = #{conversation.lastUpdateTime}, " +
+            "last_updater = #{conversation.lastUpdater}, " +
+            "user = #{conversation.user}, " +
+            "counselor = #{conversation.counselor}, " +
+            "visitor_name = #{conversation.visitorName}, " +
+            "evaluate = #{conversation.evaluate}, " +
+            "conversation_type = #{conversation.conversationType}," +
+            "message = #{conversation.message}" +
+            "WHERE id = #{conversation.id}")
+    void updateConversationUser(@Param("conversation") Conversation conversation);
+
+    @Update("UPDATE conversation SET " +
+            "last_update_time = #{conversation.lastUpdateTime}, " +
+            "last_updater = #{conversation.lastUpdater}, " +
+            "status = #{conversation.status}, " +
+            "comment = #{conversation.comment} " +
+            "WHERE id = #{conversation.id}")
+    void updateConversationCounselor(@Param("conversation") Conversation conversation);
+
     @Select("SELECT * FROM conversation WHERE user = #{user}")
     List<Conversation> findByUser(@Param("user") Long user);
 
@@ -101,6 +125,12 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
 
     @Select("SELECT COUNT(*) " +
             "FROM conversation " +
+            "WHERE counselor= #{supervisor} AND  +" +
+            "DATE(start_time) = DATE(SYSDATE()) ")
+    Integer findTodayNumBySupervisor(@Param("supervisor") Long supervisor);
+
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
             "WHERE  DATE(start_time) = DATE(SYSDATE())")
     Integer findTodayNum();
 
@@ -123,6 +153,12 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
 
     @Select("SELECT IFNULL(SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ),0) " +
             "FROM conversation " +
+            "WHERE counselor= #{supervisor} AND " +
+            "DATE(start_time) = DATE(SYSDATE())")
+    Integer findTodayTotalBySupervisor(@Param("supervisor") Long supervisor);
+
+    @Select("SELECT SUM( ( UNIX_TIMESTAMP(end_time) - UNIX_TIMESTAMP(start_time) ) / 60 ) " +
+            "FROM conversation " +
             "WHERE DATE(start_time) = DATE(SYSDATE())")
     Integer findTodayTotal();
 
@@ -134,9 +170,14 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     @Select("SELECT COUNT(*) " +
             "FROM conversation " +
             "WHERE counselor= #{counselor} AND " +
-            "status = 'active'")
+            "status = 'STARTED'")
     Integer findCurrentNumByCounselor(@Param("counselor") Long counselor);
 
+    @Select("SELECT COUNT(*) " +
+            "FROM conversation " +
+            "WHERE counselor= #{supervisor} AND " +
+            "status = 'STARTED'")
+    Integer findCurrentNumBySupervisor(@Param("supervisor") Long supervisor);
 
 
 }

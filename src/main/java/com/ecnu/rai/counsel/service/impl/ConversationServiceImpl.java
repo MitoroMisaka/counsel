@@ -3,8 +3,6 @@ package com.ecnu.rai.counsel.service.impl;
 import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.dao.ConversationResponse;
 import com.ecnu.rai.counsel.entity.Conversation;
-import com.ecnu.rai.counsel.entity.Counselor;
-import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.mapper.ConversationMapper;
 import com.ecnu.rai.counsel.mapper.UserMapper;
 import com.ecnu.rai.counsel.response.ConsultInfo;
@@ -30,13 +28,17 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public Page<ConversationResponse> findGroupMsgByCounselorUser(String counselor, String user, Integer page, Integer size, String order){
-        PageHelper.startPage(page, size, order);
         String counselor_id = String.valueOf(userMapper.findIdByName(counselor));
         String user_id = String.valueOf(userMapper.findIdByName(user));
+        PageHelper.startPage(page, size, order);
         List<Conversation> conversationList = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id);
         List<ConversationResponse> conversationResponseList = new ArrayList<>();
         for(Conversation conversation : conversationList){
             ConversationResponse conversationResponse = new ConversationResponse(conversation);
+            conversationResponse.setCounselor(userMapper.findNameById(conversation.getCounselor()));
+            conversationResponse.setUser(userMapper.findNameById(conversation.getUser()));
+            conversationResponse.setCreator(userMapper.findNameById(conversation.getCreator()));
+            conversationResponse.setLastUpdater(userMapper.findNameById(conversation.getLastUpdater()));
             conversationResponseList.add(conversationResponse);
         }
         PageInfo<ConversationResponse> pageInfo = new PageInfo<>(conversationResponseList);
@@ -86,37 +88,32 @@ public class ConversationServiceImpl implements ConversationService {
 
     @Override
     public Page<ConversationResponse> findConversationByUser(Long user, Integer page, Integer size, String order) {
+        List<ConversationResponse> conversationResponseList = new ArrayList<>();
         // 构造分页参数
         PageHelper.startPage(page, size, order);
-
         List<Conversation> conversationList = conversationMapper.findByUser(user);
 
         for(Conversation conversation : conversationList){
             conversation.setCounselor(userMapper.findNameById(conversation.getCounselor()));
             conversation.setUser(userMapper.findNameById(conversation.getUser()));
-        }
-        List<ConversationResponse> conversationResponseList = new ArrayList<>();
-        for(Conversation conversation : conversationList){
             ConversationResponse conversationResponse = new ConversationResponse(conversation);
             conversationResponseList.add(conversationResponse);
         }
 
         // 返回分页后的结果
-        return new Page<>(new PageInfo<>(conversationResponseList));
+        return new Page<ConversationResponse>(new PageInfo<ConversationResponse>(conversationResponseList));
     }
 
     @Override
     public Page<ConversationResponse> findConversationByCounselor(Long counselor, Integer page, Integer size, String order) {
+        List<ConversationResponse> conversationResponseList = new ArrayList<>();
         // 构造分页参数
         PageHelper.startPage(page, size, order);
-
         List<Conversation> conversationList = conversationMapper.findByCounselor(counselor);
+
         for(Conversation conversation : conversationList){
             conversation.setCounselor(userMapper.findNameById(conversation.getCounselor()));
             conversation.setUser(userMapper.findNameById(conversation.getUser()));
-        }
-        List<ConversationResponse> conversationResponseList = new ArrayList<>();
-        for(Conversation conversation : conversationList){
             ConversationResponse conversationResponse = new ConversationResponse(conversation);
             conversationResponseList.add(conversationResponse);
         }
@@ -128,7 +125,6 @@ public class ConversationServiceImpl implements ConversationService {
     public Page<Conversation> findConversationByCounselorUserDate(Long counselor, Long user, Date date, Integer page, Integer size, String order) {
         // 构造分页参数
         PageHelper.startPage(page, size, order);
-
         List<Conversation> conversationList = conversationMapper.findByCounselorUserDate(counselor, user, date);
 
         // 返回分页后的结果

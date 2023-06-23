@@ -1,11 +1,8 @@
 package com.ecnu.rai.counsel.controller;
 
-import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
-import com.ecnu.rai.counsel.dao.AvailableCounselor;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
 import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
-import com.ecnu.rai.counsel.entity.Conversation;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.mapper.*;
@@ -14,14 +11,11 @@ import com.ecnu.rai.counsel.service.SupervisorService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import org.apache.ibatis.annotations.Param;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -111,8 +105,8 @@ public class CounselorController {
     @GetMapping("/getCounselorRankingByWork")
     @ApiOperation("获取咨询师月咨询数量排名")
     @ApiImplicitParam(name = "listSize", value = "排名列表长度", required = true, dataType = "Integer")
-    public Result getCounselorRankingByWork(@RequestParam Integer len) {
-        List<CounselorMonthlyWork> counselorRanking = counselorService.getCounselorRankingByWork(len);
+    public Result getCounselorRankingByWork(@RequestParam Integer listSize) {
+        List<CounselorMonthlyWork> counselorRanking = counselorService.getCounselorRankingByWork(listSize);
         return Result.success("获取成功", counselorRanking);
     }
 
@@ -120,8 +114,8 @@ public class CounselorController {
     @GetMapping("/getCounselorRankingByStar")
     @ApiOperation("获取咨询师月好评数量排名")
     @ApiImplicitParam(name = "listSize", value = "排名列表长度", required = true, dataType = "Integer")
-    public Result getCounselorRankingByStar(@RequestParam Integer len) {
-        List<CounselorMonthlyStar> counselorRanking = counselorService.getCounselorRankingByStar(len);
+    public Result getCounselorRankingByStar(@RequestParam Integer listSize) {
+        List<CounselorMonthlyStar> counselorRanking = counselorService.getCounselorRankingByStar(listSize);
         return Result.success("获取成功", counselorRanking);
     }
 
@@ -192,12 +186,11 @@ public class CounselorController {
         return Result.success("获取成功",counselorService.getAvailableCounselorByBusy(page, size, order));
     }
 
-    @GetMapping("getBasicStatInfo")
-    @ApiOperation("获取基本资询统计数据")
-    public Result getBasicStatInfo() {
+    @GetMapping("getBasicStatInfoByCounselor")
+    @ApiOperation("获取咨询师基本资询统计数据")
+    public Result getBasicStatInfoByCounselor(@RequestParam("counselorId") Long counselorId) {
 
-
-        return Result.success("获取成功",counselorService.getBasicStatInfo());
+        return Result.success("获取成功",counselorService.getBasicStatInfoByCounselor(counselorId));
     }
 
     @GetMapping("getNumByWeek")

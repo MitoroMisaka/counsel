@@ -5,6 +5,7 @@ import com.ecnu.rai.counsel.common.Page;
 import com.ecnu.rai.counsel.common.Result;
 import com.ecnu.rai.counsel.dao.ConversationIdList;
 import com.ecnu.rai.counsel.dao.ConversationResponse;
+import com.ecnu.rai.counsel.dao.group.GetGroupMsgCounselor;
 import com.ecnu.rai.counsel.dao.group.GetGroupMsgResponse;
 import com.ecnu.rai.counsel.dao.group.GroupMsg;
 import com.ecnu.rai.counsel.dao.group.RspMsg;
@@ -31,7 +32,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -74,13 +77,18 @@ public class ConversationController {
             Result.fail("咨询师咨询次数已达上限");
         }
         conversation.setStatus("STARTED");
-        Conversation new_conversation = conversationService.insertConversationByID(conversation);
-        String counselor_name = userMapper.findNameById(conversation.getCounselor());
-        String counselor_imid = userSigMapper.getImidByName(counselor_name);
-        String user_name = userMapper.findNameById(conversation.getUser());
+        conversation.setYear(LocalDateTime.now().getYear());
+        conversation.setMonth(LocalDateTime.now().getMonth());
+        conversation.setDay(LocalDateTime.now().getDayOfMonth());
+        conversation.setStartTime(Timestamp.valueOf(LocalDateTime.now()));
 
-        Object result = imController.createGroup(counselor_name , user_name, counselor_imid);
-        return Result.success("获取成功", result);
+        Conversation new_conversation = conversationService.insertConversationByID(conversation);
+//        String counselor_name = userMapper.findNameById(conversation.getCounselor());
+//        String counselor_imid = userSigMapper.getImidByName(counselor_name);
+//        String user_name = userMapper.findNameById(conversation.getUser());
+//
+//        Object result = imController.createGroup(counselor_name , user_name, counselor_imid);
+        return Result.success("获取成功", new_conversation);
     }
 
     @PostMapping("/update")
@@ -95,14 +103,14 @@ public class ConversationController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "user", value = "用户id", required = true, dataType = "Long"),
             @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "page", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<ConversationResponse> getConversationbyUser(@RequestParam("user") Long user,
-                                               @RequestParam("page") Integer page,
-                                               @RequestParam("size") Integer size,
-                                               @RequestParam("order") String order) {
-        return conversationService.findConversationByUser(user, page, size, order);
+    public Result getConversationbyUser(@RequestParam(value = "user") Long user,
+                                                            @RequestParam(value = "page") Integer page,
+                                                            @RequestParam(value = "page") Integer size,
+                                                            @RequestParam(value = "order") String order) {
+        return Result.success("获取会话信息成功", conversationService.findConversationByUser(user, page, size, order));
     }
 
     @GetMapping("/counselor")
@@ -113,11 +121,11 @@ public class ConversationController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<ConversationResponse> getConversationbyCounselor(@RequestParam("counselor") Long counselor,
+    public Result getConversationbyCounselor(@RequestParam("counselor") Long counselor,
                                                                  @RequestParam("page") Integer page,
                                                                  @RequestParam("size") Integer size,
                                                                  @RequestParam("order") String order) {
-        return conversationService.findConversationByCounselor(counselor, page, size, order);
+        return Result.success("获取会话信息成功", conversationService.findConversationByCounselor(counselor, page, size, order));
     }
 
     @GetMapping("/counselorUserDate")
@@ -130,13 +138,18 @@ public class ConversationController {
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<Conversation> getConversationbyCounselorUserDate(@RequestParam("counselor") Long counselor,
+    public Result getConversationbyCounselorUserDate(@RequestParam("counselor") Long counselor,
                                                                  @RequestParam("user") Long user,
-                                                                 @RequestParam("date") Date date,
+                                                                 @RequestParam("date") String date,
                                                                  @RequestParam("page") Integer page,
                                                                  @RequestParam("size") Integer size,
-                                                                 @RequestParam("order") String order) {
-        return conversationService.findConversationByCounselorUserDate(counselor, user, date, page, size, order);
+                                                                 @RequestParam("order") String order) throws ParseException {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        java.util.Date util_date = simpleDateFormat.parse(date);
+        java.sql.Date sql_date = new java.sql.Date(util_date.getTime());
+
+        return Result.success("获取会话信息成功", conversationService.findConversationByCounselorUserDate(counselor, user, sql_date, page, size, order));
     }
 
     @GetMapping("/counselorConsultInfo")
@@ -207,20 +220,20 @@ public class ConversationController {
                 .creator(counselor_id_str)
                 .lastUpdateTime(LocalDateTime.now())
                 .lastUpdater(counselor_id_str)
-                .year(getGroupMsgResponse.getStartTime().toLocalDateTime().getYear())
-                .month(getGroupMsgResponse.getStartTime().toLocalDateTime().getMonth())
-                .day(getGroupMsgResponse.getStartTime().toLocalDateTime().getDayOfMonth())
-                .startTime(getGroupMsgResponse.getStartTime())
-                .endTime(getGroupMsgResponse.getEndTime())
+//                .year(getGroupMsgResponse.getStartTime().toLocalDateTime().getYear())
+//                .month(getGroupMsgResponse.getStartTime().toLocalDateTime().getMonth())
+//                .day(getGroupMsgResponse.getStartTime().toLocalDateTime().getDayOfMonth())
+//                .startTime(getGroupMsgResponse.getStartTime())
+                .endTime(Timestamp.valueOf(LocalDateTime.now()))
                 .user(user_id_str)
                 .counselor(counselor_id_str)
-                .status("FINISHED")
+//                .status("FINISHED")
                 .visitorName(getGroupMsgResponse.getUsername())
                 .evaluate(getGroupMsgResponse.getRating())
                 .conversationType("评价:"+getGroupMsgResponse.getComment())
                 .message(history)
                 .build();
-        conversationMapper.updateConversation(conversation);
+        conversationMapper.updateConversationUser(conversation);
         String counselorid = String.valueOf(userMapper.findIdByName(getGroupMsgResponse.getCounselorname()));
         List<Conversation> conversations1 = conversationMapper.findGroupMsgByCounselor(counselorid);
         Double sum = 0.0;
@@ -233,6 +246,45 @@ public class ConversationController {
         counselorMapper.updateCounselorRating(name , average);
 
         return Result.success("save and insert conversation ");
+    }
+
+    @PostMapping("/save_group_msg/counselor")
+    @ApiOperation(value = "存储群聊信息/结束会话", notes = "save the conversation ")
+    @ResponseBody
+    public Result saveGroupMsgByCounselor(@Valid @RequestBody GetGroupMsgCounselor getGroupMsgResponse) throws Exception {
+
+        System.out.println(getGroupMsgResponse);
+
+        Long counselor_id = userMapper.findIdByName(getGroupMsgResponse.getCounselorname());
+        Long user_id = userMapper.findIdByName(getGroupMsgResponse.getUsername());
+
+        String counselor_id_str = String.valueOf(counselor_id);
+        String user_id_str = String.valueOf(user_id);
+
+        Long conversation_id = conversationMapper.findConversationByCounselorAndUser(counselor_id_str , user_id_str);
+
+        Conversation conversation = Conversation.builder()
+                .id(conversation_id)
+//                .createTime(LocalDateTime.now())
+//                .creator(counselor_id_str)
+                .lastUpdateTime(LocalDateTime.now())
+                .lastUpdater(counselor_id_str)
+//                .year(getGroupMsgResponse.getStartTime().toLocalDateTime().getYear())
+//                .month(getGroupMsgResponse.getStartTime().toLocalDateTime().getMonth())
+//                .day(getGroupMsgResponse.getStartTime().toLocalDateTime().getDayOfMonth())
+//                .startTime(getGroupMsgResponse.getStartTime())
+//                .endTime(getGroupMsgResponse.getEndTime())
+//                .user(user_id_str)
+//                .counselor(counselor_id_str)
+                .status("FINISHED")
+//                .visitorName(getGroupMsgResponse.getUsername())
+//                .evaluate(getGroupMsgResponse.getRating())
+                .comment("评价:"+getGroupMsgResponse.getComment())
+//                .message(history)
+                .build();
+        conversationMapper.updateConversationCounselor(conversation);
+
+        return Result.success("save and insert conversation by counselor success");
     }
 
     @GetMapping("/get_group_msg")

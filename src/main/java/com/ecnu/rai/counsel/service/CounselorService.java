@@ -33,7 +33,7 @@ public interface CounselorService {
 
     Page<HashMap<String,String>> getAvailableCounselorByBusy(Integer page, Integer size, String order);
 
-    HashMap<String, Integer> getBasicStatInfo();
+    HashMap<String, Integer> getBasicStatInfoByCounselor(Long counselorId);
 
     List<TreeMap<String, Integer>> getNumByWeek();
 

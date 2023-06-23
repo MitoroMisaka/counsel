@@ -102,6 +102,12 @@ public interface DialogueMapper extends BaseMapper<Dialogue>{
 
     @Select("SELECT COUNT(*) " +
             "FROM dialogue " +
+            "WHERE counselor= #{counselor} AND  +" +
+            "DATE(start_time) = DATE(SYSDATE()) ")
+    Integer findTodayNumByCounselor(@Param("counselor") Long counselor);
+
+    @Select("SELECT COUNT(*) " +
+            "FROM dialogue " +
             "WHERE  DATE(start_time) = DATE(SYSDATE())")
     Integer findTodayNum();
 
