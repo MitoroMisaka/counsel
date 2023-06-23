@@ -90,7 +90,7 @@ public class ConversationServiceImpl implements ConversationService {
     public Page<ConversationResponse> findConversationByUser(Long user, Integer page, Integer size, String order) {
         List<ConversationResponse> conversationResponseList = new ArrayList<>();
         // 构造分页参数
-        PageHelper.startPage(page, page, order);
+        PageHelper.startPage(page, size, order);
         List<Conversation> conversationList = conversationMapper.findByUser(user);
 
         for(Conversation conversation : conversationList){
