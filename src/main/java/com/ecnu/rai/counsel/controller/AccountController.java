@@ -710,7 +710,7 @@ public class AccountController {
     //咨询师页面绑定
     @RequiresRoles("admin")
     @ApiOperation("咨询师视角绑定")
-    @GetMapping("/counselor/binding/{id}")
+    @PostMapping("/counselor/binding/{id}")
     public Result makeSuperviseByCounselor(@PathVariable Long id,
                                           @Valid @RequestBody List<Long> supervisorsId)
     {
@@ -732,7 +732,7 @@ public class AccountController {
     //督导页面绑定
     @RequiresRoles("admin")
     @ApiOperation("督导视角绑定")
-    @GetMapping("/supervisor/binding/{id}")
+    @PostMapping("/supervisor/binding/{id}")
     public Result makeSuperviseBySupervisor(@PathVariable Long id,
                                            @Valid @RequestBody List<Long> counselorsId)
     {
