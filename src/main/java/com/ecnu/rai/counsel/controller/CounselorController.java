@@ -29,14 +29,6 @@ public class CounselorController {
     @Autowired
     private UserMapper userMapper;
 
-    @Autowired
-    private CounselorMapper counselorMapper;
-
-    @Autowired
-    private ConversationMapper conversationMapper;
-
-    @Autowired
-    private SupervisorService supervisorService;
 
     @PostMapping("/add")
     @ApiOperation("添加咨询师(弃用，参考AccountController里面接口)")
@@ -177,7 +169,7 @@ public class CounselorController {
     public Result getCounselorList(@RequestParam("page") Integer page,
                                    @RequestParam("size") Integer size,
                                    @RequestParam("order") String order) {
-        return Result.success("获取成功", counselorService.getCounselorList(page, size, order));
+        return Result.success("获取咨询师列表成功", counselorService.getCounselorList(page, size, order));
     }
 
     @GetMapping("getAvailableCounselor")

@@ -42,6 +42,9 @@ public class SupervisorServiceImpl implements SupervisorService {
     @Autowired
     private UserSigMapper userSigMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public void addCounselors(Long id, Long counselorIds) {
         superviseMapper.makeSupervise(id, counselorIds);
@@ -112,6 +115,7 @@ public class SupervisorServiceImpl implements SupervisorService {
             supervisorSMInfo = new SupervisorSMInfo(supervisor);
             supervisorSMInfo.SetTotalNum(dialogueMapper.findTotalNumSupervisor(supervisor.getId()));
             supervisorSMInfo.SetTotalTime(dialogueMapper.findTotalBySupervisor(supervisor.getId()));
+            supervisorSMInfo.setState(userMapper.findStateById(supervisor.getId()));
             List<Integer> Days = arrangeMapper.findDayArrange(supervisor.getId());
             for (Integer day : Days) {
                 supervisorSMInfo.setTotalDay(day);

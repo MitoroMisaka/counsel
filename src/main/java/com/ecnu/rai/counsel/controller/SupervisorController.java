@@ -83,12 +83,12 @@ public class SupervisorController {
 
     @GetMapping("/list")
     @ApiOperation("获取督导列表")
-    public Page<Supervisor> getSupervisorList(
+    public Result getSupervisorList(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
             @RequestParam(value = "order", defaultValue = "id asc") String order
     ) {
-        return supervisorService.getSupervisorList(page, size, order);
+        return Result.success("获取督导列表成功", supervisorService.getSupervisorList(page, size, order));
     }
 
     @GetMapping("/available")
