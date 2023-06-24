@@ -81,7 +81,7 @@ public class DialogueServiceImpl implements DialogueService {
     @Override
     public Page<Dialogue> findDialogueBySupervisor(Long supervisor, Integer page, Integer size, String order) {
 
-        List<Dialogue> dialogueList = dialogueMapper.findBySupervisor(supervisor, order);
+        List<Dialogue> dialogueList = dialogueMapper.findBySupervisor(supervisor);
 
         for(Dialogue dialogue : dialogueList){
             dialogue.setCounselor(userMapper.findNameById(dialogue.getCounselor()));
@@ -95,7 +95,7 @@ public class DialogueServiceImpl implements DialogueService {
     @Override
     public Page<Dialogue> findDialogueByCounselor(Long counselor, Integer page, Integer size, String order) {
 
-        List<Dialogue> dialogueList = dialogueMapper.findByCounselor(counselor, order);
+        List<Dialogue> dialogueList = dialogueMapper.findByCounselor(counselor);
         for(Dialogue dialogue : dialogueList){
             dialogue.setCounselor(userMapper.findNameById(dialogue.getCounselor()));
             dialogue.setSupervisor(userMapper.findNameById(dialogue.getSupervisor()));

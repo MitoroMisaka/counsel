@@ -72,7 +72,7 @@ public class DialogueController {
     }
 
     @PostMapping("/start")
-    @ApiOperation("开始会话(就是建个表,给出咨询师和用户的姓名就行)")
+    @ApiOperation("开始会话(就是建个表,给出咨询师和督导的姓名就行)")
     public Result insertdialogue(@Valid @RequestBody Dialogue dialogue) throws IOException {
 //        Integer maxConsult = dialogueMapper.getMaxConsult(dialogue.getCounselor());
 //        if(maxConsult.equals(dialogueMapper.getConsultNum(dialogue.getCounselor()))){

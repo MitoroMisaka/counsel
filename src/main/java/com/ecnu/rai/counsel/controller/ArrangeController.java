@@ -36,6 +36,18 @@ public class ArrangeController {
     //添加接口的信息,id, creator,updater,updateTime,createTime,year,month,day可以不用给出
     @ApiOperation("添加排班信息,给出startTime endTime user role weekday 即可")
     public Result addArrange(@RequestBody Arrange arrange){
+        Integer year = LocalDateTime.now().getYear();
+        Integer month = LocalDateTime.now().getMonthValue();
+        Integer day = LocalDateTime.now().getDayOfMonth();
+
+        List<CounselorBasicInfo> workingCounselorToday = arrangeService.findCounselorListByDay(year, month, day);
+
+        for (CounselorBasicInfo counselor : workingCounselorToday) {
+            if (counselor.getId().equals(arrange.getUser())) {
+                return Result.fail("该员工今天已经有排班了");
+            }
+        }
+
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
         arrange.setCreator(currentUser.getId());
         arrange.setLastUpdater(currentUser.getId());

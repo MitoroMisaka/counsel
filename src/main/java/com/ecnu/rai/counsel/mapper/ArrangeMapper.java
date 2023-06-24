@@ -17,7 +17,7 @@ import java.util.List;
 public interface ArrangeMapper extends BaseMapper<Arrange> {
 
     @Insert("INSERT INTO arrange (create_time, creator, last_update_time, last_updater, year, month, day, start_time, end_time, user, role, weekday, local_date) " +
-            "VALUES (#{arrange.createTime}, #{arrange.creator}, #{arrange.lastUpdate_time}, #{arrange.lastUpdater}, #{arrange.year}, #{arrange.month}, #{arrange.day}, #{arrange.startTime}, #{arrange.endTime}, #{arrange.user}, #{arrange.role}, #{arrange.weekday}, #{arrange.localDate})")
+            "VALUES (#{arrange.createTime}, #{arrange.creator}, #{arrange.lastUpdateTime}, #{arrange.lastUpdater}, #{arrange.year}, #{arrange.month}, #{arrange.day}, #{arrange.startTime}, #{arrange.endTime}, #{arrange.user}, #{arrange.role}, #{arrange.weekday}, #{arrange.localDate})")
     void insertArrange(@Param("arrange") Arrange arrange);
 
     @Select("SELECT * FROM arrange WHERE id = #{id}")
