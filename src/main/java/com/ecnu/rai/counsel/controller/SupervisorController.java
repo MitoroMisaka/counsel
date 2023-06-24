@@ -93,13 +93,13 @@ public class SupervisorController {
 
     @GetMapping("/available")
     @ApiOperation("获取可用督导列表")
-    public Page<AvailableSupervisor> getAvailableSupervisorList(
+    public Result getAvailableSupervisorList(
             @RequestParam(value = "counselorId") Long counselorId,
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
             @RequestParam(value = "order", defaultValue = "id_asc") String order
     ) {
-        return supervisorService.getAvailableSupervisorList(counselorId, page, size, order);
+        return Result.success("获取成功", supervisorService.getAvailableSupervisorList(counselorId, page, size, order));
     }
 
     @PostMapping("/update")
