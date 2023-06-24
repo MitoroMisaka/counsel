@@ -168,17 +168,23 @@ public class DialogueController {
     public Object saveHistory(@Valid @RequestBody DialogueRequest request) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
-        String supervisor_id = userMapper.findIdByName(request.getSupervisor()).toString();
-        String counselor_id = userMapper.findIdByName(request.getCounselor()).toString();
+//        String supervisor_id = userMapper.findIdByName(request.getSupervisor()).toString();
+//        String counselor_id = userMapper.findIdByName(request.getCounselor()).toString();
 
-        Dialogue dialogue = dialogueMapper.getLastDialogue(supervisor_id, counselor_id);
+        Dialogue dialogue = dialogueMapper.getDialogueById(request.getDialogue_id());
+
+        String supervisor_id = dialogue.getSupervisor();
+        String counselor_id = dialogue.getCounselor();
+
+        String counselor_name = userMapper.findNameById(counselor_id);
+        String supervisor_name = userMapper.findNameById(supervisor_id);
 
         // 设置请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String counelor_imid = userSigMapper.getImidByName(request.getCounselor());
-        String supervisor_imid = userSigMapper.getImidByName(request.getSupervisor());
+        String counelor_imid = userSigMapper.getImidByName(counselor_name);
+        String supervisor_imid = userSigMapper.getImidByName(supervisor_name);
 
         Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
         ZoneId zone = ZoneId.of("Asia/Shanghai"); // 设置为您所需的时区

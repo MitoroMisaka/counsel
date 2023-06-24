@@ -85,10 +85,10 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
                                         @Param("month") Integer month,
                                         @Param("day") Integer day);
 
-    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='counselor' ")
+    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='COUNSELOR' ")
     List<Long> findCounselorByCurrentTime();
 
-    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='supervisor' AND state <> 0")
+    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='SUPERVISOR' AND state <> 0")
     List<Long> findSupervisorByCurrentTime();
 
     @Select("SELECT day FROM arrange WHERE user = #{user} and year = YEAR(CURRENT_DATE()) and month = MONTH(CURRENT_DATE())")

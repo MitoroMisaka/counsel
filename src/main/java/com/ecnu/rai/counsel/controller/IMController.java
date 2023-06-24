@@ -88,11 +88,23 @@ public class IMController {
         String userId = "administrator";
         ImClient client = new ImClient(sdkAppId, userId, secretKey);
 
+//        CreateGroupRequest request = CreateGroupRequest.builder()
+//                .type(GroupType.PUBLIC)
+//                .name(counselor_name)
+//                .ownerAccount(owner)
+//                .groupId(PinyinUtil.convertToPinyin(counselor_name))
+//                .introduction("心理咨询组")
+//                .notification("欢迎开始心理咨询")
+//                .faceUrl("https://avatars.githubusercontent.com/u/43716716?s=200&v=4")
+//                .maxMemberCount(500)
+//                .applyJoinOption(ApplyJoinOption.FREE_ACCESS)
+//                .build();
+
         CreateGroupRequest request = CreateGroupRequest.builder()
                 .type(GroupType.PUBLIC)
-                .name(counselor_name)
+                .name(counselor_name+ "_" + user_name)
                 .ownerAccount(owner)
-                .groupId(PinyinUtil.convertToPinyin(counselor_name))
+                .groupId(PinyinUtil.convertToPinyin(counselor_name + user_name))
                 .introduction("心理咨询组")
                 .notification("欢迎开始心理咨询")
                 .faceUrl("https://avatars.githubusercontent.com/u/43716716?s=200&v=4")

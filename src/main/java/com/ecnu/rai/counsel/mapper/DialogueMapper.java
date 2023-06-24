@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface DialogueMapper extends BaseMapper<Dialogue>{
     @Select("SELECT * FROM dialogue WHERE id = #{dialogue_id}")
-    Conversation getDialogueById(@Param("dialogue_id") Long dialogue_id);
+    Dialogue getDialogueById(@Param("dialogue_id") Long dialogue_id);
 
     //get the last dialogue by supervisor and counselor and status is STARTED
     @Select("SELECT * FROM dialogue WHERE supervisor = #{supervisor} AND counselor = #{counselor} AND status = 'STARTED' ORDER BY id DESC LIMIT 1")

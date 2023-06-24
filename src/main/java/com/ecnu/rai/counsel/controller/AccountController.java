@@ -200,16 +200,16 @@ public class AccountController {
 
         User user = accountService.findUserByID(id);
         String role = user.getRole();
-        if(role.equals("visitor")) {
+        if(role.equals("VISITOR")) {
             Visitor visitor = visitorMapper.selectById(id);
             return Result.success("获取成功", visitor);
-        } else if(role.equals("supervisor")) {
+        } else if(role.equals("SUPERVISOR")) {
             Supervisor supervisor = supervisorMapper.selectById(id);
             return Result.success("获取成功", supervisor);
-        } else if(role.equals("counselor")) {
+        } else if(role.equals("COUNSELOR")) {
             Counselor counselor = counselorMapper.selectById(id);
             return Result.success("获取成功", counselor);
-        } else if(role.equals("admin")) {
+        } else if(role.equals("ADMIN")) {
             Admin admin = adminMapper.selectById(id);
             return Result.success("获取成功", admin);
         }
