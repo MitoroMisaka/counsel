@@ -30,8 +30,7 @@ public class ConversationServiceImpl implements ConversationService {
     public Page<ConversationResponse> findGroupMsgByCounselorUser(String counselor, String user, Integer page, Integer size, String order){
         String counselor_id = String.valueOf(userMapper.findIdByName(counselor));
         String user_id = String.valueOf(userMapper.findIdByName(user));
-        PageHelper.startPage(page, size, order);
-        List<Conversation> conversationList = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id);
+        List<Conversation> conversationList = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id, order);
         List<ConversationResponse> conversationResponseList = new ArrayList<>();
         for(Conversation conversation : conversationList){
             ConversationResponse conversationResponse = new ConversationResponse(conversation);
@@ -41,8 +40,7 @@ public class ConversationServiceImpl implements ConversationService {
             conversationResponse.setLastUpdater(userMapper.findNameById(conversation.getLastUpdater()));
             conversationResponseList.add(conversationResponse);
         }
-        PageInfo<ConversationResponse> pageInfo = new PageInfo<>(conversationResponseList);
-        return new Page<>(pageInfo);
+        return new Page(conversationResponseList, page, size);
     }
 
     @Override
@@ -87,11 +85,9 @@ public class ConversationServiceImpl implements ConversationService {
     }
 
     @Override
-    public Page<ConversationResponse> findConversationByUser(Long user, Integer page, Integer size, String order) {
+    public Page<ConversationResponse> findAllConversation(Integer page, Integer size, String order) {
         List<ConversationResponse> conversationResponseList = new ArrayList<>();
-        // 构造分页参数
-        PageHelper.startPage(page, size, order);
-        List<Conversation> conversationList = conversationMapper.findByUser(user);
+        List<Conversation> conversationList = conversationMapper.getAllConversation(order);
 
         for(Conversation conversation : conversationList){
             conversation.setCounselor(userMapper.findNameById(conversation.getCounselor()));
@@ -100,16 +96,29 @@ public class ConversationServiceImpl implements ConversationService {
             conversationResponseList.add(conversationResponse);
         }
 
-        // 返回分页后的结果
-        return new Page<ConversationResponse>(new PageInfo<ConversationResponse>(conversationResponseList));
+        return new Page(conversationResponseList, page, size);
+    }
+
+
+    @Override
+    public Page<ConversationResponse> findConversationByUser(Long user, Integer page, Integer size, String order) {
+        List<ConversationResponse> conversationResponseList = new ArrayList<>();
+        List<Conversation> conversationList = conversationMapper.findByUser(user, order);
+
+        for(Conversation conversation : conversationList){
+            conversation.setCounselor(userMapper.findNameById(conversation.getCounselor()));
+            conversation.setUser(userMapper.findNameById(conversation.getUser()));
+            ConversationResponse conversationResponse = new ConversationResponse(conversation);
+            conversationResponseList.add(conversationResponse);
+        }
+
+        return new Page(conversationResponseList, page, size);
     }
 
     @Override
     public Page<ConversationResponse> findConversationByCounselor(Long counselor, Integer page, Integer size, String order) {
         List<ConversationResponse> conversationResponseList = new ArrayList<>();
-        // 构造分页参数
-        PageHelper.startPage(page, size, order);
-        List<Conversation> conversationList = conversationMapper.findByCounselor(counselor);
+        List<Conversation> conversationList = conversationMapper.findByCounselor(counselor, order);
 
         for(Conversation conversation : conversationList){
             conversation.setCounselor(userMapper.findNameById(conversation.getCounselor()));
@@ -118,7 +127,7 @@ public class ConversationServiceImpl implements ConversationService {
             conversationResponseList.add(conversationResponse);
         }
         // 返回分页后的结果
-        return new Page<>(new PageInfo<>(conversationResponseList));
+        return new Page(conversationResponseList, page, size);
     }
 
     @Override

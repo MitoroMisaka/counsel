@@ -17,7 +17,7 @@ import java.util.List;
 public interface ArrangeMapper extends BaseMapper<Arrange> {
 
     @Insert("INSERT INTO arrange (create_time, creator, last_update_time, last_updater, year, month, day, start_time, end_time, user, role, weekday, local_date) " +
-            "VALUES (#{arrange.createTime}, #{arrange.creator}, #{arrange.lastUpdate_time}, #{arrange.lastUpdater}, #{arrange.year}, #{arrange.month}, #{arrange.day}, #{arrange.startTime}, #{arrange.endTime}, #{arrange.user}, #{arrange.role}, #{arrange.weekday}, #{arrange.localDate})")
+            "VALUES (#{arrange.createTime}, #{arrange.creator}, #{arrange.lastUpdateTime}, #{arrange.lastUpdater}, #{arrange.year}, #{arrange.month}, #{arrange.day}, #{arrange.startTime}, #{arrange.endTime}, #{arrange.user}, #{arrange.role}, #{arrange.weekday}, #{arrange.localDate})")
     void insertArrange(@Param("arrange") Arrange arrange);
 
     @Select("SELECT * FROM arrange WHERE id = #{id}")
@@ -54,7 +54,7 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     @Select("SELECT day, COUNT(DISTINCT(user)) AS num FROM arrange WHERE " +
             "year = #{year} AND " +
             "month = #{month} AND " +
-            "role = 'counselor' " +
+            "role = 'COUNSELOR' " +
             "GROUP BY day")
     List<DayNum> findCounselorInfoByMonth(@Param("year") Integer year,
                                                         @Param("month") Integer month);
@@ -62,7 +62,7 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     @Select("SELECT day, COUNT(DISTINCT(user)) AS num FROM arrange WHERE " +
             "year = #{year} AND " +
             "month = #{month} AND " +
-            "role = 'supervisor' " +
+            "role = 'SUPERVISOR' " +
             "GROUP BY day")
     List<DayNum> findSupervisorInfoByMonth(@Param("year") Integer year,
                                                 @Param("month") Integer month);
@@ -71,7 +71,7 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
             "year = #{year} AND " +
             "month = #{month} AND " +
             "day = #{day} AND " +
-            "role = 'counselor' ")
+            "role = 'COUNSELOR' ")
     List<Long> findCounselorIDListByDay(@Param("year") Integer year,
                                                     @Param("month") Integer month,
                                                     @Param("day") Integer day);
@@ -80,18 +80,46 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
             "year = #{year} AND " +
             "month = #{month} AND " +
             "day = #{day} AND " +
-            "role = 'supervisor' ")
+            "role = 'SUPERVISOR' ")
     List<Long> findSupervisorIDListByDay(@Param("year") Integer year,
                                         @Param("month") Integer month,
                                         @Param("day") Integer day);
 
-    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='COUNSELOR' ")
-    List<Long> findCounselorByCurrentTime();
+    @Select("SELECT user FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='COUNSELOR' ORDER BY ${order}")
+    List<Long> findCounselorByCurrentTime(@Param("order") String order);
 
-    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='SUPERVISOR' AND state <> 0")
-    List<Long> findSupervisorByCurrentTime();
+    @Select("SELECT user FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='SUPERVISOR' ORDER BY ${order}")
+    List<Long> findSupervisorByCurrentTime(@Param("order") String order);
 
     @Select("SELECT day FROM arrange WHERE user = #{user} and year = YEAR(CURRENT_DATE()) and month = MONTH(CURRENT_DATE())")
     List<Integer> findDayArrange(@Param("user") Long user);
+
+    @Select("SELECT DISTINCT `user` FROM arrange WHERE `role` = 'SUPERVISOR' AND `user` NOT IN " +
+            "(SELECT DISTINCT `user` FROM arrange " +
+            "WHERE `year` = YEAR(CURRENT_DATE()) " +
+            "AND `month` = MONTH(CURRENT_DATE()) " +
+            "AND `day` = DAY(CURRENT_DATE()))")
+    List<Long> findFreeSupervisor();
+
+    @Select("SELECT DISTINCT `user` FROM arrange " +
+            "WHERE `role` = 'SUPERVISOR' " +
+            "AND `year` = YEAR(CURRENT_DATE()) " +
+            "AND `month` = MONTH(CURRENT_DATE()) " +
+            "AND `day` = DAY(CURRENT_DATE())")
+    List<Long> findWorkingSupervisor();
+
+    @Select("SELECT DISTINCT `user` FROM arrange WHERE `role` = 'COUNSELOR' AND `user` NOT IN " +
+            "(SELECT DISTINCT `user` FROM arrange " +
+            "WHERE `year` = YEAR(CURRENT_DATE()) " +
+            "AND `month` = MONTH(CURRENT_DATE()) " +
+            "AND `day` = DAY(CURRENT_DATE()))")
+    List<Long> findFreeCounselor();
+
+    @Select("SELECT DISTINCT `user` FROM arrange " +
+            "WHERE `role` = 'COUNSELOR' " +
+            "AND `year` = YEAR(CURRENT_DATE()) " +
+            "AND `month` = MONTH(CURRENT_DATE()) " +
+            "AND `day` = DAY(CURRENT_DATE())")
+    List<Long> findWorkingCounselor();
 
 }

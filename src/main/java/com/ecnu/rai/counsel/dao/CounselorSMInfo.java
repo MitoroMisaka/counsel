@@ -45,7 +45,7 @@ public class CounselorSMInfo implements Serializable {
     private List<Integer> totalDay = new ArrayList<>();
 
     @ApiModelProperty("禁用状态")
-    private Integer state;
+    private Integer state = 1;
 
     public CounselorSMInfo(Counselor counselor){
         this.id = counselor.getId();

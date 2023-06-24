@@ -27,11 +27,12 @@ import java.util.HashMap;
 import java.util.List;
 @Service
 public class AccountServiceImpl implements AccountService {
-    @Autowired
-    private UserMapper userMapper;
 
     @Autowired
     private MyMapper myMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private VisitorMapper visitorMapper;
@@ -44,12 +45,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Autowired
     private SupervisorMapper supervisorMapper;
-
-    @Autowired
-    private CounselorService counselorService;
-
-    @Autowired
-    private SupervisorService supervisorService;
 
     @Autowired
     private ConversationMapper conversationMapper;
@@ -70,20 +65,6 @@ public class AccountServiceImpl implements AccountService {
         PageHelper.startPage(page, size, order);
         List<UserBasicInfo> userList = userMapper.findAllUsers();
         return new Page<>(new PageInfo<>(userList));
-    }
-
-    @Override
-    public Page<CounselorSMInfo> findCounselorList(Integer page, Integer size, String order) {
-        PageHelper.startPage(page, size, order);
-        List<CounselorSMInfo> counselorList = counselorService.getAllCounselor();
-        return new Page<>(new PageInfo<>(counselorList));
-    }
-
-    @Override
-    public Page<SupervisorSMInfo> findSupervisorList(Integer page, Integer size, String order) {
-        PageHelper.startPage(page, size, order);
-        List<SupervisorSMInfo> supervisorList = supervisorService.getAllSupervisor();
-        return new Page<>(new PageInfo<>(supervisorList));
     }
 
     @Override
@@ -113,174 +94,174 @@ public class AccountServiceImpl implements AccountService {
                 throw new RuntimeException("User not found with ID: " + id);
             }
 
-            // Update the user properties
-            existingUser.setName(user.getName());
-            existingUser.setUsername(user.getUsername());
-            existingUser.setPassword(PasswordUtil.convert(user.getPassword()));
-            existingUser.setRole(user.getRole());
+        // Update the user properties
+        existingUser.setName(user.getName());
+        existingUser.setUsername(user.getUsername());
+        existingUser.setPassword(PasswordUtil.convert(user.getPassword()));
+        existingUser.setRole(user.getRole());
 
 
-            // Perform the update in the database
-            userMapper.updateUser(existingUser);
+        // Perform the update in the database
+        userMapper.updateUser(existingUser);
 
-            return existingUser;
+        return existingUser;
+    }
+
+    @Override
+    //update visitor using visitorMapper
+    public Visitor updateVisitor(Long id, Visitor visitor) {
+        Visitor existingVisitor = visitorMapper.findById(id);
+        if (existingVisitor == null) {
+            throw new RuntimeException("Visitor not found with ID: " + id);
         }
 
-        @Override
-        //update visitor using visitorMapper
-        public Visitor updateVisitor(Long id, Visitor visitor) {
-            Visitor existingVisitor = visitorMapper.findById(id);
-            if (existingVisitor == null) {
-                throw new RuntimeException("Visitor not found with ID: " + id);
-            }
+        // Update the user properties
+        existingVisitor.setName(visitor.getName());
+        existingVisitor.setUsername(visitor.getUsername());
+        // existingVisitor.setPassword(PasswordUtil.convert(visitor.getPassword()));
+        existingVisitor.setRole(visitor.getRole());
+        existingVisitor.setAvatar(visitor.getAvatar());
+        existingVisitor.setPhone(visitor.getPhone());
+        existingVisitor.setGender(visitor.getGender());
+        existingVisitor.setDepartment(visitor.getDepartment());
+        existingVisitor.setTitle(visitor.getTitle());
+        existingVisitor.setEmergentContact(visitor.getEmergentContact());
+        existingVisitor.setEmergentPhone(visitor.getEmergentPhone());
+        existingVisitor.setOpenid(visitor.getOpenid());
 
-            // Update the user properties
-            existingVisitor.setName(visitor.getName());
-            existingVisitor.setUsername(visitor.getUsername());
-            // existingVisitor.setPassword(PasswordUtil.convert(visitor.getPassword()));
-            existingVisitor.setRole(visitor.getRole());
-            existingVisitor.setAvatar(visitor.getAvatar());
-            existingVisitor.setPhone(visitor.getPhone());
-            existingVisitor.setGender(visitor.getGender());
-            existingVisitor.setDepartment(visitor.getDepartment());
-            existingVisitor.setTitle(visitor.getTitle());
-            existingVisitor.setEmergentContact(visitor.getEmergentContact());
-            existingVisitor.setEmergentPhone(visitor.getEmergentPhone());
-            existingVisitor.setOpenid(visitor.getOpenid());
+        // Perform the update in the database
+        visitorMapper.updateVisitor(existingVisitor);
 
-            // Perform the update in the database
-            visitorMapper.updateVisitor(existingVisitor);
+        return existingVisitor;
+    }
 
-            return existingVisitor;
+    //update Admin using AdminMapper
+    @Override
+    public Admin updateAdmin(Long id, Admin admin) {
+        Admin existingAdmin = adminMapper.findById(id);
+        if (existingAdmin == null) {
+            throw new RuntimeException("Admin not found with ID: " + id);
         }
 
-        //update Admin using AdminMapper
-        @Override
-        public Admin updateAdmin(Long id, Admin admin) {
-            Admin existingAdmin = adminMapper.findById(id);
-            if (existingAdmin == null) {
-                throw new RuntimeException("Admin not found with ID: " + id);
-            }
+        // Update the admin properties
+        existingAdmin.setName(admin.getName());
+        existingAdmin.setUsername(admin.getUsername());
+        // existingAdmin.setPassword(PasswordUtil.convert(admin.getPassword()));
+        existingAdmin.setPassword(admin.getPassword());
+        existingAdmin.setRole(admin.getRole());
+        existingAdmin.setAvatar(admin.getAvatar());
+        existingAdmin.setPhone(admin.getPhone());
+        existingAdmin.setGender(admin.getGender());
+        existingAdmin.setDepartment(admin.getDepartment());
+        existingAdmin.setTitle(admin.getTitle());
 
-            // Update the admin properties
-            existingAdmin.setName(admin.getName());
-            existingAdmin.setUsername(admin.getUsername());
-            // existingAdmin.setPassword(PasswordUtil.convert(admin.getPassword()));
-            existingAdmin.setPassword(admin.getPassword());
-            existingAdmin.setRole(admin.getRole());
-            existingAdmin.setAvatar(admin.getAvatar());
-            existingAdmin.setPhone(admin.getPhone());
-            existingAdmin.setGender(admin.getGender());
-            existingAdmin.setDepartment(admin.getDepartment());
-            existingAdmin.setTitle(admin.getTitle());
+        // Perform the update in the database
+        adminMapper.updateAdmin(existingAdmin);
 
-            // Perform the update in the database
-            adminMapper.updateAdmin(existingAdmin);
+        return existingAdmin;
+    }
 
-            return existingAdmin;
+    //update Counselor using CounselorMapper
+    @Override
+    public Counselor updateCounselor(Long id, Counselor counselor) {
+        Counselor existingCounselor = counselorMapper.findById(id);
+        if (existingCounselor == null) {
+            throw new RuntimeException("Counselor not found with ID: " + id);
         }
 
-        //update Counselor using CounselorMapper
-        @Override
-        public Counselor updateCounselor(Long id, Counselor counselor) {
-            Counselor existingCounselor = counselorMapper.findById(id);
-            if (existingCounselor == null) {
-                throw new RuntimeException("Counselor not found with ID: " + id);
-            }
+        // Update the counselor properties
+        existingCounselor.setName(counselor.getName());
+        existingCounselor.setUsername(counselor.getUsername());
+        // existingCounselor.setPassword(PasswordUtil.convert(counselor.getPassword()));
+        existingCounselor.setPassword(counselor.getPassword());
+        existingCounselor.setRole(counselor.getRole());
+        existingCounselor.setAvatar(counselor.getAvatar());
+        existingCounselor.setPhone(counselor.getPhone());
+        existingCounselor.setGender(counselor.getGender());
+        existingCounselor.setDepartment(counselor.getDepartment());
+        existingCounselor.setTitle(counselor.getTitle());
+        existingCounselor.setMaxConsult(counselor.getMaxConsult());
+        // Perform the update in the database
+        counselorMapper.updateCounselor(counselor);
 
-            // Update the counselor properties
-            existingCounselor.setName(counselor.getName());
-            existingCounselor.setUsername(counselor.getUsername());
-            // existingCounselor.setPassword(PasswordUtil.convert(counselor.getPassword()));
-            existingCounselor.setPassword(counselor.getPassword());
-            existingCounselor.setRole(counselor.getRole());
-            existingCounselor.setAvatar(counselor.getAvatar());
-            existingCounselor.setPhone(counselor.getPhone());
-            existingCounselor.setGender(counselor.getGender());
-            existingCounselor.setDepartment(counselor.getDepartment());
-            existingCounselor.setTitle(counselor.getTitle());
-            existingCounselor.setMaxConsult(counselor.getMaxConsult());
-            // Perform the update in the database
-            counselorMapper.updateCounselor(counselor);
+        return existingCounselor;
+    }
 
-            return existingCounselor;
+    //update Supervisor using SupervisorMapper
+    @Override
+    public Supervisor updateSupervisor(Long id, Supervisor supervisor) {
+        Supervisor existingSupervisor = supervisorMapper.findById(id);
+        if (existingSupervisor == null) {
+            throw new RuntimeException("Supervisor not found with ID: " + id);
         }
 
-        //update Supervisor using SupervisorMapper
-        @Override
-        public Supervisor updateSupervisor(Long id, Supervisor supervisor) {
-            Supervisor existingSupervisor = supervisorMapper.findById(id);
-            if (existingSupervisor == null) {
-                throw new RuntimeException("Supervisor not found with ID: " + id);
-            }
+        // Update the supervisor properties
+        existingSupervisor.setName(supervisor.getName());
+        existingSupervisor.setUsername(supervisor.getUsername());
+        // existingSupervisor.setPassword(PasswordUtil.convert(supervisor.getPassword()));
+        existingSupervisor.setPassword(supervisor.getPassword());
+        existingSupervisor.setRole(supervisor.getRole());
+        existingSupervisor.setAvatar(supervisor.getAvatar());
+        existingSupervisor.setPhone(supervisor.getPhone());
+        existingSupervisor.setGender(supervisor.getGender());
+        existingSupervisor.setDepartment(supervisor.getDepartment());
+        existingSupervisor.setTitle(supervisor.getTitle());
+        existingSupervisor.setQualification(supervisor.getQualification());
+        existingSupervisor.setQualificationCode(supervisor.getQualificationCode());
 
-            // Update the supervisor properties
-            existingSupervisor.setName(supervisor.getName());
-            existingSupervisor.setUsername(supervisor.getUsername());
-            // existingSupervisor.setPassword(PasswordUtil.convert(supervisor.getPassword()));
-            existingSupervisor.setPassword(supervisor.getPassword());
-            existingSupervisor.setRole(supervisor.getRole());
-            existingSupervisor.setAvatar(supervisor.getAvatar());
-            existingSupervisor.setPhone(supervisor.getPhone());
-            existingSupervisor.setGender(supervisor.getGender());
-            existingSupervisor.setDepartment(supervisor.getDepartment());
-            existingSupervisor.setTitle(supervisor.getTitle());
-            existingSupervisor.setQualification(supervisor.getQualification());
-            existingSupervisor.setQualificationCode(supervisor.getQualificationCode());
+        // Perform the update in the database
+        supervisorMapper.updateSupervisor(existingSupervisor);
 
-            // Perform the update in the database
-            supervisorMapper.updateSupervisor(existingSupervisor);
+        return existingSupervisor;
+    }
 
-            return existingSupervisor;
-        }
+    @Override
+    public boolean isPhoneUsedByOtherCounselor(Long id, String phone) {
+        // Get the counselor with the given phone number
+        Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("phone", phone));
+        // Check if the counselor exists and has a different ID than the given ID
+        return counselor != null && !counselor.getId().equals(id);
+    }
 
-        @Override
-        public boolean isPhoneUsedByOtherCounselor(Long id, String phone) {
-            // Get the counselor with the given phone number
-            Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("phone", phone));
-            // Check if the counselor exists and has a different ID than the given ID
-            return counselor != null && !counselor.getId().equals(id);
-        }
+    @Override
+    public boolean isPhoneUsedByOtherSupervisor(Long id, String phone) {
+        // Get the counselor with the given phone number
+        Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("phone", phone));
+        // Check if the counselor exists and has a different ID than the given ID
+        return supervisor != null && !supervisor.getId().equals(id);
+    }
 
-        @Override
-        public boolean isPhoneUsedByOtherSupervisor(Long id, String phone) {
-            // Get the counselor with the given phone number
-            Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("phone", phone));
-            // Check if the counselor exists and has a different ID than the given ID
-            return supervisor != null && !supervisor.getId().equals(id);
-        }
+    @Override
+    public boolean isEmailUsedByOtherCounselor(Long id, String email) {
+        // Get the counselor with the given email address
+        Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("email", email));
+        // Check if the counselor exists and has a different ID than the given ID
+        return counselor != null && !counselor.getId().equals(id);
+    }
 
-        @Override
-        public boolean isEmailUsedByOtherCounselor(Long id, String email) {
-            // Get the counselor with the given email address
-            Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("email", email));
-            // Check if the counselor exists and has a different ID than the given ID
-            return counselor != null && !counselor.getId().equals(id);
-        }
+    @Override
+    public boolean isUsernameUsedByOtherUser(String username) {
+        // Get the user with the given username
+        User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
+        // Check if the user exists
+        return user != null;
+    }
 
-        @Override
-        public boolean isUsernameUsedByOtherUser(String username) {
-            // Get the user with the given username
-            User user = userMapper.selectOne(new QueryWrapper<User>().eq("username", username));
-            // Check if the user exists
-            return user != null;
-        }
+    @Override
+    public boolean isUsernameUsedByOtherCounselor(String username) {
+        // Get the counselor with the given username
+        Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("username", username));
+        // Check if the counselor exists
+        return counselor != null;
+    }
 
-        @Override
-        public boolean isUsernameUsedByOtherCounselor(String username) {
-            // Get the counselor with the given username
-            Counselor counselor = counselorMapper.selectOne(new QueryWrapper<Counselor>().eq("username", username));
-            // Check if the counselor exists
-            return counselor != null;
-        }
-
-        @Override
-        public boolean isUsernameUsedByOtherSupervisor(String username) {
-            // Get the supervisor with the given username
-            Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("username", username));
-            // Check if the supervisor exists
-            return supervisor != null;
-        }
+    @Override
+    public boolean isUsernameUsedByOtherSupervisor(String username) {
+        // Get the supervisor with the given username
+        Supervisor supervisor = supervisorMapper.selectOne(new QueryWrapper<Supervisor>().eq("username", username));
+        // Check if the supervisor exists
+        return supervisor != null;
+    }
 
     @Override
     public HashMap<String, Integer> getBasicStatInfo() {

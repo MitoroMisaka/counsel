@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Data
@@ -30,6 +32,16 @@ public class Page<T> {
         this.total = pageInfo.getTotal();
         this.pages = pageInfo.getPages();
         this.items = pageInfo.getList();
+    }
+
+    public Page(List<T> rawList, Integer pageNum, Integer pageSize) {
+        this.total = (long) rawList.size();
+        pageSize = pageSize > this.total ? this.total.intValue() : pageSize;
+        List<T> list  = rawList.subList((pageNum - 1) * pageSize, Math.min(pageNum * pageSize, rawList.size()));
+        this.items = list;
+        this.pageNum = pageNum;
+        this.pageSize = pageSize;
+        this.pages = (int) Math.ceil((double) list.size() / pageSize);
     }
 
 }

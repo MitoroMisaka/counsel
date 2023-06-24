@@ -72,7 +72,7 @@ public class DialogueController {
     }
 
     @PostMapping("/start")
-    @ApiOperation("开始会话(就是建个表,给出咨询师和用户的姓名就行)")
+    @ApiOperation("开始会话(就是建个表,给出咨询师和督导的姓名就行)")
     public Result insertdialogue(@Valid @RequestBody Dialogue dialogue) throws IOException {
 //        Integer maxConsult = dialogueMapper.getMaxConsult(dialogue.getCounselor());
 //        if(maxConsult.equals(dialogueMapper.getConsultNum(dialogue.getCounselor()))){
@@ -108,12 +108,12 @@ public class DialogueController {
     @GetMapping("/supervisor")
     @ApiOperation("根据督导ID获取会话信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "supervisorId", value = "用户id", required = true, dataType = "Long"),
+            @ApiImplicitParam(name = "supervisorId", value = "督导id", required = true, dataType = "Long"),
             @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
             @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
     })
-    public Page<Dialogue> getdialoguebyUser(@RequestParam("supervisorId") Long supervisorId,
+    public Page<Dialogue> getdialoguebySupervisor(@RequestParam("supervisorId") Long supervisorId,
                                                             @RequestParam("page") Integer page,
                                                             @RequestParam("size") Integer size,
                                                             @RequestParam("order") String order) {

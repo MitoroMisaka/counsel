@@ -2,9 +2,11 @@ package com.ecnu.rai.counsel.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -77,9 +79,13 @@ public class Counselor {
     @ApiModelProperty(value = "头像")
     private String avatar;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @ApiModelProperty(value = "创建时间")
     private LocalDateTime createTime;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @ApiModelProperty(value = "更新时间")
     private LocalDateTime updateTime;
     

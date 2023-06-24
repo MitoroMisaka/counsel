@@ -35,15 +35,18 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("SELECT * FROM user WHERE username = #{username}")
     User findByUsername(@Param("username") String username);
 
-    @Update("UPDATE user SET name = #{user.name}, username = #{user.username}, password = #{user.password}, role = #{user.role},state = #{user.state}  " +
+    @Update("UPDATE user SET name = #{user.name}, username = #{user.username}, password = #{user.password}, role = #{user.role} " +
             "WHERE id = #{user.id}")
     void updateUser(@Param("user") User user);
+
+    @Update("UPDATE user SET state = #{user.state} where id = #{user.id}")
+    void updateState(@Param("user") User user);
 
     @Select("SELECT * FROM user")
     List<User> getUserList();
 
-    @Insert("INSERT INTO user (name, username, password, role) " +
-        "VALUES (#{user.name}, #{user.username}, #{user.password}, #{user.role})")
+    @Insert("INSERT INTO user (name, username, password, role, state) " +
+        "VALUES (#{user.name}, #{user.username}, #{user.password}, #{user.role}, #{user.state})")
     void insertUser(@Param("user") User user);
 
     @Options(useGeneratedKeys = true, keyProperty = "id")
