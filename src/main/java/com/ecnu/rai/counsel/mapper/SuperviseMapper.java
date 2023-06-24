@@ -15,6 +15,9 @@ public interface SuperviseMapper {
     @Select("SELECT supervisor_id FROM supervise WHERE counselor_id = #{counselor_id}")
     List<Long> findSupervisorByCounselorId(@Param("counselor_id") Long counselor_id);
 
+    @Select("SELECT counselor_id FROM supervise WHERE supervisor_id = #{supervisor_id}")
+    List<Long> findCounselorBySupervisorId(@Param("supervisor_id") Long supervisor_id);
+
     @Insert("INSERT INTO supervise values (#{counselorid},#{supervisorid})")
     void makeSupervise(@Param("counselorid")Long counselorid, @Param("supervisorid")Long supervisorid);
 

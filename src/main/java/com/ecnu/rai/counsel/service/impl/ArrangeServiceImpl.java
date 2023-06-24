@@ -102,4 +102,27 @@ public class ArrangeServiceImpl implements ArrangeService {
         return SupervisorBasicInfoList;
     }
 
+    public List<SupervisorBasicInfo> findSupervisorFreeListByDay(Integer year, Integer month, Integer day) {
+        List<Long> SupervisorIdList = arrangeMapper.findSupervisorIDListByDay(year, month, day);
+        List<Long> SupervisorList = supervisorMapper.findId();
+        SupervisorList.removeAll(SupervisorIdList);
+        List<SupervisorBasicInfo> SupervisorBasicInfoList = new ArrayList<>();
+        for(Long id : SupervisorIdList) {
+            SupervisorBasicInfoList.add(new SupervisorBasicInfo(supervisorMapper.findById(id)));
+        }
+        return SupervisorBasicInfoList;
+    }
+
+    @Override
+    public List<CounselorBasicInfo> findCounselorFreeListByDay(Integer year, Integer month, Integer day) {
+        List<Long> CounselorIdList = arrangeMapper.findCounselorIDListByDay(year, month, day);
+        List<Long> CounselorList = counselorMapper.findId();
+        CounselorList.removeAll(CounselorIdList);
+        List<CounselorBasicInfo> CounselorBasicInfoList = new ArrayList<>();
+        for(Long id : CounselorIdList) {
+            CounselorBasicInfoList.add(new CounselorBasicInfo(counselorMapper.findById(id)));
+        }
+        return CounselorBasicInfoList;
+    }
+
 }

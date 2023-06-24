@@ -1,4 +1,5 @@
 package com.ecnu.rai.counsel.service;
+import com.ecnu.rai.counsel.dao.VisitorSMInfo;
 import com.ecnu.rai.counsel.entity.User;
 import com.ecnu.rai.counsel.entity.Visitor;
 import org.apache.ibatis.annotations.Param;
@@ -14,5 +15,7 @@ public interface WXService {
     Long findIdByopenid(String openid);
     boolean visitorState(String openid);
     User finduserByopenid(String openid);
+
+    List<VisitorSMInfo> getAllVisitor();
 //    List<HashMap<String,Object>> findAvaliableCounselorInfo(LocalDateTime localDateTime);
 }
