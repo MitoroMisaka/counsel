@@ -67,7 +67,7 @@ public class ConversationController {
     @ApiOperation("获取是否结束")
     public Result isEnd(@RequestParam("id") Long id) {
         Conversation conversation = conversationService.findConversationByID(id);
-        if (conversation.getStatus().equals("ENDED")) {
+        if (conversation.getStatus().equals("FINISHED")) {
             return Result.success("已结束", true);
         } else {
             return Result.success("未结束", false);
@@ -84,10 +84,10 @@ public class ConversationController {
     @PostMapping("/start")
     @ApiOperation("开始会话(就是建个表,给出咨询师和用户的姓名就行)")
     public Result insertConversation(@Valid @RequestBody Conversation conversation) throws IOException {
-        String counselor_id = userMapper.findNameById(conversation.getCounselor());
-        String user_id = userMapper.findNameById(conversation.getUser());
-        conversation.setCounselor(counselor_id);
-        conversation.setUser(user_id);
+        Long counselor_id = userMapper.findIdByName(conversation.getCounselor());
+        Long user_id = userMapper.findIdByName(conversation.getUser());
+        conversation.setCounselor(counselor_id.toString());
+        conversation.setUser(user_id.toString());
 //        Integer maxConsult = conversationMapper.getMaxConsult(conversation.getCounselor());
 //        if(maxConsult.equals(conversationMapper.getConsultNum(conversation.getCounselor()))){
 //            Result.fail("咨询师咨询次数已达上限");
@@ -97,6 +97,12 @@ public class ConversationController {
         conversation.setMonth(LocalDateTime.now().getMonth());
         conversation.setDay(LocalDateTime.now().getDayOfMonth());
         conversation.setStartTime(Timestamp.valueOf(LocalDateTime.now()));
+        conversation.setCreateTime(LocalDateTime.now());
+        conversation.setCreator(counselor_id.toString());
+        conversation.setLastUpdater(counselor_id.toString());
+        conversation.setLastUpdateTime(LocalDateTime.now());
+        conversation.setVisitorName(conversation.getUser());
+
 
         Conversation new_conversation = conversationService.insertConversationByID(conversation);
 //        String counselor_name = userMapper.findNameById(conversation.getCounselor());
@@ -263,16 +269,16 @@ public class ConversationController {
                 .message(history)
                 .build();
         conversationMapper.updateConversationUser(conversation);
-        String counselorid = String.valueOf(userMapper.findIdByName(getGroupMsgResponse.getCounselorname()));
-        List<Conversation> conversations1 = conversationMapper.findGroupMsgByCounselor(counselorid);
-        Double sum = 0.0;
-        for(Conversation conversation1 : conversations1){
-            sum += conversation1.getEvaluate();
-        }
-        //average 四舍五入
-        Integer average = (int) Math.round(sum/conversations1.size());
-        String name = getGroupMsgResponse.getCounselorname();
-        counselorMapper.updateCounselorRating(name , average);
+//        String counselorid = String.valueOf(userMapper.findIdByName(getGroupMsgResponse.getCounselorname()));
+//        List<Conversation> conversations1 = conversationMapper.findGroupMsgByCounselor(counselorid);
+//        Double sum = 0.0;
+//        for(Conversation conversation1 : conversations1){
+//            sum += conversation1.getEvaluate();
+//        }
+//        //average 四舍五入
+//        Integer average = (int) Math.round(sum/conversations1.size());
+//        String name = getGroupMsgResponse.getCounselorname();
+//        counselorMapper.updateCounselorRating(name , average);
 
         return Result.success("save and insert conversation ");
     }

@@ -81,6 +81,7 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
             "creator = #{conversation.creator}, " +
             "last_update_time = #{conversation.lastUpdateTime}, " +
             "last_updater = #{conversation.lastUpdater}, " +
+            "end_time = #{conversation.endTime}, " +
             "user = #{conversation.user}, " +
             "counselor = #{conversation.counselor}, " +
             "visitor_name = #{conversation.visitorName}, " +

@@ -71,15 +71,14 @@ public class DialogueController {
         return Result.success("获取成功", dialogue);
     }
 
-    @PostMapping("/start")
-    @ApiOperation("开始会话(就是建个表,给出咨询师和督导的姓名就行)")
-    public Result insertdialogue(@Valid @RequestBody Dialogue dialogue) throws IOException {
+    @PostMapping("/start/{group_id}")
+    @ApiOperation("开始会话(就是建个表,给出咨询师和督导的姓名,和群组的id就行)")
+    public Result insertdialogue(@Valid @RequestBody Dialogue dialogue, @PathVariable String group_id) throws IOException {
 //        Integer maxConsult = dialogueMapper.getMaxConsult(dialogue.getCounselor());
 //        if(maxConsult.equals(dialogueMapper.getConsultNum(dialogue.getCounselor()))){
 //            Result.fail("咨询师咨询次数已达上限");
 //        }
         dialogue.setStatus("STARTED");
-        dialogue.setVisitorName(dialogue.getCounselor());
         dialogue.setCreateTime(LocalDateTime.now());
         dialogue.setLastUpdateTime(LocalDateTime.now());
         dialogue.setYear(LocalDateTime.now().getYear());
@@ -92,10 +91,27 @@ public class DialogueController {
         dialogue.setCounselor(counselor_id.toString());
         dialogue.setCreator(counselor_id.toString());
         dialogue.setLastUpdater(counselor_id.toString());
+        dialogue.setVisitorName(group_id);
         Dialogue new_dialogue = dialogueService.insertDialogueByID(dialogue);
 //        String counselor_name = userMapper.findNameById(dialogue.getCounselor());
 //        String supervisor_name = userMapper.findNameById(dialogue.getSupervisor());
         return Result.success("插入成功", new_dialogue);
+    }
+
+
+    //get dialogue by counselor name and supervisor name
+    @GetMapping("/getDialogue")
+    @ApiOperation("根据咨询师和督导imid获取会话信息")
+    public Result getDialoguebyName(@RequestParam("counselor") String counselor, @RequestParam("supervisor") String supervisor) {
+        String counelor_name = userSigMapper.getNameByImid(counselor);
+        String supervisor_name = userSigMapper.getNameByImid(supervisor);
+
+        String counselor_id = userMapper.findIdByName(counelor_name).toString();
+        String supervisor_id = userMapper.findIdByName(supervisor_name).toString();
+
+
+        Dialogue dialogue = dialogueMapper.getLastDialogueByCounselorAndSupervisor(counselor_id, supervisor_id);
+        return Result.success("获取成功", dialogue);
     }
 
     @PostMapping("/update")
@@ -168,17 +184,23 @@ public class DialogueController {
     public Object saveHistory(@Valid @RequestBody DialogueRequest request) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
-        String supervisor_id = userMapper.findIdByName(request.getSupervisor()).toString();
-        String counselor_id = userMapper.findIdByName(request.getCounselor()).toString();
+//        String supervisor_id = userMapper.findIdByName(request.getSupervisor()).toString();
+//        String counselor_id = userMapper.findIdByName(request.getCounselor()).toString();
 
-        Dialogue dialogue = dialogueMapper.getLastDialogue(supervisor_id, counselor_id);
+        Dialogue dialogue = dialogueMapper.getDialogueById(request.getDialogue_id());
+
+        String supervisor_id = dialogue.getSupervisor();
+        String counselor_id = dialogue.getCounselor();
+
+        String counselor_name = userMapper.findNameById(counselor_id);
+        String supervisor_name = userMapper.findNameById(supervisor_id);
 
         // 设置请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        String counelor_imid = userSigMapper.getImidByName(request.getCounselor());
-        String supervisor_imid = userSigMapper.getImidByName(request.getSupervisor());
+        String counelor_imid = userSigMapper.getImidByName(counselor_name);
+        String supervisor_imid = userSigMapper.getImidByName(supervisor_name);
 
         Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
         ZoneId zone = ZoneId.of("Asia/Shanghai"); // 设置为您所需的时区

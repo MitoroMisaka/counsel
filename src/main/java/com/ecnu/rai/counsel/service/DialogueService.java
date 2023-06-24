@@ -11,6 +11,8 @@ import java.sql.Date;
 public interface DialogueService {
     //Page<ConversationResponse> findGroupMsgByCounselorUser(String counselor, String user, Integer page, Integer size, String order);
 
+
+
     Dialogue findDialogueByID(Long id);
 
     Dialogue insertDialogueByID(Dialogue dialogue);
