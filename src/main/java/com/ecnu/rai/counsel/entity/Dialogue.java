@@ -68,6 +68,7 @@ public class Dialogue {
 
     @ApiModelProperty(value = "咨询督导姓名")
     private String  supervisor;
+
     @ApiModelProperty(value = "状态")
     private String status;
 
