@@ -90,9 +90,9 @@ public class IMController {
 
         CreateGroupRequest request = CreateGroupRequest.builder()
                 .type(GroupType.PUBLIC)
-                .name(counselor_name+ "_" + user_name)
+                .name(counselor_name)
                 .ownerAccount(owner)
-                .groupId(PinyinUtil.convertToPinyin(counselor_name) +  PinyinUtil.convertToPinyin(user_name))
+                .groupId(PinyinUtil.convertToPinyin(counselor_name))
                 .introduction("心理咨询组")
                 .notification("欢迎开始心理咨询")
                 .faceUrl("https://avatars.githubusercontent.com/u/43716716?s=200&v=4")
@@ -355,6 +355,43 @@ public class IMController {
                 .build();
 
         SendGroupSystemNotificationResult result = client.group.sendGroupSystemNotification(request);
+
+        return result;
+    }
+
+    @GetMapping("/group/delete")
+    @ApiOperation("解散群组")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "group_id", value = "群组ID", required = true, dataType = "String")
+    })
+    public Object deleteGroup( @RequestParam("group_id") String group_id) throws IOException {
+        Long sdkAppId = userSigConfig.getSdkAppId();
+        String secretKey = userSigConfig.getSecretKey();
+        String userId = "administrator";
+        ImClient client = new ImClient(sdkAppId, userId, secretKey);
+
+        DestroyGroupRequest request = new DestroyGroupRequest(group_id);
+
+        DestroyGroupResult result = client.group.destroyGroup(request);
+
+        return result;
+    }
+
+    //查询用户加入的群组
+    @GetMapping("/group/joined")
+    @ApiOperation("查询用户加入的群组")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "imid", value = "imid", required = true, dataType = "String")
+    })
+    public Object getJoinedGroup( @RequestParam("imid") String imid) throws IOException {
+        Long sdkAppId = userSigConfig.getSdkAppId();
+        String secretKey = userSigConfig.getSecretKey();
+        String userId = "administrator";
+        ImClient client = new ImClient(sdkAppId, userId, secretKey);
+
+        GetJoinedGroupListRequest request = new GetJoinedGroupListRequest(imid);
+
+        GetJoinGroupListResult result = client.group.getJoinGroupList(request);
 
         return result;
     }
