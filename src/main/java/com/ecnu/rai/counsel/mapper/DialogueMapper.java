@@ -16,6 +16,10 @@ public interface DialogueMapper extends BaseMapper<Dialogue>{
     @Select("SELECT * FROM dialogue WHERE id = #{dialogue_id}")
     Conversation getDialogueById(@Param("dialogue_id") Long dialogue_id);
 
+    //get the last dialogue by supervisor and counselor and status is STARTED
+    @Select("SELECT * FROM dialogue WHERE supervisor = #{supervisor} AND counselor = #{counselor} AND status = 'STARTED' ORDER BY id DESC LIMIT 1")
+    Dialogue getLastDialogue(@Param("supervisor") String supervisor, @Param("counselor") String counselor);
+
     @Select("SELECT * FROM dialogue WHERE counselor = #{counselor} AND supervisor = #{supervisor} AND status = 'FINISHED' ORDER BY id DESC")
     List<Dialogue> findGroupMsgByBoth(String counselor, String supervisor);
 
@@ -69,6 +73,13 @@ public interface DialogueMapper extends BaseMapper<Dialogue>{
             "message = #{dialogue.message}" +
             "WHERE id = #{dialogue.id}")
     void updateDialogue(@Param("dialogue") Dialogue dialogue);
+
+    @Update("UPDATE dialogue SET " +
+            "end_time = #{dialogue.endTime}, " +
+            "status = #{dialogue.status}, " +
+            "message = #{dialogue.message}" +
+            "WHERE id = #{dialogue.id}")
+    void updateDialogueFinish(@Param("dialogue") Dialogue dialogue);
 
     @Select("SELECT * FROM dialogue WHERE supervisor = #{supervisor}")
     List<Dialogue> findBySupervisor(@Param("supervisor") Long supervisor);

@@ -174,24 +174,24 @@ public class IMController {
 
         ObjectMapper objectMapper = new ObjectMapper();
         GroupMsg groupMsg = objectMapper.readValue(response.getBody(), GroupMsg.class);
-//
-//        // 对From_Account进行修改
-//        Iterator<RspMsg> iterator = groupMsg.getRspMsgList().iterator();
-//        while (iterator.hasNext()) {
-//            RspMsg rspMsg = iterator.next();
-//            List<GroupMsgBody> msgBody = rspMsg.getMsgBody();
-//            for (GroupMsgBody body : msgBody) {
-//                if (body.getMsgType().equals("TIMTextElem")) {
-//                    String text = body.getMsgContent().getText();
-//                    System.out.println(text);
-//                } else if (body.getMsgType().equals("TIMRelayElem")) {
-//                    iterator.remove(); // Use iterator to remove the element
-//                }
-//            }
-//            String fromAccount = rspMsg.getFromAccount();
-//            String name = userSigMapper.getNameByImid(fromAccount);
-//            rspMsg.setFromAccount(name);
-//        }
+
+        // 对From_Account进行修改
+        Iterator<RspMsg> iterator = groupMsg.getRspMsgList().iterator();
+        while (iterator.hasNext()) {
+            RspMsg rspMsg = iterator.next();
+            List<GroupMsgBody> msgBody = rspMsg.getMsgBody();
+            for (GroupMsgBody body : msgBody) {
+                if (body.getMsgType().equals("TIMTextElem")) {
+                    String text = body.getMsgContent().getText();
+                    System.out.println(text);
+                } else if (body.getMsgType().equals("TIMRelayElem")) {
+                    iterator.remove(); // Use iterator to remove the element
+                }
+            }
+            String fromAccount = rspMsg.getFromAccount();
+            String name = userSigMapper.getNameByImid(fromAccount);
+            rspMsg.setFromAccount(name);
+        }
         return groupMsg;
     }
 
