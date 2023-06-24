@@ -102,9 +102,9 @@ public class IMController {
 
         CreateGroupRequest request = CreateGroupRequest.builder()
                 .type(GroupType.PUBLIC)
-                .name(counselor_name+ "_" + user_name)
+                .name(counselor_name)
                 .ownerAccount(owner)
-                .groupId(PinyinUtil.convertToPinyin(counselor_name + user_name))
+                .groupId(PinyinUtil.convertToPinyin(counselor_name + "null"))
                 .introduction("心理咨询组")
                 .notification("欢迎开始心理咨询")
                 .faceUrl("https://avatars.githubusercontent.com/u/43716716?s=200&v=4")
@@ -160,7 +160,7 @@ public class IMController {
     }
 
     @GetMapping("/history")
-    @ApiOperation("测试")
+    @ApiOperation("获取群组历史信息")
     public GroupMsg getGroupHistory(@RequestParam("group_id") String group_id) throws Exception {
 //        group_id = "@TGS#2Y2M4MYM6";
 
@@ -290,7 +290,7 @@ public class IMController {
     }
 
     @GetMapping("/group/text")
-    @ApiOperation("发送群聊文本消息")
+    @ApiOperation("发送群聊文本消息(API)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "group_id", value = "群组ID", required = true, dataType = "String"),
             @ApiImplicitParam(name = "imid", value = "imid", required = true, dataType = "String")

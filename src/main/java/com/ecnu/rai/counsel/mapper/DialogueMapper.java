@@ -13,6 +13,11 @@ import java.util.List;
 
 @Repository
 public interface DialogueMapper extends BaseMapper<Dialogue>{
+
+    //get the last dialogue by counselor name and supervisor name
+    @Select("SELECT * FROM dialogue WHERE counselor = #{counselor} AND supervisor = #{supervisor} ORDER BY id DESC LIMIT 1")
+    Dialogue getLastDialogueByCounselorAndSupervisor(@Param("counselor") String counselor, @Param("supervisor") String supervisor);
+
     @Select("SELECT * FROM dialogue WHERE id = #{dialogue_id}")
     Dialogue getDialogueById(@Param("dialogue_id") Long dialogue_id);
 
