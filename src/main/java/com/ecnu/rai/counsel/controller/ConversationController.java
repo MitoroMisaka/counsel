@@ -176,40 +176,40 @@ public class ConversationController {
     @ApiOperation(value = "存储单聊信息(已弃用)", notes = "save the conversation ")
     @ResponseBody
     public Result saveHistory(@Valid @RequestBody IMRequest request) {
-        System.out.println(request);
-        List<Message> messages = request.getMsgList();
-        for (Message message : messages) {
-            if (message.getFromAccount().equals(request.getOperatorAccount())) {
-                message.setFromAccount(request.getOperatorAccountReal());
-                message.setToAccount(request.getPeerAccountReal());
-            } else if (message.getFromAccount().equals(request.getPeerAccount())) {
-                message.setFromAccount(request.getPeerAccountReal());
-                message.setToAccount(request.getOperatorAccountReal());
-            }
-        }
-        //convert message into JSON string
-        String history = JSON.toJSONString(messages);
-        System.out.println(history);
-        Conversation conversation = Conversation.builder()
-                .id(null)
-                .createTime(LocalDateTime.now())
-                .creator(request.getOperatorAccountReal())
-                .lastUpdateTime(LocalDateTime.now())
-                .lastUpdater(request.getOperatorAccountReal())
-                .year(request.getMinTime().toLocalDateTime().getYear())
-                .month(request.getMinTime().toLocalDateTime().getMonth())
-                .day(request.getMinTime().toLocalDateTime().getDayOfMonth())
-                .startTime(request.getMinTime())
-                .endTime(request.getMaxTime())
-                .user(request.getPeerAccountReal())
-                .counselor(request.getOperatorAccountReal())
-                .status("FINISHED")
-                .visitorName(request.getPeerAccountReal())
-                .evaluate(0)
-                .conversationType("C2C")
-                .message(history)
-                .build();
-        conversationMapper.insertConversation(conversation);
+//        System.out.println(request);
+//        List<Message> messages = request.getMsgList();
+//        for (Message message : messages) {
+//            if (message.getFromAccount().equals(request.getOperatorAccount())) {
+//                message.setFromAccount(request.getOperatorAccountReal());
+//                message.setToAccount(request.getPeerAccountReal());
+//            } else if (message.getFromAccount().equals(request.getPeerAccount())) {
+//                message.setFromAccount(request.getPeerAccountReal());
+//                message.setToAccount(request.getOperatorAccountReal());
+//            }
+//        }
+//        //convert message into JSON string
+//        String history = JSON.toJSONString(messages);
+//        System.out.println(history);
+//        Conversation conversation = Conversation.builder()
+//                .id(null)
+//                .createTime(LocalDateTime.now())
+//                .creator(request.getOperatorAccountReal())
+//                .lastUpdateTime(LocalDateTime.now())
+//                .lastUpdater(request.getOperatorAccountReal())
+//                .year(request.getMinTime().toLocalDateTime().getYear())
+//                .month(request.getMinTime().toLocalDateTime().getMonth())
+//                .day(request.getMinTime().toLocalDateTime().getDayOfMonth())
+//                .startTime(request.getMinTime())
+//                .endTime(request.getMaxTime())
+//                .user(request.getPeerAccountReal())
+//                .counselor(request.getOperatorAccountReal())
+//                .status("FINISHED")
+//                .visitorName(request.getPeerAccountReal())
+//                .evaluate(0)
+//                .conversationType("C2C")
+//                .message(history)
+//                .build();
+//        conversationMapper.insertConversation(conversation);
         return Result.success("save and insert conversation ");
     }
 
