@@ -45,8 +45,8 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("SELECT * FROM user")
     List<User> getUserList();
 
-    @Insert("INSERT INTO user (name, username, password, role,state) " +
-        "VALUES (#{user.name}, #{user.username}, #{user.password}, #{user.role}),#{user.state}")
+    @Insert("INSERT INTO user (name, username, password, role, state) " +
+        "VALUES (#{user.name}, #{user.username}, #{user.password}, #{user.role}, #{user.state})")
     void insertUser(@Param("user") User user);
 
     @Options(useGeneratedKeys = true, keyProperty = "id")

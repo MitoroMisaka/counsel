@@ -12,6 +12,7 @@ import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ public class SupervisorController {
     @Autowired
     private SupervisorService supervisorService;
 
+    @RequiresRoles("admin")
     @PostMapping("/add")
     @ApiOperation("添加督导")
     public Result addSupervisor(@RequestBody Supervisor supervisor) {

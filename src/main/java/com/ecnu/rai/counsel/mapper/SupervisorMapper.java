@@ -63,6 +63,6 @@ public interface SupervisorMapper extends BaseMapper<Supervisor> {
             "#{supervisor.department}, #{supervisor.title}, #{supervisor.qualification}, #{supervisor.qualificationCode})")
     void insertSupervisor(@Param("supervisor") Supervisor supervisor);
 
-    @Select("SELECT user FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='supervisor' ORDER BY ${order}")
+    @Select("SELECT user FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='SUPERVISOR' ORDER BY ${order}")
     List<Long> findSupervisorByCurrentTime(@Param("order") String order);
 }

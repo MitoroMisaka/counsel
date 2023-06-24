@@ -36,7 +36,7 @@ public class MyRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 
         //管理员
-        if (role.equals("admin")){
+        if (role.equals("ADMIN")){
             info.addRole("admin");
             info.addRole("online");
             info.addRole("insert");
@@ -46,7 +46,7 @@ public class MyRealm extends AuthorizingRealm {
         }
 
         //普通用户
-        else if (role.equals("visitor")) {
+        else if (role.equals("VISITOR")) {
             info.addRole("visitor");
             info.addRole("online");
         }

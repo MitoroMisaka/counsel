@@ -54,7 +54,7 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     @Select("SELECT day, COUNT(DISTINCT(user)) AS num FROM arrange WHERE " +
             "year = #{year} AND " +
             "month = #{month} AND " +
-            "role = 'counselor' " +
+            "role = 'COUNSELOR' " +
             "GROUP BY day")
     List<DayNum> findCounselorInfoByMonth(@Param("year") Integer year,
                                                         @Param("month") Integer month);
@@ -62,7 +62,7 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
     @Select("SELECT day, COUNT(DISTINCT(user)) AS num FROM arrange WHERE " +
             "year = #{year} AND " +
             "month = #{month} AND " +
-            "role = 'supervisor' " +
+            "role = 'SUPERVISOR' " +
             "GROUP BY day")
     List<DayNum> findSupervisorInfoByMonth(@Param("year") Integer year,
                                                 @Param("month") Integer month);
@@ -71,7 +71,7 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
             "year = #{year} AND " +
             "month = #{month} AND " +
             "day = #{day} AND " +
-            "role = 'counselor' ")
+            "role = 'COUNSELOR' ")
     List<Long> findCounselorIDListByDay(@Param("year") Integer year,
                                                     @Param("month") Integer month,
                                                     @Param("day") Integer day);
@@ -80,15 +80,15 @@ public interface ArrangeMapper extends BaseMapper<Arrange> {
             "year = #{year} AND " +
             "month = #{month} AND " +
             "day = #{day} AND " +
-            "role = 'supervisor' ")
+            "role = 'SUPERVISOR' ")
     List<Long> findSupervisorIDListByDay(@Param("year") Integer year,
                                         @Param("month") Integer month,
                                         @Param("day") Integer day);
 
-    @Select("SELECT user FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='counselor' ORDER BY ${order}")
+    @Select("SELECT user FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='COUNSELOR' ORDER BY ${order}")
     List<Long> findCounselorByCurrentTime(@Param("order") String order);
 
-    @Select("SELECT user FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='supervisor' ORDER BY ${order}")
+    @Select("SELECT user FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='SUPERVISOR' ORDER BY ${order}")
     List<Long> findSupervisorByCurrentTime(@Param("order") String order);
 
     @Select("SELECT day FROM arrange WHERE user = #{user} and year = YEAR(CURRENT_DATE()) and month = MONTH(CURRENT_DATE())")

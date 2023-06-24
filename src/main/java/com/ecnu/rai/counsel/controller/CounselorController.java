@@ -84,7 +84,7 @@ public class CounselorController {
 
         // 权限控制，只有机构管理员 和 该咨询师本人可以获取
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
+        if (!currentUser.getRole().equals("ADMIN")) {
             if (currentUser.getId() != id) {
                 return Result.fail("You have no permission to query this counselor");
             }
@@ -142,7 +142,7 @@ public class CounselorController {
         if(counselor.getUsername()!=null && !counselor.getUsername().matches("^[a-zA-Z0-9_]{2,32}$")){
             return Result.fail("用户名只能是大小写字母数字和下划线组成。 2-32 位");
         }
-        if(counselor.getRole()!=null && !counselor.getRole().equals("counselor")){
+        if(counselor.getRole()!=null && !counselor.getRole().equals("COUNSELOR")){
             return Result.fail("角色必须是COUNSELOR");
         }
         if(counselor.getPhone()!=null && !counselor.getPhone().matches("^1[0-9]{10}$")){

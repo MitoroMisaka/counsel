@@ -107,7 +107,7 @@ public class WXController {
         u.setUsername(request.getUserName());
         u.setEmergentContact(request.getEmergencyContactName());
         u.setEmergentPhone(request.getEmergencyContactPhoneNumber());
-        u.setRole("visitor");
+        u.setRole("VISITOR");
         u.setTitle(request.getTitle());
         u.setDepartment(request.getDepartment());
         u.setGender(request.getGender());
@@ -117,7 +117,7 @@ public class WXController {
         User user = userMapper.findById(id);
         user.setName(request.getRealName());
         user.setUsername(request.getUserName());
-        user.setRole("visitor");
+        user.setRole("VISITOR");
         user.setState(1);
         userMapper.updateUser(user);
         return Result.success("信息修改成功");

@@ -75,7 +75,7 @@ public class ArrangeController {
 
         // 权限控制，机构管理员可以获取所有人的排班信息，咨询师或督导本人只可以获取自己的排班信息
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
+        if (!currentUser.getRole().equals("ADMIN")) {
             if (currentUser.getId() != user) {
                 return Result.fail("You have no permission to query this user");
             }
@@ -93,7 +93,7 @@ public class ArrangeController {
 
         // 权限控制，机构管理员可以获取所有人的排班信息，咨询师或督导本人只可以获取自己的排班信息
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
+        if (!currentUser.getRole().equals("ADMIN")) {
             if (currentUser.getId() != user) {
                 return Result.fail("You have no permission to query this user");
             }

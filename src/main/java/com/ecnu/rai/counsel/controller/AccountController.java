@@ -105,11 +105,11 @@ public class AccountController {
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         info.addRole(principal.getRole());
 
-        if(principal.getRole().equals("counselor"))
+        if(principal.getRole().equals("COUNSELOR"))
         {
             counselorMapper.setStatusOnline(username);
         }
-        else if(principal.getRole().equals("supervisor"))
+        else if(principal.getRole().equals("SUPERVISOR"))
         {
             supervisorMapper.setStatusOnline(username);
         }
@@ -136,10 +136,10 @@ public class AccountController {
         //if user is null return fail
         if(user==null)
             return Result.fail("用户未登录");
-        if(user.getRole().equals("counselor")){
+        if(user.getRole().equals("COUNSELOR")){
             counselorMapper.setStatusOffline(user.getUsername());
         }
-        else if(user.getRole().equals("supervisor"))
+        else if(user.getRole().equals("SUPERVISOR"))
         {
             supervisorMapper.setStatusOffline(user.getUsername());
         }
@@ -215,7 +215,7 @@ public class AccountController {
     public Result getUserInfo(@PathVariable Long id) {
 
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
+        if (!currentUser.getRole().equals("ADMIN")) {
             if (currentUser.getId() != id) {
                 return Result.fail("无权访问");
             }
@@ -250,7 +250,7 @@ public class AccountController {
 
         // 权限控制，只有机构管理员 和 该访客本人可以修改
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
+        if (!currentUser.getRole().equals("ADMIN")) {
             if (currentUser.getId() != id) {
                 return Result.fail("You have no permission to update this counselor");
             }
@@ -299,7 +299,7 @@ public class AccountController {
                 .id(updatedVisitor.getId())
                 .name(updatedVisitor.getName())
                 .username(updatedVisitor.getUsername())
-                .role("visitor")
+                .role("ADMIN")
                 .build();
         User updatedUser = accountService.updateUser(id, user);
         return Result.success("更新访客数据", updatedVisitor);
@@ -354,7 +354,7 @@ public class AccountController {
                 .name(updatedAdmin.getName())
                 .username(updatedAdmin.getUsername())
                 .password(updatedAdmin.getPassword())
-                .role("admin")
+                .role("ADMIN")
                 .build();
         User updatedUser = accountService.updateUser(id, user);
         return Result.success("更新机构管理员信息成功", updatedAdmin);
@@ -417,7 +417,7 @@ public class AccountController {
                 .name(counselor.getName())
                 .username(counselor.getUsername())
                 .password(counselor.getPassword())
-                .role("counselor")
+                .role("COUNSELOR")
                 .state(1)
                 .build();
         // Insert the user
@@ -465,7 +465,7 @@ public class AccountController {
 
         // 权限控制，只有机构管理员 和 该咨询师本人可以修改
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
+        if (!currentUser.getRole().equals("ADMIN")) {
             if (currentUser.getId() != id) {
                 return Result.fail("You have no permission to update this counselor");
             }
@@ -524,7 +524,7 @@ public class AccountController {
                 .name(updatedCounselor.getName())
                 .username(updatedCounselor.getUsername())
                 .password(updatedCounselor.getPassword())
-                .role("counselor")
+                .role("COUNSELOR")
                 .build();
         User updatedUser = accountService.updateUser(id, user);
         return Result.success("更新咨询师信息成功", updatedCounselor);
@@ -556,7 +556,7 @@ public class AccountController {
             return Result.fail("Invalid password");
         }
         //role must be supervisor
-        if(!supervisor.getRole().equals("supervisor")) {
+        if(!supervisor.getRole().equals("SUPERVISOR")) {
             return Result.fail("Invalid role");
         }
 
@@ -590,9 +590,10 @@ public class AccountController {
                 .name(supervisor.getName())
                 .username(supervisor.getUsername())
                 .password(supervisor.getPassword())
-                .role("supervisor")
+                .role("SUPERVISOR")
                 .state(1)
                 .build();
+        System.out.println(user);
 
         // Insert the user
         // Check if the phone number is used by another counselor
@@ -632,7 +633,7 @@ public class AccountController {
 
         // 权限控制，只有机构管理员 和 该咨询师本人可以修改
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
+        if (!currentUser.getRole().equals("ADMIN")) {
             if (currentUser.getId() != id) {
                 return Result.fail("You have no permission to update this supervisor");
             }
@@ -654,7 +655,7 @@ public class AccountController {
             return Result.fail("Invalid username.");
         }
         //role must be supervisor
-        if(!supervisor.getRole().equals("supervisor")) {
+        if(!supervisor.getRole().equals("SUPERVISOR")) {
             return Result.fail("Invalid role.");
         }
 
@@ -679,7 +680,7 @@ public class AccountController {
                 .name(updatedSupervisor.getName())
                 .username(updatedSupervisor.getUsername())
                 .password(updatedSupervisor.getPassword())
-                .role("supervisor")
+                .role("SUPERVISOR")
                 .build();
         User updatedUser = accountService.updateUser(id, user);
         return Result.success("更新督导信息成功", updatedSupervisor);
@@ -698,7 +699,7 @@ public class AccountController {
             User user = userMapper.selectById(id);
             if (user == null)
                 continue;
-            if(Objects.equals(user.getRole(), "admin"))
+            if(Objects.equals(user.getRole(), "ADMIN"))
                 continue;
             user.setState(0);
             userMapper.updateState(user);
@@ -731,14 +732,14 @@ public class AccountController {
     public Result makeSuperviseByCounselor(@PathVariable Long id,
                                           @Valid @RequestBody List<Long> supervisorsId)
     {
-        if(!Objects.equals(userMapper.findRoleById(id), "counselor"))
+        if(!Objects.equals(userMapper.findRoleById(id), "COUNSELOR"))
             return Result.fail("Unauthorized.");
         if(supervisorsId.isEmpty())
             return Result.fail("No supervisors to bind.");
         superviseMapper.deleteCounselorSupervise(id);
         for(Long supervisorid : supervisorsId)
         {
-            if(superviseMapper.findSupervise(id,supervisorid)==1||!Objects.equals(userMapper.findRoleById(supervisorid), "supervisor"))
+            if(superviseMapper.findSupervise(id,supervisorid)==1||!Objects.equals(userMapper.findRoleById(supervisorid), "SUPERVISOR"))
                 continue;
             superviseMapper.makeSupervise(id,supervisorid);
         }
@@ -753,13 +754,13 @@ public class AccountController {
     public Result makeSuperviseBySupervisor(@PathVariable Long id,
                                            @Valid @RequestBody List<Long> counselorsId)
     {
-        if(!Objects.equals(userMapper.findRoleById(id), "supervisor"))
+        if(!Objects.equals(userMapper.findRoleById(id), "SUPERVISOR"))
             return Result.fail("Unauthorized.");
         if(counselorsId.isEmpty())
             return Result.fail("No counselors to bind.");
         superviseMapper.deleteSupervisorSupervise(id);
         for(Long counselorid:counselorsId){
-            if(superviseMapper.findSupervise(counselorid,id)==1|| !Objects.equals(userMapper.findRoleById(counselorid), "counselor"))
+            if(superviseMapper.findSupervise(counselorid,id)==1|| !Objects.equals(userMapper.findRoleById(counselorid), "COUNSELOR"))
                 continue;
             superviseMapper.makeSupervise(counselorid,id);
         }
@@ -775,7 +776,7 @@ public class AccountController {
         if(userId.isEmpty())
             return Result.fail("No user to delete.");
         for(Long userid:userId){
-            if(!Objects.equals(userMapper.findRoleById(userid), "admin"))
+            if(!Objects.equals(userMapper.findRoleById(userid), "ADMIN"))
                 continue;
             userMapper.deleteById(userid);
         }
