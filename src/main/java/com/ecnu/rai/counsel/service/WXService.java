@@ -15,7 +15,6 @@ public interface WXService {
     Long findIdByopenid(String openid);
     boolean visitorState(String openid);
     User finduserByopenid(String openid);
-
     List<VisitorSMInfo> getAllVisitor();
 //    List<HashMap<String,Object>> findAvaliableCounselorInfo(LocalDateTime localDateTime);
 }

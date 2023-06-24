@@ -160,6 +160,7 @@ public class AccountController {
         return Result.success("获取用户列表成功", accountService.findUserList(page, size, order));
     }
 
+    @RequiresRoles("admin")
     @GetMapping("/counselors")
     @ApiOperation("获取咨询师列表")
     @ApiImplicitParams({
@@ -172,7 +173,7 @@ public class AccountController {
                                                   @RequestParam("order") String order) {
         return Result.success("获取咨询师列表成功", accountService.findCounselorList(page, size, order));
     }
-
+    @RequiresRoles("admin")
     @GetMapping("/supervisors")
     @ApiOperation("获取督导列表")
     @ApiImplicitParams({
@@ -185,6 +186,7 @@ public class AccountController {
                                                     @RequestParam("order") String order) {
         return Result.success("获取督导列表成功", accountService.findSupervisorList(page, size, order));
     }
+    @RequiresRoles("admin")
     @GetMapping("/visitors")
     @ApiOperation("获取访客列表")
     @ApiImplicitParams({
@@ -200,9 +202,8 @@ public class AccountController {
 
 
 
-
-    //获取用户信息
     @GetMapping("/{id}")
+    @ApiOperation("获取用户信息")
     public Result getUserInfo(@PathVariable Long id) {
 
 //        User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
@@ -291,14 +292,14 @@ public class AccountController {
                 .name(updatedVisitor.getName())
                 .username(updatedVisitor.getUsername())
                 .role("visitor")
-                .state(1)
                 .build();
         User updatedUser = accountService.updateUser(id, user);
         return Result.success("更新访客数据", updatedVisitor);
     }
 
-    // update Admin
+
     @RequiresRoles("admin")
+    @ApiOperation("更新管理员")
     @PutMapping("/admin/{id}")
     public Result updateAdmin(
             @PathVariable Long id,
@@ -353,6 +354,7 @@ public class AccountController {
 
     // insert Counselor
     @RequiresRoles("admin")
+    @ApiOperation("新增咨询师")
     @PostMapping("/counselor")
     public Result insertCounselor(@Valid @RequestBody Counselor counselor) {
         // Check if all required fields are filled
@@ -408,6 +410,7 @@ public class AccountController {
                 .username(counselor.getUsername())
                 .password(counselor.getPassword())
                 .role("counselor")
+                .state(1)
                 .build();
         // Insert the user
         //if the username is used by another user
@@ -446,6 +449,7 @@ public class AccountController {
 
     // update Counselor
     @PutMapping("/counselor/{id}")
+    @ApiOperation("修改咨询师")
     public Result updateCounselor(
         @PathVariable Long id,
         @Valid @RequestBody Counselor counselor
@@ -521,6 +525,7 @@ public class AccountController {
 
     // insert Supervisor
     @RequiresRoles("admin")
+    @ApiOperation("新增督导")
     @PostMapping("/supervisor")
     public Result insertSupervisor(@Valid @RequestBody Supervisor supervisor) {
         // Check if all required fields are filled
@@ -611,6 +616,7 @@ public class AccountController {
 
     // update Supervisor
     @PutMapping("/supervisor/{id}")
+    @ApiOperation("更新督导")
     public Result updateSupervisor(
             @PathVariable Long id,
             @Valid @RequestBody Supervisor supervisor
@@ -670,8 +676,10 @@ public class AccountController {
         User updatedUser = accountService.updateUser(id, user);
         return Result.success("更新督导信息成功", updatedSupervisor);
     }
-//禁用用户
+
+
     @RequiresRoles("admin")
+    @ApiOperation("禁用用户")
     @PostMapping("/banUser")
     public Result banUser(@Valid @RequestBody List<Long> ids)
     {
@@ -685,13 +693,14 @@ public class AccountController {
             if(Objects.equals(user.getRole(), "admin"))
                 continue;
             user.setState(0);
-            userMapper.updateUser(user);
+            userMapper.updateState(user);
         }
         return Result.success("Ban users successfully.");
     }
 
-    //启用用户
+
     @RequiresRoles("admin")
+    @ApiOperation("启用用户")
     @PostMapping("/enableUser")
     public Result enableUser(@Valid @RequestBody List<Long> ids)
     {
@@ -702,12 +711,12 @@ public class AccountController {
             if (user == null)
                 continue;
             user.setState(1);
-            userMapper.updateUser(user);
+            userMapper.updateState(user);
         }
         return Result.success("Enable users successfully.");
     }
 
-    //咨询师页面绑定
+
     @RequiresRoles("admin")
     @ApiOperation("咨询师视角绑定")
     @PostMapping("/counselor/binding/{id}")
@@ -729,7 +738,7 @@ public class AccountController {
         return Result.success("Bind successfully!");
     }
 
-    //督导页面绑定
+
     @RequiresRoles("admin")
     @ApiOperation("督导视角绑定")
     @PostMapping("/supervisor/binding/{id}")
@@ -751,6 +760,7 @@ public class AccountController {
     }
 
     @RequiresRoles("admin")
+    @ApiOperation("删号")
     @GetMapping("/delete")
     public Result delUser(@Valid @RequestBody List<Long> userId)
     {
@@ -768,7 +778,6 @@ public class AccountController {
     @GetMapping("getBasicStatInfo")
     @ApiOperation("获取基本咨询统计数据")
     public Result getBasicStatInfo() {
-
         return Result.success("获取成功", accountService.getBasicStatInfo());
     }
 
