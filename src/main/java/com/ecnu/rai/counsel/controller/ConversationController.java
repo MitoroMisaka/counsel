@@ -62,6 +62,18 @@ public class ConversationController {
     @Autowired
     private UserSigMapper userSigMapper;
 
+    //获取是否结束
+    @GetMapping("/isEnd")
+    @ApiOperation("获取是否结束")
+    public Result isEnd(@RequestParam("id") Long id) {
+        Conversation conversation = conversationService.findConversationByID(id);
+        if (conversation.getStatus().equals("ENDED")) {
+            return Result.success("已结束", true);
+        } else {
+            return Result.success("未结束", false);
+        }
+    }
+
     @GetMapping("/id")
     @ApiOperation("根据ID获取会话信息")
     public Result getConversationbyID(@RequestParam("id") Long id) {
@@ -72,10 +84,14 @@ public class ConversationController {
     @PostMapping("/start")
     @ApiOperation("开始会话(就是建个表,给出咨询师和用户的姓名就行)")
     public Result insertConversation(@Valid @RequestBody Conversation conversation) throws IOException {
-        Integer maxConsult = conversationMapper.getMaxConsult(conversation.getCounselor());
-        if(maxConsult.equals(conversationMapper.getConsultNum(conversation.getCounselor()))){
-            Result.fail("咨询师咨询次数已达上限");
-        }
+        String counselor_id = userMapper.findNameById(conversation.getCounselor());
+        String user_id = userMapper.findNameById(conversation.getUser());
+        conversation.setCounselor(counselor_id);
+        conversation.setUser(user_id);
+//        Integer maxConsult = conversationMapper.getMaxConsult(conversation.getCounselor());
+//        if(maxConsult.equals(conversationMapper.getConsultNum(conversation.getCounselor()))){
+//            Result.fail("咨询师咨询次数已达上限");
+//        }
         conversation.setStatus("STARTED");
         conversation.setYear(LocalDateTime.now().getYear());
         conversation.setMonth(LocalDateTime.now().getMonth());
