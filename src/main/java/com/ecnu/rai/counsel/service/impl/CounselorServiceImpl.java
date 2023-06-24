@@ -3,21 +3,15 @@ package com.ecnu.rai.counsel.service.impl;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ecnu.rai.counsel.common.Page;
-import com.ecnu.rai.counsel.dao.CounselorMonthlyStar;
-import com.ecnu.rai.counsel.dao.CounselorMonthlyWork;
-import com.ecnu.rai.counsel.dao.CounselorSMInfo;
+import com.ecnu.rai.counsel.dao.*;
 import com.ecnu.rai.counsel.entity.Counselor;
 import com.ecnu.rai.counsel.entity.Supervise;
 import com.ecnu.rai.counsel.entity.Supervisor;
-import com.ecnu.rai.counsel.dao.AvailableCounselor;
 import com.ecnu.rai.counsel.entity.*;
 import com.ecnu.rai.counsel.mapper.*;
-import com.ecnu.rai.counsel.response.ConsultInfo;
-import com.ecnu.rai.counsel.service.ConversationService;
 import com.ecnu.rai.counsel.service.CounselorService;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -76,6 +70,30 @@ public class CounselorServiceImpl implements CounselorService {
     }
 
     @Override
+    public
+    List<CounselorBasicInfo> getFreeCounselorList() {
+        List<Long> freeCounselorIdList = arrangeMapper.findFreeCounselor();
+        List<CounselorBasicInfo> counselorList = new ArrayList<>();
+        for (Long freeCounselorId : freeCounselorIdList) {
+            CounselorBasicInfo counselor = new CounselorBasicInfo(counselorMapper.findById(freeCounselorId));
+            counselorList.add(counselor);
+        }
+        return counselorList;
+    }
+
+    @Override
+    public
+    List<CounselorBasicInfo> getWorkingCounselorList() {
+        List<Long> workingCounselorIdList = arrangeMapper.findWorkingCounselor();
+        List<CounselorBasicInfo> counselorList = new ArrayList<>();
+        for (Long freeCounselorId : workingCounselorIdList) {
+            CounselorBasicInfo counselor = new CounselorBasicInfo(counselorMapper.findById(freeCounselorId));
+            counselorList.add(counselor);
+        }
+        return counselorList;
+    }
+
+    @Override
     public List<CounselorMonthlyWork> getCounselorRankingByWork(Integer len) {
         List<CounselorMonthlyWork> list = counselorMapper.findCounselorRankingByWork(len);
         for (CounselorMonthlyWork item : list) {
@@ -91,6 +109,7 @@ public class CounselorServiceImpl implements CounselorService {
         List<CounselorMonthlyStar> list = counselorMapper.findCounselorRankingByComments(len);
         for (CounselorMonthlyStar item : list) {
             item.setName(counselorMapper.findById(item.getCounselorId()).getName());
+            item.setAvatar(counselorMapper.findById(item.getCounselorId()).getAvatar());
             item.setUsername(counselorMapper.findById(item.getCounselorId()).getUsername());
         }
         return list;
@@ -108,10 +127,9 @@ public class CounselorServiceImpl implements CounselorService {
 
     @Override
     public Page<AvailableCounselor> getAvailableCounselor(Integer page, Integer size, String order, String token ) {
-        List<Long> availableCounselorIdList = arrangeMapper.findCounselorByCurrentTime();
+        List<Long> availableCounselorIdList = arrangeMapper.findCounselorByCurrentTime(order);
         List<AvailableCounselor> counselorList = new ArrayList<>();
 
-        PageHelper.startPage(page, size, order);
         for (Long availableCounselorId : availableCounselorIdList) {
             Counselor counselor = counselorMapper.findById(availableCounselorId);
             AvailableCounselor availableCounselor = new AvailableCounselor(counselor);
@@ -127,7 +145,7 @@ public class CounselorServiceImpl implements CounselorService {
             User user = userMapper.findById(visitor.getId());
             String counselor_id = String.valueOf(userMapper.findIdByName(counselor.getName()));
             String user_id = String.valueOf(userMapper.findIdByName(user.getName()));
-            List<Conversation> conversations = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id);
+            List<Conversation> conversations = conversationMapper.findGroupMsgByCounselorUser(counselor_id, user_id, "id asc");
             if(conversations.size() > 0){
                 availableCounselor.setConsulted("已咨询");
             }else {
@@ -140,12 +158,12 @@ public class CounselorServiceImpl implements CounselorService {
                 counselorList.add(availableCounselor);
             }
         }
-        return new Page<>(new PageInfo<>(counselorList));
+        return new Page(counselorList, page, size);
     }
 
     @Override
-    public List<CounselorSMInfo> getAllCounselor() {
-        List<Counselor> counselors = counselorMapper.findAllCounselors();
+    public Page<CounselorSMInfo> getAllCounselor(Integer page, Integer size, String order) {
+        List<Counselor> counselors = counselorMapper.findAllCounselors(order);
         List<CounselorSMInfo> counselorSMInfos = new ArrayList<>();
         for(Counselor counselor:counselors)
         {
@@ -172,9 +190,7 @@ public class CounselorServiceImpl implements CounselorService {
             }
             counselorSMInfos.add(counselorSMInfo);
         }
-
-
-        return counselorSMInfos;
+        return new Page(counselorSMInfos, page, size);
     }
 
 
@@ -182,8 +198,10 @@ public class CounselorServiceImpl implements CounselorService {
     @Override
     public Page<HashMap<String, String>> getAvailableCounselorByBusy(Integer page, Integer size, String order) {
         List<HashMap<String, String>> CounselorBusy= new ArrayList<>();
-        PageHelper.startPage(page, size, order);
-        List<Counselor> counselors = counselorMapper.findAllCounselorsOnline();
+
+        List<Counselor> counselors = counselorMapper.findAllCounselorsOnline(order);
+
+        System.out.println(counselors);
         for(Counselor counselor:counselors)
         {
             Integer currentConsult = conversationMapper.getConsultNum(counselor.getName());
@@ -199,7 +217,7 @@ public class CounselorServiceImpl implements CounselorService {
                 CounselorBusy.add(h);
             }
         }
-        return new Page<>(new PageInfo<>(CounselorBusy));
+        return new Page(CounselorBusy, page, size);
     }
 
     @Override

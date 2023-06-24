@@ -10,6 +10,7 @@ import com.ecnu.rai.counsel.service.CounselorService;
 import com.ecnu.rai.counsel.service.SupervisorService;
 import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
@@ -28,14 +29,6 @@ public class CounselorController {
     @Autowired
     private UserMapper userMapper;
 
-    @Autowired
-    private CounselorMapper counselorMapper;
-
-    @Autowired
-    private ConversationMapper conversationMapper;
-
-    @Autowired
-    private SupervisorService supervisorService;
 
     @PostMapping("/add")
     @ApiOperation("添加咨询师(弃用，参考AccountController里面接口)")
@@ -55,8 +48,8 @@ public class CounselorController {
         if(counselor.getUsername()!=null && !counselor.getUsername().matches("^[a-zA-Z0-9_]{2,32}$")){
             return Result.fail("用户名只能是大小写字母数字和下划线组成。 2-32 位");
         }
-        if(counselor.getRole()!=null && !counselor.getRole().equals("counselor")){
-            return Result.fail("角色必须是counselor");
+        if(counselor.getRole()!=null && !counselor.getRole().equals("COUNSELOR")){
+            return Result.fail("角色必须是COUNSELOR");
         }
         if(counselor.getPhone()!=null && !counselor.getPhone().matches("^[0-9]{11}$")){
             return Result.fail("电话号码必须是11位");
@@ -91,7 +84,7 @@ public class CounselorController {
 
         // 权限控制，只有机构管理员 和 该咨询师本人可以获取
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
+        if (!currentUser.getRole().equals("ADMIN")) {
             if (currentUser.getId() != id) {
                 return Result.fail("You have no permission to query this counselor");
             }
@@ -99,6 +92,18 @@ public class CounselorController {
 
         Counselor counselor = counselorService.findCounselorByID(id);
         return Result.success("获取成功", counselor);
+    }
+
+    @GetMapping("/getFreeCounselorList")
+    @ApiOperation("获取当天空闲督导列表")
+    public Result getFreeCounselorList() {
+        return Result.success("获取可用督导列表成功", counselorService.getFreeCounselorList());
+    }
+
+    @GetMapping("/getWorkingCounselorList")
+    @ApiOperation("获取当天有排版督导列表")
+    public Result getWorkingCounselorList() {
+        return Result.success("获取可用督导列表成功", counselorService.getWorkingCounselorList());
     }
 
     @RequiresRoles("admin")
@@ -137,8 +142,8 @@ public class CounselorController {
         if(counselor.getUsername()!=null && !counselor.getUsername().matches("^[a-zA-Z0-9_]{2,32}$")){
             return Result.fail("用户名只能是大小写字母数字和下划线组成。 2-32 位");
         }
-        if(counselor.getRole()!=null && !counselor.getRole().equals("counselor")){
-            return Result.fail("角色必须是counselor");
+        if(counselor.getRole()!=null && !counselor.getRole().equals("COUNSELOR")){
+            return Result.fail("角色必须是COUNSELOR");
         }
         if(counselor.getPhone()!=null && !counselor.getPhone().matches("^1[0-9]{10}$")){
             return Result.fail("电话号码必须是11位");
@@ -164,7 +169,7 @@ public class CounselorController {
     public Result getCounselorList(@RequestParam("page") Integer page,
                                    @RequestParam("size") Integer size,
                                    @RequestParam("order") String order) {
-        return Result.success("获取成功", counselorService.getCounselorList(page, size, order));
+        return Result.success("获取咨询师列表成功", counselorService.getCounselorList(page, size, order));
     }
 
     @GetMapping("getAvailableCounselor")
@@ -178,12 +183,16 @@ public class CounselorController {
 
     @GetMapping("getCounselorByBusy")
     @ApiOperation("获取咨询师及其繁忙状态")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+    })
     public Result getCounselorByBusy(@RequestParam("page") Integer page,
                                         @RequestParam("size") Integer size,
                                         @RequestParam("order") String order) {
 
-
-        return Result.success("获取成功",counselorService.getAvailableCounselorByBusy(page, size, order));
+        return Result.success("获取成功", counselorService.getAvailableCounselorByBusy(page, size, order));
     }
 
     @GetMapping("getBasicStatInfoByCounselor")
@@ -205,13 +214,4 @@ public class CounselorController {
         return Result.success("获取成功",counselorService.getNumByHours());
     }
 
-    @GetMapping("getSupervisorByBusy")
-    @ApiOperation("获取督导及其繁忙状态")
-    public Result getSupervisorByBusy(@RequestParam("page") Integer page,
-                                      @RequestParam("size") Integer size,
-                                      @RequestParam("order") String order) {
-
-
-        return Result.success("获取成功",supervisorService.getAvailableSupervisorByBusy(page, size, order));
-    }
 }

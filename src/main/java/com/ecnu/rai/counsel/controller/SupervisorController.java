@@ -12,6 +12,7 @@ import com.ecnu.rai.counsel.util.PasswordUtil;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ public class SupervisorController {
     @Autowired
     private SupervisorService supervisorService;
 
+    @RequiresRoles("admin")
     @PostMapping("/add")
     @ApiOperation("添加督导")
     public Result addSupervisor(@RequestBody Supervisor supervisor) {
@@ -42,8 +44,8 @@ public class SupervisorController {
         //本系统的角色分为admin, visitor , counselor 和 supervisor.
         //其中admin是系统管理员，visitor是访客，counselor是咨询师，supervisor是督导。
         //角色必须是supervisor
-        if (!supervisor.getRole().equals("supervisor")) {
-            return Result.fail("角色必须是supervisor");
+        if (!supervisor.getRole().equals("SUPERVISOR")) {
+            return Result.fail("角色必须是SUPERVISOR");
         }
         //电话号码必须是11位
         if (!supervisor.getPhone().matches("^\\d{11}$")) {
@@ -66,7 +68,7 @@ public class SupervisorController {
         user.setName(supervisor.getName());
         user.setUsername(supervisor.getUsername());
         user.setPassword(supervisor.getPassword());
-        user.setRole("supervisor");
+        user.setRole("SUPERVISOR");
         userMapper.insertUser(user);
         Long id = userMapper.findByUsername(supervisor.getUsername()).getId();
         supervisor.setId(id);
@@ -83,23 +85,35 @@ public class SupervisorController {
 
     @GetMapping("/list")
     @ApiOperation("获取督导列表")
-    public Page<Supervisor> getSupervisorList(
+    public Result getSupervisorList(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
-            @RequestParam(value = "order", defaultValue = "id_asc") String order
+            @RequestParam(value = "order", defaultValue = "id asc") String order
     ) {
-        return supervisorService.getSupervisorList(page, size, order);
+        return Result.success("获取督导列表成功", supervisorService.getSupervisorList(page, size, order));
     }
 
     @GetMapping("/available")
-    @ApiOperation("获取可用督导列表")
-    public Page<AvailableSupervisor> getAvailableSupervisorList(
+    @ApiOperation("获取可请求的督导列表")
+    public Result getAvailableSupervisorList(
             @RequestParam(value = "counselorId") Long counselorId,
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "20") Integer size,
             @RequestParam(value = "order", defaultValue = "id_asc") String order
     ) {
-        return supervisorService.getAvailableSupervisorList(counselorId, page, size, order);
+        return Result.success("获取可用督导列表成功", supervisorService.getAvailableSupervisorList(counselorId, page, size, order));
+    }
+
+    @GetMapping("/getFreeSupervisorList")
+    @ApiOperation("获取当天空闲督导列表")
+    public Result getFreeSupervisorList() {
+        return Result.success("获取可用督导列表成功", supervisorService.getFreeSupervisorList());
+    }
+
+    @GetMapping("/getWorkingSupervisorList")
+    @ApiOperation("获取当天有排版督导列表")
+    public Result getWorkingSupervisorList() {
+        return Result.success("获取可用督导列表成功", supervisorService.getWorkingSupervisorList());
     }
 
     @PostMapping("/update")
@@ -117,8 +131,8 @@ public class SupervisorController {
         //本系统的角色分为admin, visitor , counselor 和 supervisor.
         //其中admin是系统管理员，visitor是访客，counselor是咨询师，supervisor是督导。
         //角色必须是supervisor
-        if (!supervisor.getRole().equals("supervisor")) {
-            return Result.fail("角色必须是supervisor");
+        if (!supervisor.getRole().equals("SUPERVISOR")) {
+            return Result.fail("角色必须是SUPERVISOR");
         }
         //电话号码必须是11位
         if (!supervisor.getPhone().matches("^\\d{11}$")) {
@@ -143,24 +157,24 @@ public class SupervisorController {
         user.setName(supervisor.getName());
         user.setUsername(supervisor.getUsername());
         user.setPassword(supervisor.getPassword());
-        user.setRole("supervisor");
+        user.setRole("SUPERVISOR");
         userMapper.updateUser(user);
         return Result.success("更新成功");
     }
 
-    @GetMapping("/getCounselors")
+    @GetMapping("/getSupervisedCounselors")
     @ApiOperation("获取督导所管理的咨询师")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "督导id", required = true, dataType = "Long"),
-            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer"),
-            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String")
+            @ApiImplicitParam(name = "supervisorId", value = "督导id", required = true, dataType = "Long", example = "2"),
+            @ApiImplicitParam(name = "page", value = "页码", required = true, dataType = "Integer", example = "1"),
+            @ApiImplicitParam(name = "size", value = "每页数量", required = true, dataType = "Integer", example = "2"),
+            @ApiImplicitParam(name = "order", value = "排序", required = true, dataType = "String", example = "supervisor_id asc")
     })
-    public Page<Counselor> getAvailableCounselor(@RequestParam("id") Long id,
+    public Page<Counselor> getSupervisedCounselors(@RequestParam("supervisorId") Long supervisorId,
                                                  @RequestParam("page") Integer page,
                                                  @RequestParam("size") Integer size,
                                                  @RequestParam("order") String order) {
-        return supervisorService.getAvailableCounselor(id, page, size, order);
+        return supervisorService.getAvailableCounselor(supervisorId, page, size, order);
     }
 
     @GetMapping("/addCounselor")
@@ -178,10 +192,10 @@ public class SupervisorController {
 
     @GetMapping("getAvailableSupervisor")
     @ApiOperation("获取可用咨询师,目前只能根据排班判断，无法根据繁忙程度判断")
-    public Page<Supervisor> getAvailableCounselor(@RequestParam("page") Integer page,
+    public Result getAvailableCounselor(@RequestParam("page") Integer page,
                                                   @RequestParam("size") Integer size,
                                                   @RequestParam("order") String order) {
-        return supervisorService.getAvailableSupervisor(page, size, order);
+        return Result.success("获取可用咨询师成功", supervisorService.getAvailableSupervisor(page, size, order));
     }
 
     @GetMapping("getBasicStatInfoBySupervisor")
@@ -189,6 +203,15 @@ public class SupervisorController {
     public Result getBasicStatInfoBySupervisor(@RequestParam("supervisorId") Long supervisorId) {
 
         return Result.success("获取成功",supervisorService.getBasicStatInfoBySupervisor(supervisorId));
+    }
+
+    @GetMapping("getSupervisorByBusy")
+    @ApiOperation("获取督导及其繁忙状态")
+    public Result getSupervisorByBusy(@RequestParam("page") Integer page,
+                                      @RequestParam("size") Integer size,
+                                      @RequestParam("order") String order) {
+
+        return Result.success("获取成功",supervisorService.getAvailableSupervisorByBusy(page, size, order));
     }
 
 }

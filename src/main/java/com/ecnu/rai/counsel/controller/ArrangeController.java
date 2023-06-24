@@ -36,6 +36,18 @@ public class ArrangeController {
     //添加接口的信息,id, creator,updater,updateTime,createTime,year,month,day可以不用给出
     @ApiOperation("添加排班信息,给出startTime endTime user role weekday 即可")
     public Result addArrange(@RequestBody Arrange arrange){
+        Integer year = LocalDateTime.now().getYear();
+        Integer month = LocalDateTime.now().getMonthValue();
+        Integer day = LocalDateTime.now().getDayOfMonth();
+
+        List<CounselorBasicInfo> workingCounselorToday = arrangeService.findCounselorListByDay(year, month, day);
+
+        for (CounselorBasicInfo counselor : workingCounselorToday) {
+            if (counselor.getId().equals(arrange.getUser())) {
+                return Result.fail("该员工今天已经有排班了");
+            }
+        }
+
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
         arrange.setCreator(currentUser.getId());
         arrange.setLastUpdater(currentUser.getId());
@@ -63,7 +75,7 @@ public class ArrangeController {
 
         // 权限控制，机构管理员可以获取所有人的排班信息，咨询师或督导本人只可以获取自己的排班信息
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
+        if (!currentUser.getRole().equals("ADMIN")) {
             if (currentUser.getId() != user) {
                 return Result.fail("You have no permission to query this user");
             }
@@ -81,7 +93,7 @@ public class ArrangeController {
 
         // 权限控制，机构管理员可以获取所有人的排班信息，咨询师或督导本人只可以获取自己的排班信息
         User currentUser = (User) SecurityUtils.getSubject().getPrincipal();
-        if (!currentUser.getRole().equals("admin")) {
+        if (!currentUser.getRole().equals("ADMIN")) {
             if (currentUser.getId() != user) {
                 return Result.fail("You have no permission to query this user");
             }

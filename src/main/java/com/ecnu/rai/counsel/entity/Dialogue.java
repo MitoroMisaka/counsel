@@ -53,9 +53,13 @@ public class Dialogue {
     @ApiModelProperty(value = "日")
     private Integer day;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @ApiModelProperty(value = "开始时间")
     private Timestamp startTime;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @ApiModelProperty(value = "结束时间")
     private Timestamp endTime;
 
@@ -64,6 +68,7 @@ public class Dialogue {
 
     @ApiModelProperty(value = "咨询督导姓名")
     private String  supervisor;
+
     @ApiModelProperty(value = "状态")
     private String status;
 

@@ -15,8 +15,13 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     @Select("SELECT * FROM conversation WHERE id = #{conversation_id}")
     Conversation getConversationById(@Param("conversation_id") Long conversation_id);
 
-    @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND user = #{user} AND status = 'FINISHED' ORDER BY id DESC")
-    List<Conversation> findGroupMsgByCounselorUser(String counselor, String user);
+    @Select("SELECT * FROM conversation ORDER BY ${order}")
+    List<Conversation> getAllConversation(@Param("order") String order);
+
+    @Select("SELECT * FROM conversation WHERE counselor = #{counselor} AND user = #{user} AND status = 'FINISHED' ORDER BY ${order}")
+    List<Conversation> findGroupMsgByCounselorUser(@Param("counselor") String counselor,
+                                                   @Param("user") String user,
+                                                   @Param("order") String order);
 
     //find the last conversation id by counselor and user and status is STARTED
     @Select("SELECT id FROM conversation WHERE counselor = #{counselor} AND user = #{user} AND status = 'STARTED' ORDER BY id DESC LIMIT 1")
@@ -94,10 +99,12 @@ public interface ConversationMapper extends BaseMapper<Conversation> {
     void updateConversationCounselor(@Param("conversation") Conversation conversation);
 
     @Select("SELECT * FROM conversation WHERE user = #{user}")
-    List<Conversation> findByUser(@Param("user") Long user);
+    List<Conversation> findByUser(@Param("user") Long user,
+                                  @Param("order") String order);
 
-    @Select("SELECT * FROM conversation WHERE counselor = #{counselor}")
-    List<Conversation> findByCounselor(@Param("counselor") Long counselor);
+    @Select("SELECT * FROM conversation WHERE counselor = #{counselor} ORDER BY ${order}")
+    List<Conversation> findByCounselor(@Param("counselor") Long counselor,
+                                       @Param("order") String order);
 
     @Select("SELECT * FROM conversation WHERE " +
             "counselor = #{counselor} AND " +

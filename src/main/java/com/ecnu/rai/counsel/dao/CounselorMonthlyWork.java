@@ -36,7 +36,7 @@ public class CounselorMonthlyWork {
     @Size(min = 3, max = 20, message = "用户名长度必须在3到20个字符之间")
     private String username;
 
-    @ApiModelProperty(value = "头像", example = "https://xsgames.co/randomusers/avatar.php?g=pixel&key=${index}")
+    @ApiModelProperty(value = "头像", example = "https://gravatar.com/avatar/7e7c7e484eabe8cddace1a593be4fada?s=400&d=robohash&r=x")
     private String avatar;
 
     // finishedconsults

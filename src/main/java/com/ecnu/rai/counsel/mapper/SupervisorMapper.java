@@ -28,8 +28,11 @@ public interface SupervisorMapper extends BaseMapper<Supervisor> {
     @Update("UPDATE supervisor SET status = 'OFFLINE' WHERE username = #{username}")
     void setStatusOffline(@Param("username") String username);
 
-    @Select("SELECT * FROM supervisor")
-    List<Supervisor> getAll();
+    @Select("SELECT * FROM supervisor ORDER BY ${order}")
+    List<Supervisor> getAll(@Param("order") String order);
+
+    @Select("SELECT * FROM supervisor where status ='ONLINE' ORDER BY ${order}")
+    List<Supervisor> findAllSupervisorsOnline(@Param("order") String order);
 
     @Select("SELECT * FROM supervise WHERE counselor_id = #{id}")
     List<Supervise> findSupervisors(@Param("id") Long id);
@@ -60,6 +63,6 @@ public interface SupervisorMapper extends BaseMapper<Supervisor> {
             "#{supervisor.department}, #{supervisor.title}, #{supervisor.qualification}, #{supervisor.qualificationCode})")
     void insertSupervisor(@Param("supervisor") Supervisor supervisor);
 
-    @Select("SELECT DISTINCT(user) FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='supervisor'")
-    List<Long> findSupervisorByCurrentTime();
+    @Select("SELECT user FROM arrange WHERE NOW()>start_time AND NOW()<end_time AND role='SUPERVISOR' ORDER BY ${order}")
+    List<Long> findSupervisorByCurrentTime(@Param("order") String order);
 }
